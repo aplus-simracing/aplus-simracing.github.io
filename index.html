@@ -1868,7 +1868,7 @@ function realBlocked(mail){app.innerHTML='<div class="login"><div class="flag" a
 function realAfter(s){var mail=String((s&&s.user&&s.user.email)||'').toLowerCase();L.mail=mail;realMsg('Deine Daten werden geladen …');
   SB.from('freigabe').select('fahrer,name,rolle').then(function(r){if(r.error)throw r.error;var rows=r.data||[];if(!rows.length){realBlocked(mail);return;}
     REALROLE=rows.some(function(x){return x.rolle==='betreiber';});
-    return SB.storage.from('daten').download('data.json').then(function(d){if(d.error)throw d.error;return d.data.text();}).then(function(txt){prepData(JSON.parse(txt));
+    return SB.from('app_daten').select('inhalt').eq('id','main').maybeSingle().then(function(d){if(d.error)throw d.error;if(!d.data||!d.data.inhalt)throw new Error('Noch keine Daten in der Zentrale');return d.data.inhalt;}).then(function(txt){prepData(JSON.parse(txt));
       REALKEYS=rows.map(function(x){return x.fahrer;}).filter(function(k,i,a){return D.people[k]&&a.indexOf(k)===i;});if(!REALKEYS.length){realBlocked(mail);return;}
       var u=ls('user')||MEMU||{},k=REALKEYS.indexOf(u.k)>=0?u.k:(REALKEYS.length===1?REALKEYS[0]:null);
       if(k){ls('user',{k:k,mail:mail});start();}else{L={step:'who',mail:mail,err:'',q:''};drawLogin();}});
