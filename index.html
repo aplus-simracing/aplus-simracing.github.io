@@ -86,6 +86,7 @@ button.li:active{background:var(--card2)}
 .kpi b{display:block;font-family:var(--disp);font-size:22px;line-height:1.05}
 .kpi span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
 .note{font-size:12.5px;color:var(--muted)}
+.vsw button{color:#fff;font-size:15.5px;padding:10px 4px}.vsw button.on.drv{background:var(--blue);color:#000;box-shadow:none}.vsw button.on.adm{background:var(--gold);color:#000;box-shadow:none}.vsw-t{font-size:13px;color:#fff;line-height:1.4;margin:8px 2px 10px}
 .empty{text-align:center;color:var(--muted);padding:26px 10px}
 hr.sep{border:0;border-top:1px solid var(--line);margin:4px 0}
 
@@ -829,7 +830,7 @@ function render(){
     else if(parts[0]==='news')v=parts[1]?vNewsOne(parts[1]):vNews();
     else if(parts[0]==='events')v=vEvents(parts[1]);
     else if(parts[0]==='ev')v=vEventOne(parts[1]);
-    else if(parts[0]==='admin')v=vAdmin();
+    else if(parts[0]==='admin')v=CHAT.admin?vAdmin():'<div class="card" style="display:flex;flex-direction:column;gap:10px"><b>Nur für Betreiber</b><p style="margin:0;color:#fff">Dieser Bereich ist nur für Roger und Nici – und nur in der Ansicht «Betreiber».</p><button class="btn" data-go="me">Zum Profil</button></div>';
     else if(parts[0]==='info')v=vInfo();
     else v=vHome();
   }catch(err){v='<div class="card"><b>Da ist etwas schiefgelaufen.</b><p class="note">'+e(err.message)+'</p><button class="btn" data-go="home">Zur Startseite</button></div>';if(window.console)console.error(err);}
@@ -1382,6 +1383,7 @@ function vMe(){
   if(!U)return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">Gast-Modus</b><p class="note" style="margin:0">Du schaust dich ohne Anmeldung um. Melde dich an, um deine Zeiten, deine Lizenz und deine Mitteilungen zu sehen.</p><button class="btn pri" data-act="login">Anmelden</button></div>'+testCard();
   var p=ME,s=p.st,a=awState(U),fav=p.fav!=null?D.combos[p.fav]:null,set=ls('set-'+U)||{aw:true,ls:true,ev:true,news:true,chat:true,club:true};
   var h='<div class="card row" style="gap:14px"><span class="av" style="width:56px;height:56px;font-size:22px">'+e(ini(p.n))+'</span><div class="grow"><b style="font-family:var(--disp);font-size:22px;display:block">'+e(p.n)+'</b><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">'+(p.pass?'<span class="tag blue">'+e(p.pass)+'</span>':'')+(p.club?'<span class="tag green">Club</span>':'')+(a&&a.lic?badge(a.lic):'')+(p.teams.length?'<span class="tag">'+e(p.teams[0])+'</span>':'')+'</div><div class="note" style="margin-top:4px">Fahrer seit '+tsY(s[2])+(L.mail||(ls('user')||{}).mail?' · '+e(L.mail||(ls('user')||{}).mail):'')+'</div></div></div>';
+  h+=viewSw();   // Roger 01.11.2026: Schalter Fahrer | Betreiber im Profil (nur Betreiber)
   h+='<div class="kpis"><div class="kpi"><b class="num">'+n0(s[0])+'</b><span>Runden total</span></div><div class="kpi"><b class="num">'+(s[0]?Math.round(s[1]/s[0]*100):0)+' %</b><span>gültig</span></div><div class="kpi"><b class="num">'+n0(s[6])+'</b><span>km gefahren</span></div><div class="kpi"><b class="num">'+s[4]+'</b><span>Strecken</span></div><div class="kpi"><b class="num">'+s[5]+'</b><span>Autos</span></div><div class="kpi"><b class="num">'+n0(s[7])+'</b><span>Runden 2026</span></div></div>';
   if(s[6]>500)h+=weltreise(s[6]);
   if(fav)h+='<button class="card li" style="border-radius:var(--r);border:1px solid var(--line)" data-go="times/board/'+p.fav+'"><span class="grow"><span class="s" style="display:block;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Lieblings-Kombi</span><span class="t ell" style="display:block">'+e(fav.t)+'</span><span class="s ell" style="display:block">'+e(fav.c)+'</span></span>'+IC.chev+'</button>';
@@ -1391,12 +1393,18 @@ function vMe(){
   h+='<button class="btn full" data-act="logout">Abmelden</button><p class="note" style="text-align:center">APlus Lounge · Testversion 0.1 · Daten-Stand '+e(D.meta.stand)+'</p>';
   return h;
 }
+function viewSw(){if(!U||!CHAT.adminReal)return '';var drv=!!ls('asdriver');
+  return '<section class="sec"><div class="sh"><h2>Ansicht</h2></div><div class="seg vsw" role="radiogroup" aria-label="Ansicht wählen">'
+    +'<button type="button" role="radio" aria-checked="'+drv+'" class="'+(drv?'on drv':'')+'" data-act="view" data-v="fahrer">Fahrer</button>'
+    +'<button type="button" role="radio" aria-checked="'+(!drv)+'" class="'+(!drv?'on adm':'')+'" data-act="view" data-v="betreiber">Betreiber</button></div>'
+    +'<p class="vsw-t">'+(drv?'Du siehst die App genau so wie ein Fahrer. Alle Betreiber-Knöpfe sind ausgeblendet.':'Du siehst zusätzlich die Betreiber-Knöpfe: Race Time ausschreiben, in Infokanälen schreiben, «Infos zum Kanal» bearbeiten, Nachrichten löschen.')+'</p>'
+    +(drv?'':'<div class="list"><button class="li" data-go="admin"><span class="grow"><span class="t" style="display:block">Betreiber-Bereich</span><span class="s" style="color:#fff">Push senden, News schreiben, Race Time, Kanäle, Anmeldungen</span></span>'+IC.chev+'</button></div>')
+    +'</section>';}
 function testCard(){return '<section class="sec"><div class="sh"><h2>Testen</h2></div><div class="list">'
   +(U?'<button class="li" data-act="pushdemo"><span class="grow"><span class="t" style="display:block">Push-Nachricht ausprobieren</span><span class="s">Zeigt, wie eine Mitteilung auf dem Handy aussieht</span></span>'+IC.chev+'</button>':'')
   +(U?'<button class="li" data-act="trdemo"><span class="grow"><span class="t" style="display:block">Trophäen-Feier ausprobieren</span><span class="s">So sieht es aus, wenn du eine neue Trophäe holst</span></span>'+IC.chev+'</button>':'')
   +(!REAL||REALKEYS.length>1?'<button class="li" data-act="switch"><span class="grow"><span class="t" style="display:block">Anderen Fahrer wählen</span><span class="s">'+(REAL?'Weitere Fahrer mit deiner E-Mail':'Die App mit den Daten eines anderen Fahrers ansehen')+'</span></span>'+IC.chev+'</button>':'')
-  +(CHAT.adminReal?'<button class="li" data-act="asdriver" role="switch" aria-checked="'+(!!ls('asdriver'))+'"><span class="grow"><span class="t" style="display:block">So sieht es ein Fahrer</span><span class="s">Betreiber-Knöpfe ausblenden (z.B. «Infos zum Kanal» bearbeiten, in Infokanälen schreiben)</span></span><span class="tgl'+(ls('asdriver')?' on':'')+'"></span></button>':'')
-  +'<button class="li" data-go="admin"><span class="grow"><span class="t" style="display:block">Betreiber-Ansicht</span><span class="s">Für Roger & Nici: Push senden, News schreiben, Anmeldungen</span></span>'+IC.chev+'</button>'
+  +(!REAL&&!U?'<button class="li" data-go="admin"><span class="grow"><span class="t" style="display:block">Betreiber-Ansicht</span><span class="s">Für Roger & Nici: Push senden, News schreiben, Anmeldungen</span></span>'+IC.chev+'</button>':'')
   +'<button class="li" data-go="info"><span class="grow"><span class="t" style="display:block">Über diese Testversion</span><span class="s">Was echt ist, was noch Beispiel ist</span></span>'+IC.chev+'</button></div></section>';}
 
 // ---------------------------------------------------------------- Mitteilungen, News, Termine
@@ -1427,7 +1435,7 @@ function rtAdminList(){var a=CHAT.msgs.club.filter(function(m){return isRT(m)&&!
   return a.map(function(m){var g=rtGoing(m.id);return '<div class="card" style="margin-top:8px"><b>'+e(rtLabel(m.rt))+'</b> · '+(g.length?g.length+' kommen':'noch niemand')+(g.length?'<p class="note" style="margin:6px 0 0">'+g.map(function(x){return e(x.n)+' ('+hm(x.ts)+')';}).join(', ')+'</p>':'')+'</div>';}).join('');}
 function vAdmin(){
   var P=st.push=st.push||{to:'all',ch:'',keys:[],title:'',text:'',news:false},nx=(EVENTS[0]||{}).date;
-  var h='<div class="testbar">Nur für Roger & Nici. In der echten App liegt dieser Bereich im TimeTool auf dem Command-PC.</div>';
+  var h='<div class="testbar">'+(REAL?'Nur für Roger & Nici. Noch nicht verbunden: Was du hier sendest, bleibt vorerst nur auf diesem Handy – die Fahrer sehen es erst, wenn die App mit dem TimeTool verbunden ist.':'Nur für Roger & Nici. In der echten App liegt dieser Bereich im TimeTool auf dem Command-PC.')+'</div>';
   // Push
   var chs=CH.filter(function(c){return !c.arch;});
   h+='<section class="sec"><div class="sh"><h2>Push senden</h2></div><form id="fPush2" class="card" style="display:flex;flex-direction:column;gap:10px">'
@@ -1905,6 +1913,7 @@ function act(a,x){
   if(a==='reg'||a==='unreg'){var d=x.getAttribute('data-d');regToggle(d,a==='reg');if(a==='reg')dialog('Du bist dabei','<p class="note">Wir freuen uns auf dich am '+WDL[pd(d).getUTCDay()]+', '+dmy(d)+'. In der echten App stehst du damit in der Gästeliste dieses AfterWorks im TimeTool.</p>',[{t:'Super',cls:'pri'}]);render();}
   if(a==='chnew')chEdit('');
   if(a==='asdriver'){ls('asdriver',ls('asdriver')?null:true);applyAdm();st.pinEdit=false;render();}
+  if(a==='view'){ls('asdriver',x.getAttribute('data-v')==='fahrer'?true:null);applyAdm();st.pinEdit=false;render();}
   if(a==='jump'){var r2=$('#meRow');if(r2)r2.scrollIntoView({behavior:'smooth',block:'center'});}
   if(a==='readall'){markRead(null);render();}
   if(a==='pushdemo'){var list=notifs();dialog('Push-Nachricht ausprobieren','<p class="note">Welche Mitteilung soll erscheinen? Tippe danach auf die Nachricht oben.</p>',list.slice(0,4).map(function(n){return {t:n.kind,f:function(){showPush(n);}};}));}
