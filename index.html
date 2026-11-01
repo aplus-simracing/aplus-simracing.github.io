@@ -322,7 +322,7 @@ button.tc{width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}b
 .inp{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:13px 14px;font-size:16px}
 .inp:focus{border-color:var(--blue);outline:none}
 .code{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.code{position:relative}.code .cbx{display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--disp);font-size:26px;font-weight:700;padding:10px 0;min-height:52px}.code .cbx.on{border-color:var(--blue)}.code .code-in{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;outline:none;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:transparent;font-size:16px;letter-spacing:0;opacity:1;z-index:2}.code .code-in::selection{background:transparent}.code .code-in:-webkit-autofill,.code .code-in:autofill{-webkit-box-shadow:0 0 0 1000px transparent inset;transition:background-color 99999s ease-out 0s;-webkit-text-fill-color:transparent}.login .note,.login .muted{color:#fff}.login .err{color:#fff;background:rgba(255,77,77,.16);border:1px solid #FF4D4D;border-radius:12px;padding:10px 12px;font-weight:600}.login .info{color:#fff;background:rgba(0,178,231,.14);border:1px solid #00B2E7;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45}.login .lnk{font-size:14.5px;padding:6px 0;align-self:center;cursor:pointer}.login .lnk.wait{color:#fff;font-weight:500;cursor:default}.login .fld label,.login .li .s,.login .chk{color:#fff}.login .btn:disabled{opacity:.8}.login input:-webkit-autofill{-webkit-text-fill-color:#fff;-webkit-box-shadow:0 0 0 1000px var(--bg2) inset;caret-color:#fff}.login .help{font-size:13px;color:#fff;line-height:1.4}.login .warn{color:#fff;background:rgba(255,190,50,.14);border:1px solid #FFBE32;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45;display:flex;flex-direction:column;gap:8px}.login .warn .btn{align-self:flex-start;padding:8px 14px;font-size:13.5px}.pastebtn{background:none;border:0;color:var(--blue2);font-family:var(--body);font-size:15px;padding:4px 0;cursor:pointer;align-self:center}
+.code{position:relative}.code .cbx{display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--disp);font-size:26px;font-weight:700;padding:10px 0;min-height:52px}.code .cbx.on{border-color:var(--blue)}.code .code-in{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;outline:none;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:transparent;font-size:16px;letter-spacing:0;opacity:1;z-index:2}.code .code-in::selection{background:transparent}.code .code-in:-webkit-autofill,.code .code-in:autofill{-webkit-box-shadow:0 0 0 1000px transparent inset;transition:background-color 99999s ease-out 0s;-webkit-text-fill-color:transparent}.login .note,.login .muted{color:#fff}.login .err{color:#fff;background:rgba(255,77,77,.16);border:1px solid #FF4D4D;border-radius:12px;padding:10px 12px;font-weight:600}.login .info{color:#fff;background:rgba(0,178,231,.14);border:1px solid #00B2E7;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45}.login .lnk{font-size:14.5px;padding:6px 0;align-self:center;cursor:pointer}.login .lnk.wait{color:#fff;font-weight:500;cursor:default}.login .fld label,.login .li .s,.login .chk{color:#fff}.login .btn:disabled{opacity:.8}.login input:-webkit-autofill{-webkit-text-fill-color:#fff;-webkit-box-shadow:0 0 0 1000px var(--bg2) inset;caret-color:#fff}.login .help{font-size:13px;color:#fff;line-height:1.4}.login .note b,.login .info b,.login .err b{overflow-wrap:anywhere}.login .card{min-width:0}.login .li .t.ell{white-space:normal;overflow:visible;text-overflow:clip}@media (max-height:620px){.login .hero img{width:76px}.login h2{font-size:22px}.login .hero p{display:none}}.login .warn{color:#fff;background:rgba(255,190,50,.14);border:1px solid #FFBE32;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45;display:flex;flex-direction:column;gap:8px}.login .warn .btn{align-self:flex-start;padding:8px 14px;font-size:13.5px}.pastebtn{background:none;border:0;color:var(--blue2);font-family:var(--body);font-size:15px;padding:4px 0;cursor:pointer;align-self:center}
 .err{color:var(--red);font-size:13.5px;font-weight:600}
 .testhint{border:1px dashed rgba(255,190,50,.55);color:#FFD884;background:rgba(255,190,50,.07);border-radius:12px;padding:10px 12px;font-size:13px}
 .pick{max-height:46vh;overflow:auto}
@@ -673,7 +673,12 @@ function go(path,push){var cur=st.path||'home';if(cur===path){render();return;}
   st.path=path;setTab(path);render();window.scrollTo(0,0);}
 function back(){var x=st.stack.pop();if(!x){if(isDetail(st.path)){st.path=st.lastTab||'home';setTab(st.path);render();window.scrollTo(0,0);}return;}
   st.path=x.p;setTab(x.p);render();window.scrollTo(0,x.y||0);}
-var SKIP=0;window.addEventListener('popstate',function(){if(SKIP){SKIP=0;return;}var d=$('#dlg');if(d&&!d.hidden){d.hidden=true;try{history.pushState({apl:1},'');}catch(x){}return;}if(HP>0)HP--;back();});   // Prüfung 01.11.2026: offenes Fenster zuerst schliessen
+var SKIP=0,LGH=0;function lgGuard(){if(LGH)return;try{history.pushState({apl:'lg'},'');LGH=1;}catch(x){}}
+window.addEventListener('popstate',function(){if(SKIP){SKIP=0;return;}
+  if(LGH&&($('#fMail')||$('#fCode')||$('.login.who'))){LGH=0;var dd=$('#dlg');if(dd&&!dd.hidden){dd.hidden=true;if(L.step!=='mail')lgGuard();return;}   // Prüfung 01.11.2026: Zurück-Geste bleibt in der Anmeldung
+    if(L.step==='code'){LGS++;LGV++;L.busySend=false;L.busyVerify=false;L.step='mail';L.err='';L.info='';L.expired=false;if(REAL)lgSave();drawLogin();return;}
+    if(L.step==='who')lgGuard();return;}
+  var d=$('#dlg');if(d&&!d.hidden){d.hidden=true;try{history.pushState({apl:1},'');}catch(x){}return;}if(HP>0)HP--;back();});   // Prüfung 01.11.2026: offenes Fenster zuerst schliessen
 function goBack(){if(HP>0&&st.stack.length){try{history.back();return;}catch(x){}}back();}
 function tabGo(t){if(HP>0){SKIP=1;try{history.go(-HP);}catch(x){SKIP=0;}HP=0;}st.stack=[];if(t==='aw')st.sub.aw='abende';go(t,false);}
 
@@ -683,29 +688,31 @@ var L={step:'mail',mail:'',err:'',q:''};
 // Einfügen/Autofill, Zeitüberschreitung, klare Meldungen. Werte müssen zu Supabase passen: Code 6 Ziffern, gültig 3600 s, neuer Code frühestens nach 60 s.
 var LG_MAX=3600*1000,LG_WAIT=60*1000,LG_TO=20000,LGT=null,LGS=0,LGV=0,MAILRX=/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i;
 function hm(t){var d=new Date(t);return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
-function lgSave(){ls('login',{mail:L.mail||'',ok:!!L.ok,step:L.step==='code'?'code':'mail',sent:L.sent||0,to:L.sentTo||''});}
+function lgSave(){ls('login',{mail:L.mail||'',ok:!!L.ok,step:L.step==='code'?'code':'mail',sent:L.sent||0,to:L.sentTo||'',est:!!L.sentEst});}
 function lgLoad(){var g=ls('login')||{},now=Date.now(),sent=+g.sent||0,to=String(g.to||''),mail=String(g.mail||''),same=!!(sent&&to&&to===mail),fresh=same&&now-sent<LG_MAX;
-  var o={step:'mail',mail:mail,ok:!!g.ok,sent:same?sent:0,sentTo:same?to:'',err:'',info:'',q:''};
+  var o={step:'mail',mail:mail,ok:!!g.ok,sent:same?sent:0,sentTo:same?to:'',sentEst:!!g.est,err:'',info:'',q:''};
+  if(g.pend&&mail){o.step='code';o.sent=0;o.sentTo='';o.info='Die App wurde beim Senden geschlossen. Schau in deinem Postfach nach dem Code – ist keiner da, tippe auf «Kein Code erhalten? Code nochmals senden».';return o;}
   if(g.step==='code'&&mail){if(fresh||!same)o.step='code';else o.info='Dein letzter Code ist abgelaufen (ein Code gilt 1 Stunde). Tippe unten auf «Code per E-Mail senden» – du bekommst sofort einen neuen.';}
   return o;}
 function lgSent(){return L.sent&&L.sentTo&&L.sentTo===L.mail?L.sent:0;}
 function lgExpiredMsg(){L.expired=true;L.info='';L.err='Dein Code ist abgelaufen – ein Code gilt nur 1 Stunde. Tippe auf «Neuen Code senden», du bekommst sofort einen neuen.';}
 function lgTimeout(p){return Promise.race([p,new Promise(function(res,rej){setTimeout(function(){rej({message:'timeout',status:0,timeout:true});},LG_TO);})]);}
 function lgSend(mail,from){if(L.busySend)return;L.busySend=true;var id=++LGS,prev={step:L.step,sent:L.sent,sentTo:L.sentTo};L.mail=mail;
-  if(REAL)ls('login',{mail:mail,ok:!!L.ok,step:'code',sent:Date.now(),to:mail});   // falls das Handy die App während dem Senden schliesst
+  if(REAL)ls('login',{mail:mail,ok:!!L.ok,step:'code',sent:0,to:'',pend:true});   // falls das Handy die App während dem Senden schliesst (QA 01.11.: nicht so tun, als sei die Mail schon raus)
   app.querySelectorAll('#fMail button[type=submit],#bResend,#bNewCode').forEach(function(b){b.disabled=true;b.textContent='Code wird gesendet …';});
-  var toCode=function(info){L.step='code';L.err='';L.expired=false;L.info=info||'';lgSave();drawLogin();var c=$('#cIn');if(c)c.focus();};
-  var ok=function(){if(id!==LGS)return;L.busySend=false;L.sent=Date.now();L.sentTo=mail;L.mail=mail;toCode(from==='mail'?'':'Neuer Code ist unterwegs (gesendet um '+hm(L.sent)+' Uhr). Es gilt nur dieser neueste Code.');};
+  var toCode=function(info){L.lastCode='';L.step='code';L.err='';L.expired=false;L.info=info||'';lgSave();drawLogin();var c=$('#cIn');if(c)c.focus();};
+  var ok=function(){if(id!==LGS)return;L.busySend=false;L.sent=Date.now();L.sentTo=mail;L.sentEst=false;L.mail=mail;toCode(from==='mail'?'':'Neuer Code ist unterwegs (gesendet um '+hm(L.sent)+' Uhr). Es gilt nur dieser neueste Code.');};
   var fail=function(err){if(id!==LGS)return;L.busySend=false;var m=String((err&&(err.message||err.msg))||''),w=/(\d+)\s*sec/i.exec(m);
-    if(w&&(+(err&&err.status)===429||/security purposes/i.test(m))){var n=Math.max(1,Math.min(60,+w[1]));L.sent=Date.now()-(60-n)*1000;L.sentTo=mail;
+    if(w&&(+(err&&err.status)===429||/security purposes/i.test(m))){var n=Math.max(1,Math.min(60,+w[1]));L.sent=Date.now()-(60-n)*1000;L.sentTo=mail;L.sentEst=true;
       toCode('Wir haben dir vor weniger als einer Minute schon einen Code geschickt – gib diesen ein. Einen neuen Code kannst du in '+n+' Sekunden anfordern.');return;}
     L.step=prev.step;L.sent=prev.sent;L.sentTo=prev.sentTo;L.info='';L.err=realErr(err,'send');if(REAL)lgSave();drawLogin();};
   if(!REAL){ok();return;}
   try{lgTimeout(SB.auth.signInWithOtp({email:mail,options:{shouldCreateUser:true}})).then(function(r){if(r&&r.error){fail(r.error);return;}ok();},fail);}catch(x){fail(x);}}
 function lgVerify(c){if(L.busyVerify)return;L.busyVerify=true;var id=++LGV,mail=L.mail;app.querySelectorAll('#fCode button[type=submit]').forEach(function(b){b.disabled=true;b.textContent='Wird geprüft …';});
-  var fail=function(err){if(id!==LGV)return;L.busyVerify=false;lgCodeErr(err,c);};
-  try{lgTimeout(SB.auth.verifyOtp({email:mail,token:c,type:'email'})).then(function(r){if(id!==LGV)return;L.busyVerify=false;if(!r||r.error||!r.data||!r.data.session){lgCodeErr(r&&r.error,c);return;}
-    L.err='';L.info='';ls('login',null);if(LGT){clearInterval(LGT);LGT=null;}realAfter(r.data.session);},fail);}catch(x){fail(x);}}
+  var done=function(sess){L.busyVerify=false;L.err='';L.info='';ls('login',null);if(LGT){clearInterval(LGT);LGT=null;}realAfter(sess);};
+  var fail=function(err){if(id!==LGV)return;L.busyVerify=false;if(err&&err.timeout){L.info='';L.lastCode=c;L.err='Die Antwort dauert gerade sehr lange. Tippe nochmals auf «Anmelden» – falls es schon geklappt hat, bist du dann direkt drin.';drawLogin();return;}lgCodeErr(err,c);};
+  var check=function(){lgTimeout(SB.auth.verifyOtp({email:mail,token:c,type:'email'})).then(function(r){if(r&&r.data&&r.data.session){if($('#fCode')||id===LGV)done(r.data.session);return;}if(id!==LGV)return;L.busyVerify=false;lgCodeErr(r&&r.error,c);},fail);};
+  try{SB.auth.getSession().then(function(r){var ss=r&&r.data&&r.data.session;if(ss&&String(ss.user&&ss.user.email||'').toLowerCase()===mail){done(ss);return;}check();},check);}catch(x){fail(x);}}
 function lgTick(){var fc=$('#fCode');if(!fc){clearInterval(LGT);LGT=null;return;}var t=lgSent();
   if(t&&Date.now()-t>LG_MAX&&!L.expired&&!L.busyVerify&&!L.busySend){var ci=$('#cIn'),v=ci?ci.value:'';lgExpiredMsg();L.lastCode=v;drawLogin();return;}
   var b=$('#bResend');if(!b||L.busySend)return;var left=t?Math.min(60,Math.ceil((LG_WAIT-(Date.now()-t))/1000)):0;
@@ -725,20 +732,20 @@ function drawLogin(){
       +'<p class="note">Wir schicken dir einen 6-stelligen Code per E-Mail. Ein Passwort brauchst du nicht. <a data-lg="imp" style="color:var(--blue2);cursor:pointer">Impressum</a></p></form>'
       +(REAL?'':'<button class="btn full" id="bGuest">Was kann die App? Ansehen</button>');
   }else if(L.step==='code'){
-    h+='<form id="fCode" class="card" style="display:flex;flex-direction:column;gap:12px" novalidate><div><b>Code aus der E-Mail eingeben</b><p class="note" style="margin-top:4px">'+(lgSent()?'Wir haben dir um '+hm(lgSent())+' Uhr eine E-Mail an <b>'+e(L.mail)+'</b> geschickt. Der Code gilt 1 Stunde.':'Gib den Code aus der E-Mail an <b>'+e(L.mail)+'</b> ein.')+' Tippe auf die Kästchen – auf dem iPhone erscheint der Code oft direkt über der Tastatur.</p></div>'
+    h+='<form id="fCode" class="card" style="display:flex;flex-direction:column;gap:12px" novalidate><div><b>Code aus der E-Mail eingeben</b><p class="note" style="margin-top:4px">'+(lgSent()&&!L.sentEst?'Wir haben dir um '+hm(lgSent())+' Uhr eine E-Mail an <b>'+e(L.mail)+'</b> geschickt. Der Code gilt 1 Stunde.':'Gib den Code aus der E-Mail an <b>'+e(L.mail)+'</b> ein. Der Code gilt 1 Stunde.')+' Tippe auf die Kästchen – auf dem iPhone erscheint der Code oft direkt über der Tastatur.</p></div>'
       +(L.info?'<div class="info" role="status">'+e(L.info)+'</div>':'')+(L.err?'<div class="err" role="alert">'+e(L.err)+'</div>':'')
       +'<div class="code">'+[0,1,2,3,4,5].map(function(i){return '<span class="inp cbx" aria-hidden="true"></span>';}).join('')+'<input class="code-in" id="cIn" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" enterkeyhint="go" aria-label="6-stelliger Code"></div>'
       +((navigator.clipboard&&navigator.clipboard.readText)?'<button type="button" class="pastebtn" id="bPaste">📋 Code aus der E-Mail einfügen</button>':'')
       +(REAL?'':'<div class="testhint">Testversion: Es wird keine E-Mail verschickt. Jeder 6-stellige Code funktioniert, z.B. 123456.</div>')
       +(L.expired?'<button class="btn pri full" type="button" id="bNewCode">Neuen Code senden</button><button class="btn full" type="submit">Alten Code trotzdem prüfen</button>':'<button class="btn pri full" type="submit">Anmelden</button>')
       +(L.expired?'':'<button class="lnk" type="button" id="bResend">Kein Code erhalten? Code nochmals senden</button>')
-      +'<p class="note">Keine E-Mail? Warte 1–2 Minuten und schau im Spam- oder Werbung-Ordner nach (Absender: A Plus SimRacing Lounge).</p>'
+      +'<p class="note">Keine E-Mail? Warte 1–2 Minuten und schau im Spam- oder Werbe-Ordner nach (Absender: A Plus SimRacing Lounge).</p>'
       +'<button class="lnk" type="button" id="bReMail">Falsche E-Mail-Adresse? Ändern</button></form>';
   }else{
     var q=nk(L.q),list=(REAL?REALKEYS:Object.keys(D.people)).map(function(k){return [k,D.people[k]];});
     var aw=D.aw.year.map(function(r){return r.k;});
     list=list.filter(function(x){return !q||nk(x[1].n).indexOf(q)>=0;}).sort(function(a,b){var ia=aw.indexOf(a[0]),ib=aw.indexOf(b[0]);ia=ia<0?1e5:ia;ib=ib<0?1e5:ib;return ia-ib||a[1].n.localeCompare(b[1].n);}).slice(0,60);
-    h+='<div class="card" style="display:flex;flex-direction:column;gap:10px"><div><b>Wer bist du?</b><p class="note" style="margin-top:4px">'+(REAL?'Mit dieser E-Mail sind mehrere Fahrerinnen und Fahrer verbunden (z.B. Familie). Tippe auf deinen Namen. Wechseln kannst du später in den Einstellungen.':'In der echten App ist deine E-Mail mit deinem Fahrer-Namen verbunden. In der Testversion wählst du hier, mit welchem Fahrer du die App ansehen willst – '+(ANON?'die Namen sind erfunden, die Zeiten echt aus dem TimeTool.':'mit echten Daten aus dem TimeTool.'))+'</p></div>'
+    h+='<div class="card" style="display:flex;flex-direction:column;gap:10px"><div><b>Wer bist du?</b><p class="note" style="margin-top:4px">'+(REAL?'Mit dieser E-Mail sind mehrere Fahrerinnen und Fahrer verbunden (z.B. Familie). Tippe auf deinen Namen. Wechseln kannst du später unter «Ich» → «Anderen Fahrer wählen».':'In der echten App ist deine E-Mail mit deinem Fahrer-Namen verbunden. In der Testversion wählst du hier, mit welchem Fahrer du die App ansehen willst – '+(ANON?'die Namen sind erfunden, die Zeiten echt aus dem TimeTool.':'mit echten Daten aus dem TimeTool.'))+'</p></div>'
       +(REAL?'':'<div class="srch">'+IC.search+'<input id="iWho" placeholder="Name suchen …" value="'+e(L.q)+'" autocomplete="off"></div>')
       +'<div class="list pick">'+list.map(function(x){var y=yr(x[0]);return '<button class="li" data-who="'+e(x[0])+'"><span class="av">'+e(ini(x[1].n))+'</span><span class="grow"><span class="t ell" style="display:block">'+e(x[1].n)+'</span><span class="s">'+(y?'AfterWork 2026: '+y.c+'×':(x[1].st[7]?x[1].st[7]+' Runden 2026':'Fahrer'))+(x[1].club?' · Club':'')+'</span></span>'+(y&&y.l?badge(y.l):'')+'</button>';}).join('')+(list.length?'':'<div class="empty">Kein Fahrer gefunden.</div>')+'</div>'+(REAL?'<button class="lnk" type="button" id="bWhoOut">Mit anderer E-Mail anmelden</button>':'')+'</div>';
   }
@@ -746,6 +753,7 @@ function drawLogin(){
   app.innerHTML=h;
   app.querySelectorAll('[data-lg]').forEach(function(a){a.onclick=function(ev){ev.preventDefault();ev.stopPropagation();legalSheet(a.getAttribute('data-lg'));};});
   if(L.step!=='code'&&LGT){clearInterval(LGT);LGT=null;}
+  if(L.step!=='mail')lgGuard();
   var iok=$('#iOk');if(iok)iok.onchange=function(){L.ok=iok.checked;if(REAL)lgSave();};
   var imk=$('#iMail');if(imk&&REAL)imk.oninput=function(){L.mail=(imk.value||'').trim().toLowerCase();lgSave();};
   var bhc=$('#bHaveCode');if(bhc)bhc.onclick=function(){var m=(($('#iMail')||{}).value||'').trim().toLowerCase();L.ok=!!($('#iOk')||{}).checked;L.mail=m;L.info='';
@@ -1719,7 +1727,7 @@ function rtForm(){var d=new Date(),h=Math.min(21,d.getHours()+1);
 function bindRTForm(root,done){var f=root.querySelector('#fRT');if(!f)return;f.onsubmit=function(ev){ev.preventDefault();var rt={d:$('#rtD').value||nowIso(),f:$('#rtF').value||'18:00',t:$('#rtT').value||'21:00',sims:Math.max(1,Math.min(12,parseInt($('#rtS').value,10)||4)),note:($('#rtN').value||'').trim().slice(0,120)};
   if(rt.t<=rt.f){dialog('Zeit prüfen','<p class="note">«bis» muss später sein als «von».</p>',[{t:'OK',cls:'pri'}]);return;}
   chatPost('club',{kind:'rt',rt:rt,a:'APlus Lounge',k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
-function sheet(html,binder){var d=$('#dlg');d.innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';d.hidden=false;d.onclick=function(ev){if(ev.target===d)d.hidden=true;};if(binder)binder(d);}
+function sheet(html,binder){var d=$('#dlg');if($('#fMail')||$('#fCode')||$('.login.who'))lgGuard();d.innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';d.hidden=false;d.onclick=function(ev){if(ev.target===d)d.hidden=true;};if(binder)binder(d);}
 function msgActions(ch,id){var m=CHAT.msgs[ch].filter(function(x){return x.id===id;})[0];if(!m||!U)return;var rx=CHAT.rx[id]||{},mine=isMine(m),cw=canWrite(chOf(ch));
   var eb=function(x){return '<button type="button" data-se="'+x[0]+'" class="'+((rx[x[0]]||[]).indexOf(U)>=0?'mine':'')+'" aria-label="Reaktion '+x[1]+'">'+x[1]+'</button>';};
   var more=EMO.slice(EMO_NQ).some(function(x){return (rx[x[0]]||[]).indexOf(U)>=0;});
@@ -1924,7 +1932,7 @@ function realErr(err,what){var m=String((err&&(err.message||err.msg||err.error_d
   if(/error sending|smtp/i.test(m))return 'Wir können gerade keine E-Mails senden. Bitte versuche es später nochmals oder melde dich bei uns in der Lounge.';
   if(st>=500||nm==='AuthRetryableFetchError')return 'Die Lounge-Zentrale antwortet gerade nicht. Bitte versuche es in einer Minute nochmals.';
   if(what!=='code'&&(/freigeschaltet|signups? not allowed|not allowed|not authorized/i.test(m)||st===403))return 'Diese E-Mail-Adresse kennen wir noch nicht. Hast du in der Lounge vielleicht eine andere E-Mail angegeben? Dann versuche es damit – sonst melde dich an der Theke.';
-  if(what==='code')return 'Dieser Code passt nicht. Nimm den Code aus der neuesten E-Mail – ältere Codes gelten nicht mehr.';
+  if(what==='code')return 'Dieser Code passt nicht. Nimm den Code aus der neuesten E-Mail – ältere Codes und Codes, die älter als 1 Stunde sind, gelten nicht mehr.';
   if(/invalid.*email|email.*invalid|valid email/i.test(m))return 'Diese E-Mail-Adresse ist ungültig. Bitte prüfe sie nochmals.';
   return 'Der Code konnte nicht gesendet werden. Bitte versuche es in ein paar Minuten nochmals.';}
 function lgCodeErr(err,c){var r=realErr(err,'code'),t=lgSent();L.info='';
@@ -1932,12 +1940,12 @@ function lgCodeErr(err,c){var r=realErr(err,'code'),t=lgSent();L.info='';
   drawLogin();}
 function realMsg(t){app.innerHTML='<div class="login"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2><p class="muted">'+e(t)+'</p></div></div>';}
 function realLogout(){var done=function(){try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('apl-')===0)localStorage.removeItem(k);});}catch(x){}MEMU=null;location.reload();};try{SB.auth.signOut({scope:'local'}).then(done,done);}catch(x){done();}}   // Prüfung 01.11.: alles von der App auf diesem Handy löschen, andere Geräte bleiben angemeldet
-function realBlocked(mail){app.innerHTML='<div class="login"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><b>Diese E-Mail kennen wir noch nicht</b><p class="note" style="margin:0"><b>'+e(mail)+'</b> ist bei uns noch nicht für die App freigeschaltet. Hast du in der Lounge vielleicht eine andere E-Mail angegeben? Dann versuche es damit. Sonst melde dich an der Theke – sobald wir dich freigeschaltet haben, tippe auf «Nochmals prüfen».</p><button class="btn pri full" id="bAgain">Nochmals prüfen</button><button class="btn full" id="bOut">Andere E-Mail versuchen</button></div></div>';var b=$('#bOut');if(b)b.onclick=realLogout;var a=$('#bAgain');if(a)a.onclick=function(){location.reload();};}
+function realBlocked(mail,why){app.innerHTML='<div class="login"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px">'+(why==='nodata'?'<b>Deine Fahrerdaten fehlen noch</b><p class="note" style="margin:0"><b>'+e(mail)+'</b> ist freigeschaltet, aber wir finden deine Fahrerdaten noch nicht. Bitte melde dich an der Theke – danach tippe auf «Nochmals prüfen».</p>':'<b>Diese E-Mail kennen wir noch nicht</b><p class="note" style="margin:0"><b>'+e(mail)+'</b> ist bei uns noch nicht für die App freigeschaltet. Hast du in der Lounge vielleicht eine andere E-Mail angegeben? Dann versuche es damit. Sonst melde dich an der Theke – sobald wir dich freigeschaltet haben, tippe auf «Nochmals prüfen».</p>')+'<button class="btn pri full" id="bAgain">Nochmals prüfen</button><button class="btn full" id="bOut">Andere E-Mail versuchen</button></div></div>';var b=$('#bOut');if(b)b.onclick=realLogout;var a=$('#bAgain');if(a)a.onclick=function(){location.reload();};}
 function realAfter(s){var mail=String((s&&s.user&&s.user.email)||'').toLowerCase();L.mail=mail;realMsg('Deine Daten werden geladen …');
   SB.from('freigabe').select('fahrer,name,rolle').then(function(r){if(r.error)throw r.error;var rows=r.data||[];if(!rows.length){realBlocked(mail);return;}
     REALROLE=rows.some(function(x){return x.rolle==='betreiber';});
     return SB.from('app_daten').select('inhalt').eq('id','main').maybeSingle().then(function(d){if(d.error)throw d.error;if(!d.data||!d.data.inhalt)throw new Error('Noch keine Daten in der Zentrale');return d.data.inhalt;}).then(function(txt){prepData(JSON.parse(txt));
-      REALKEYS=rows.map(function(x){return x.fahrer;}).filter(function(k,i,a){return D.people[k]&&a.indexOf(k)===i;});if(!REALKEYS.length){realBlocked(mail);return;}
+      REALKEYS=rows.map(function(x){return x.fahrer;}).filter(function(k,i,a){return D.people[k]&&a.indexOf(k)===i;});if(!REALKEYS.length){realBlocked(mail,'nodata');return;}
       var u=ls('user')||MEMU||{},k=REALKEYS.indexOf(u.k)>=0?u.k:(REALKEYS.length===1?REALKEYS[0]:null);
       if(k){ls('user',{k:k,mail:mail});start();}else{L={step:'who',mail:mail,err:'',q:''};drawLogin();}});
   }).catch(function(err){loadErr(err);});}
