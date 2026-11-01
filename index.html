@@ -324,7 +324,7 @@ button.tc{width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}b
 .inp{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:12px;padding:13px 14px;font-size:16px}
 .inp:focus{border-color:var(--blue);outline:none}
 .code{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.code input{text-align:center;font-family:var(--disp);font-size:26px;font-weight:700;padding:10px 0}
+.code{position:relative}.code .cbx{display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--disp);font-size:26px;font-weight:700;padding:10px 0;min-height:52px}.code .cbx.on{border-color:var(--blue)}.code .code-in{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;outline:none;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:transparent;font-size:16px;letter-spacing:0;opacity:1;z-index:2}.code .code-in::selection{background:transparent}.code .code-in:-webkit-autofill,.code .code-in:autofill{-webkit-box-shadow:0 0 0 1000px transparent inset;transition:background-color 99999s ease-out 0s;-webkit-text-fill-color:transparent}.pastebtn{background:none;border:0;color:var(--blue2);font-family:var(--body);font-size:15px;padding:4px 0;cursor:pointer;align-self:center}
 .err{color:var(--red);font-size:13.5px;font-weight:600}
 .testhint{border:1px dashed rgba(255,190,50,.55);color:#FFD884;background:rgba(255,190,50,.07);border-radius:12px;padding:10px 12px;font-size:13px}
 .pick{max-height:46vh;overflow:auto}
@@ -690,7 +690,8 @@ function drawLogin(){
       +(REAL?'':'<button class="btn full" id="bGuest">Was kann die App? Ansehen</button>');
   }else if(L.step==='code'){
     h+='<form id="fCode" class="card" style="display:flex;flex-direction:column;gap:12px" novalidate><div><b>Code eingeben</b><p class="note" style="margin-top:4px">Wir haben dir einen Code an <b>'+e(L.mail)+'</b> geschickt.'+(REAL?' Schau auch im Spam-Ordner nach.':' Er ist 10 Minuten gültig.')+'</p></div>'
-      +'<div class="code">'+[0,1,2,3,4,5].map(function(i){return '<input class="inp" id="c'+i+'" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Ziffer '+(i+1)+'">';}).join('')+'</div>'
+      +'<div class="code">'+[0,1,2,3,4,5].map(function(i){return '<span class="inp cbx" aria-hidden="true"></span>';}).join('')+'<input class="code-in" id="cIn" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="one-time-code" aria-label="6-stelliger Code"></div>'
+      +((navigator.clipboard&&navigator.clipboard.readText)?'<button type="button" class="pastebtn" id="bPaste">📋 Code aus der E-Mail einfügen</button>':'')
       +(L.err?'<div class="err">'+e(L.err)+'</div>':'')+(REAL?'':'<div class="testhint">Testversion: Es wird keine E-Mail verschickt. Jeder 6-stellige Code funktioniert, z.B. 123456.</div>')
       +'<button class="btn pri full" type="submit">Anmelden</button><button class="lnk" type="button" id="bReMail">Andere E-Mail-Adresse</button></form>';
   }else{
@@ -708,14 +709,17 @@ function drawLogin(){
   var f=$('#fMail');if(f){f.onsubmit=function(ev){ev.preventDefault();var m=($('#iMail').value||'').trim();L.ok=!!($('#iOk')||{}).checked;if(!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(m)){L.err='Bitte eine gültige E-Mail-Adresse eingeben (z.B. name@beispiel.ch).';L.mail=m;drawLogin();return;}
       if(!L.ok){L.err='Bitte das Häkchen setzen: Nutzungsregeln und Datenschutz.';L.mail=m;drawLogin();return;}
       if(REAL){var sb1=f.querySelector('button[type=submit]');if(sb1){sb1.disabled=true;sb1.textContent='Code wird gesendet …';}
-        SB.auth.signInWithOtp({email:m.toLowerCase(),options:{shouldCreateUser:true}}).then(function(r){L.mail=m.toLowerCase();if(r&&r.error){L.err=realErr(r.error,'send');drawLogin();return;}L.err='';L.step='code';drawLogin();var c1=$('#c0');if(c1)c1.focus();},function(err){L.mail=m;L.err=realErr(err,'send');drawLogin();});return;}
-      L.mail=m;L.err='';L.step='code';drawLogin();var c0=$('#c0');if(c0)c0.focus();};
+        SB.auth.signInWithOtp({email:m.toLowerCase(),options:{shouldCreateUser:true}}).then(function(r){L.mail=m.toLowerCase();if(r&&r.error){L.err=realErr(r.error,'send');drawLogin();return;}L.err='';L.step='code';drawLogin();var c1=$('#cIn');if(c1)c1.focus();},function(err){L.mail=m;L.err=realErr(err,'send');drawLogin();});return;}
+      L.mail=m;L.err='';L.step='code';drawLogin();var c0=$('#cIn');if(c0)c0.focus();};
     var bg=$('#bGuest');if(bg)bg.onclick=function(){U=null;ls('user',{guest:true});st.guest=true;start();};}
-  var fc=$('#fCode');if(fc){var ins=[].slice.call(fc.querySelectorAll('.code input'));
-    ins.forEach(function(inp,i){inp.oninput=function(){inp.value=inp.value.replace(/\D/g,'').slice(-1);if(inp.value&&ins[i+1])ins[i+1].focus();if(ins.every(function(x){return x.value;}))fc.requestSubmit?fc.requestSubmit():fc.onsubmit(new Event('submit'));};
-      inp.onkeydown=function(ev){if(ev.key==='Backspace'&&!inp.value&&ins[i-1])ins[i-1].focus();};
-      inp.onpaste=function(ev){var t=(ev.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);if(t.length){ev.preventDefault();t.split('').forEach(function(ch,j){if(ins[j])ins[j].value=ch;});if(t.length===6)fc.onsubmit(new Event('submit'));}};});
-    fc.onsubmit=function(ev){if(ev&&ev.preventDefault)ev.preventDefault();var c=ins.map(function(x){return x.value;}).join('');if(c.length!==6){L.err='Bitte alle 6 Ziffern eingeben.';drawLogin();return;}
+  var fc=$('#fCode');if(fc){var ci=$('#cIn'),bx=[].slice.call(fc.querySelectorAll('.cbx'));
+    var paint=function(){var v=ci.value;bx.forEach(function(b,k){b.textContent=v.charAt(k);b.classList.toggle('on',document.activeElement===ci&&k===Math.min(v.length,5));});};
+    var setCode=function(t){var v=String(t||'').replace(/\D/g,'').slice(0,6);if(ci.value!==v)ci.value=v;paint();if(v.length===6&&!L.busy)fc.onsubmit(new Event('submit'));};
+    ci.oninput=function(){setCode(ci.value);};ci.onfocus=paint;ci.onblur=paint;ci.onkeyup=paint;
+    ci.onpaste=function(ev){var t=((ev.clipboardData||window.clipboardData)||{getData:function(){return '';}}).getData('text');var d=String(t||'').replace(/\D/g,'');if(d.length){ev.preventDefault();setCode(d);}};
+    var bp=$('#bPaste');if(bp)bp.onclick=function(){navigator.clipboard.readText().then(function(t){var d=String(t||'').replace(/\D/g,'');if(d.length<6){L.err='In der Zwischenablage ist kein Code. Kopiere zuerst den Code aus der E-Mail.';drawLogin();return;}setCode(d);},function(){ci.focus();});};
+    paint();if(L.err)ci.focus();
+    fc.onsubmit=function(ev){if(ev&&ev.preventDefault)ev.preventDefault();var c=ci.value.replace(/\D/g,'');if(c.length!==6){L.err='Bitte alle 6 Ziffern eingeben.';drawLogin();return;}
       if(REAL){if(L.busy)return;L.busy=true;var sb2=fc.querySelector('button[type=submit]');if(sb2){sb2.disabled=true;sb2.textContent='Wird geprüft …';}
         SB.auth.verifyOtp({email:L.mail,token:c,type:'email'}).then(function(r){L.busy=false;if(!r||r.error||!r.data||!r.data.session){L.err=realErr(r&&r.error,'code');drawLogin();return;}L.err='';realAfter(r.data.session);},function(err){L.busy=false;L.err=realErr(err,'code');drawLogin();});return;}
       L.err='';L.step='who';drawLogin();var w=$('#iWho');if(w)w.focus();};
