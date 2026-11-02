@@ -648,13 +648,15 @@ function notifSeed(k){
   return out;
 }
 function notifs(){var x=ls('notif-'+U);if(!x){x=notifSeed(U);x.forEach(function(n){n.read=false;});ls('notif-'+U,x);}var extra=ls('admin-push')||[];
-  return extra.concat(lpush(),x).sort(function(a,b){return a.ts<b.ts?1:a.ts>b.ts?-1:0;});}
+  return extra.concat(lpush(),x).sort(function(a,b){return a.ts<b.ts?1:a.ts>b.ts?-1:((b.t||0)-(a.t||0));});}   // Prüfung 3x: am gleichen Tag die neueste zuerst
 function unread(){return notifs().some(function(n){return !n.read;});}
 function markRead(id){var x=ls('notif-'+U)||[];x.forEach(function(n){if(!id||n.id===id)n.read=true;});ls('notif-'+U,x);var a=ls('admin-push')||[];a.forEach(function(n){if(!id||n.id===id)n.read=true;});ls('admin-push',a);var pr=ls('pushread-'+(U||'gast'))||{};lpush().forEach(function(n){if(!id||n.id===id)pr[n.id]=1;});ls('pushread-'+(U||'gast'),pr);}
 var pushT=null;
 function showPush(n){var P=$('#push');P.innerHTML='<button class="pb" id="pbB"><img src="logo.png" alt=""><div class="grow"><div class="row"><span class="pt grow ell">APlus Lounge</span><span class="pa">jetzt</span></div><div class="pt" style="margin-top:2px">'+e(n.title)+'</div><div class="px">'+e(n.text)+'</div></div></button>';
   requestAnimationFrame(function(){P.classList.add('show');});clearTimeout(pushT);pushT=setTimeout(function(){P.classList.remove('show');},6500);
-  $('#pbB').onclick=function(){P.classList.remove('show');if(n.id)markRead(n.id);if(n.go)go(n.go,true);};}
+  $('#pbB').onclick=function(){P.classList.remove('show');if(n.id)markRead(n.id);if(pushOeffnen(n))return;if(n.go)go(n.go,true);};}
+// Prüfung 3x (C4): «Antippen öffnet» aus dem TimeTool – Webseite im Browser, Mitteilung nur mit Bild → Bild zeigen (sonst die Seite aus n.go)
+function pushOeffnen(n){if(!n)return false;if(n.url&&okUrl(n.url)){window.open(n.url,'_blank','noopener');return true;}if(n.img&&(!n.go||n.go==='notif')&&CHAT.mode==='sb'){sbFile(n.img,n.title);return true;}return false;}
 
 // ---------------------------------------------------------------- Dialog
 function dialog(title,html,buttons){var d=$('#dlg');d.innerHTML='<div class="box" role="dialog" aria-modal="true"><h3>'+e(title)+'</h3><div>'+html+'</div><div class="row" style="justify-content:flex-end;gap:8px;flex-wrap:wrap">'+(buttons||[]).map(function(b,i){return '<button class="btn '+(b.cls||'')+'" data-db="'+i+'">'+e(b.t)+'</button>';}).join('')+'</div></div>';d.hidden=false;
@@ -794,7 +796,7 @@ function drawLogin(){
 // ---------------------------------------------------------------- Rahmen
 function header(){
   var p=st.path||'home',parts=p.split('/'),t='',sub='';
-  var titles={home:'Start',aw:'AfterWork',times:'Bestzeiten',chat:'Chat',club:'Club',me:'Ich',settings:'Einstellungen',notif:'Mitteilungen',news:'News',events:'Termine',ev:'Termin',admin:'Betreiber-Ansicht',info:'Über die Testversion'};
+  var titles={home:'Start',aw:'AfterWork',times:'Bestzeiten',chat:'Chat',club:'Club',me:'Ich',settings:'Einstellungen',notif:'Mitteilungen',news:'News',events:'Termine',ev:'Termin',admin:'Betreiber-Ansicht',info:REAL?'Über die App':'Über die Testversion'};
   t=titles[parts[0]]||'A Plus SimRacing Lounge';
   if(p==='home'){t='A Plus SimRacing Lounge';sub=U?'Hoi '+first(ME.n):'Willkommen';}
   if(parts[0]==='aw'&&parts[1]==='abend')sub=wd(parts[2])+' '+dmy(parts[2]);
@@ -854,7 +856,7 @@ function vHome(){
   else{var ev=D.aw.evenings.filter(function(x){return x.d===nx.date;})[0],reg=isReg(nx.date);
   h+='<section class="sec"><div class="sh"><h2>Nächstes AfterWork</h2><a href="#" data-go="events/aw">Alle AfterWorks</a></div><div class="card next" style="display:flex;flex-direction:column;gap:12px"><div class="evc"><div class="date"><span>'+WD[pd(nx.date).getUTCDay()]+'</span><b>'+pd(nx.date).getUTCDate()+'</b><span>'+MO[pd(nx.date).getUTCMonth()]+'</span></div><div class="grow"><b style="font-size:16px">AfterWork Race · 17–22 Uhr</b><div class="note">'+(nx.what?e(nx.what):ev&&ev.label?e(ev.label):'Strecke und Auto folgen')+'</div></div></div>'
     +(ev&&ev.refs&&ev.refs.Diamant?refGrid(ev.refs):'<div class="note">Die Lizenz-Zielzeiten erscheinen hier, sobald sie gefahren sind.</div>')
-    +(U?(reg?'<div class="row"><button class="btn ok grow" data-act="unreg" data-d="'+nx.date+'">✓ Du bist dabei</button></div><p class="note" style="margin:0">Du stehst auf der Gästeliste – Slots zahlst du wie gewohnt vor Ort.</p>':'<button class="btn pri full" data-act="reg" data-d="'+nx.date+'">Ich komme</button>'):'')+'</div></section>';}
+    +(U?(reg?'<div class="row"><button class="btn ok grow" data-act="unreg" data-d="'+nx.date+'">✓ Du bist dabei</button></div><p class="note" style="margin:0">Die Lounge sieht, dass du kommst. Slots zahlst du wie gewohnt vor Ort.</p>':'<button class="btn pri full" data-act="reg" data-d="'+nx.date+'">Ich komme</button>'):'')+'</div></section>';}
   // Letzter Abend
   if(U){var me=myEv(U).filter(function(x){return x.r.b>0||x.r.p;}),l=me[me.length-1];
     if(l)h+='<section class="sec"><div class="sh"><h2>Dein letztes AfterWork</h2><a href="#" data-go="aw/abend/'+l.ev.d+'">Rangliste</a></div><button class="card li" style="border-radius:var(--r);border:1px solid var(--line)" data-go="aw/abend/'+l.ev.d+'"><div class="date" style="width:56px;flex:0 0 auto"><span>'+wd(l.ev.d)+'</span><b>'+pd(l.ev.d).getUTCDate()+'</b><span>'+MO[pd(l.ev.d).getUTCMonth()]+'</span></div><span class="grow"><span class="t ell" style="display:block">'+e(l.ev.label||l.ev.track)+'</span><span class="s num">Bestzeit '+fmt(l.r.b)+' · Platz '+l.pos+' von '+l.of+'</span>'+(l.r.nw?'<span class="s" style="display:block;color:#FF9F43">nicht gewertet</span>':(l.r.nx&&l.r.g>0?'<span class="s" style="display:block">noch <b style="color:var(--fg)">'+(l.r.g/1000).toFixed(3)+' s</b> bis '+e(l.r.nx)+'</span>':''))+'</span>'+badge(l.r.l||'')+'</button></section>';}
@@ -921,7 +923,7 @@ function refGrid(r){return '<div class="refs">'+LV.filter(function(l){return r[l
 var NEWS_ANON={
  n3:{title:'Brands Hatch: 17 Fahrer, ganz knapp an Diamant',text:'Mit dem Toyota Yaris auf Brands Hatch fehlten dem Schnellsten nur 0.036 s auf die Diamant-Zeit – ein klassischer Last Shot.'},
  n4:{title:'Club-Meisterschaft: Renntag 1 gefahren',text:'Tatuus F4 auf Brands Hatch Indy, sechs Rennen. Nach dem ersten Renntag liegen die ersten vier nur 7 Punkte auseinander.'}};
-function allNews(){return (ls('admin-news')||[]).concat(NEWS.map(function(n){return ANON&&NEWS_ANON[n.id]?Object.assign({},n,NEWS_ANON[n.id]):n;}));}
+function allNews(){return (CHAT.mode==='sb'?sbNewsList():(ls('admin-news')||[])).concat(NEWS.map(function(n){return ANON&&NEWS_ANON[n.id]?Object.assign({},n,NEWS_ANON[n.id]):n;}));}
 function newsLi(n){return '<button class="li" data-go="news/'+e(n.id)+'"><span class="grow"><span class="row" style="gap:6px"><span class="tag blue">'+e(n.tag)+'</span><span class="s">'+dmy(n.date)+'</span>'+(n.local?'<span class="tag gold">neu</span>':'')+'</span><span class="t" style="display:block;margin-top:4px">'+e(n.title)+'</span></span>'+IC.chev+'</button>';}
 var KCOL={'AfterWork':'#FF8A5C','Race100':'#00B2E7','4h NOS':'#B98CFF','One Lap Contest':'#FFBE32','Highlight':'#FFBE32','Club':'#3FD47A','Camp':'#FACC15'};
 function eventLi(x){var d=x.date?pd(x.date):null,kc=KCOL[x.kind]||'#7487A6';return '<button class="li" data-go="ev/'+e(x.id)+'"><div class="date" style="width:52px;flex:0 0 auto;border-color:'+kc+'">'+(d?'<span>'+WD[d.getUTCDay()]+'</span><b>'+d.getUTCDate()+'</b><span>'+MO[d.getUTCMonth()]+'</span>':'<span>Datum</span><b>?</b><span>folgt</span>')+'</div><span class="grow"><span class="row" style="gap:6px"><span class="t ell">'+e(x.title)+'</span>'+(x.aw||x.title===x.kind?'':'<span class="tag" style="border-color:'+kc+';color:'+kc+'">'+e(x.kind)+'</span>')+'</span><span class="s ell" style="display:block">'+e(x.time)+(x.what?' · '+e(x.what):'')+'</span></span>'+IC.chev+'</button>';}
@@ -1085,7 +1087,7 @@ function clubLock(){
 function vClubDay(nr){
   var d=D.club.days.filter(function(x){return x.nr===nr;})[0];if(!d)return '<div class="empty">Clubrennen nicht gefunden.</div>';
   var mem=U&&isClub(U),h='<div class="card" style="display:flex;flex-direction:column;gap:8px"><b style="font-family:var(--disp);font-size:21px">'+crName(d.nr)+' · '+dmy(d.date)+'</b><div class="note">'+e(d.track)+' · '+e(d.car)+'</div>'
-    +(mem?'<a class="btn" style="align-self:flex-start;color:#fff;background:#B3121C;border-color:#B3121C" href="'+YT+'" target="_blank" rel="noopener">'+IC.play+' Rennvideo auf YouTube</a><p class="note" style="margin:0">Testversion: führt zum Kanal. Der Link zum Video dieses Renntags kommt später direkt aus dem TimeTool.</p>':'<div class="lock">'+IC.lockic+'<span>Die Rennvideos sind für Club-Mitglieder.</span></div>')+'</div>';
+    +(mem?'<a class="btn" style="align-self:flex-start;color:#fff;background:#B3121C;border-color:#B3121C" href="'+YT+'" target="_blank" rel="noopener">'+IC.play+' Rennvideo auf YouTube</a><p class="note" style="margin:0">'+(REAL?'Führt zum YouTube-Kanal der Lounge.':'Testversion: führt zum Kanal.')+' Der Link zum Video dieses Renntags kommt später direkt aus dem TimeTool.</p>':'<div class="lock">'+IC.lockic+'<span>Die Rennvideos sind für Club-Mitglieder.</span></div>')+'</div>';
   var ents={};(D.club.entries||[]).forEach(function(x){ents[x.id]=x.name;});
   if(d.pts){var tot=Object.keys(d.pts).map(function(id){return [id,d.pts[id].reduce(function(a,b){return a+(b||0);},0)];}).sort(function(a,b){return b[1]-a[1];});
     h+='<section class="sec"><div class="sh"><h2>Punkte an diesem Clubrennen</h2><span class="note">R1–R'+d.races.length+'</span></div><div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Punkte</th></tr></thead><tbody>'+tot.map(function(x,i){var me=isMeEnt(x[0],ents[x[0]]||'');return '<tr class="'+(me?'me':'')+(i<3?' p'+(i+1):'')+'"><td class="rk num">'+(i+1)+'</td><td class="nm">'+e(ents[x[0]]||x[0])+'<small>'+d.pts[x[0]].map(function(p){return p==null?'–':p;}).join(' · ')+'</small></td><td class="r num t">'+x[1]+'</td></tr>';}).join('')+'</tbody></table></div></section>';}
@@ -1390,7 +1392,7 @@ function vMe(){
   h+=meErfolge(p)+meTroph(p)+meRekorde(p);   // Roger 31.10.2026: Meilensteine → Trophäen   // Roger 31.10.2026: statt QR-Code (Lounge-Pass kommt später, wenn Einloggen vor Ort gebraucht wird)
   h+='<section class="sec"><div class="sh"><h2>Einstellungen</h2></div><div class="list"><button class="li" data-go="settings"><span class="grow"><span class="t" style="display:block">Mitteilungen, Kanäle, Newsletter</span><span class="s">Was aufs Handy kommt, rote Zahl pro Kanal, Newsletter per E-Mail</span></span>'+IC.chev+'</button><button class="li" data-legal="ds"><span class="grow t">Datenschutz, Regeln, Impressum</span>'+IC.chev+'</button></div></section>';
   h+=testCard();
-  h+='<button class="btn full" data-act="logout">Abmelden</button><p class="note" style="text-align:center">APlus Lounge · Testversion 0.1 · Daten-Stand '+e(D.meta.stand)+'</p>';
+  h+='<button class="btn full" data-act="logout">Abmelden</button><p class="note" style="text-align:center">APlus Lounge · '+(REAL?'':'Testversion 0.1 · ')+'Daten-Stand '+e(D.meta.stand)+'</p>';   // Prüfung 4: in der echten App ohne «Testversion»
   return h;
 }
 function viewSw(){if(!U||!CHAT.adminReal)return '';var drv=!!ls('asdriver');
@@ -1400,16 +1402,17 @@ function viewSw(){if(!U||!CHAT.adminReal)return '';var drv=!!ls('asdriver');
     +'<p class="vsw-t">'+(drv?'Du siehst die App genau so wie ein Fahrer. Alle Betreiber-Knöpfe sind ausgeblendet.':'Du siehst zusätzlich die Betreiber-Knöpfe: Race Time ausschreiben, in Infokanälen schreiben, «Infos zum Kanal» bearbeiten, Nachrichten löschen.')+'</p>'
     +(drv?'':'<div class="list"><button class="li" data-go="admin"><span class="grow"><span class="t" style="display:block">Betreiber-Bereich</span><span class="s" style="color:#fff">Push senden, News schreiben, Race Time, Kanäle, Anmeldungen</span></span>'+IC.chev+'</button></div>')
     +'</section>';}
-function testCard(){return '<section class="sec"><div class="sh"><h2>Testen</h2></div><div class="list">'
-  +(U?'<button class="li" data-act="pushdemo"><span class="grow"><span class="t" style="display:block">Push-Nachricht ausprobieren</span><span class="s">Zeigt, wie eine Mitteilung auf dem Handy aussieht</span></span>'+IC.chev+'</button>':'')
-  +(U?'<button class="li" data-act="trdemo"><span class="grow"><span class="t" style="display:block">Trophäen-Feier ausprobieren</span><span class="s">So sieht es aus, wenn du eine neue Trophäe holst</span></span>'+IC.chev+'</button>':'')
+function testCard(){return '<section class="sec"><div class="sh"><h2>'+(REAL?'App':'Testen')+'</h2></div><div class="list">'   // Prüfung 4: Demo-Knöpfe nur in der Testversion
+  +(U&&!REAL?'<button class="li" data-act="pushdemo"><span class="grow"><span class="t" style="display:block">Push-Nachricht ausprobieren</span><span class="s">Zeigt, wie eine Mitteilung auf dem Handy aussieht</span></span>'+IC.chev+'</button>':'')
+  +(U&&!REAL?'<button class="li" data-act="trdemo"><span class="grow"><span class="t" style="display:block">Trophäen-Feier ausprobieren</span><span class="s">So sieht es aus, wenn du eine neue Trophäe holst</span></span>'+IC.chev+'</button>':'')
   +(!REAL||REALKEYS.length>1?'<button class="li" data-act="switch"><span class="grow"><span class="t" style="display:block">Anderen Fahrer wählen</span><span class="s">'+(REAL?'Weitere Fahrer mit deiner E-Mail':'Die App mit den Daten eines anderen Fahrers ansehen')+'</span></span>'+IC.chev+'</button>':'')
   +(!REAL&&!U?'<button class="li" data-go="admin"><span class="grow"><span class="t" style="display:block">Betreiber-Ansicht</span><span class="s">Für Roger & Nici: Push senden, News schreiben, Anmeldungen</span></span>'+IC.chev+'</button>':'')
-  +'<button class="li" data-go="info"><span class="grow"><span class="t" style="display:block">Über diese Testversion</span><span class="s">Was echt ist, was noch Beispiel ist</span></span>'+IC.chev+'</button></div></section>';}
+  +'<button class="li" data-go="info"><span class="grow"><span class="t" style="display:block">'+(REAL?'Über die App':'Über diese Testversion')+'</span><span class="s">'+(REAL?'Was die App kann':'Was echt ist, was noch Beispiel ist')+'</span></span>'+IC.chev+'</button></div></section>';}
 
 // ---------------------------------------------------------------- Mitteilungen, News, Termine
 function vNotif(){var n=notifs();if(!n.length)return '<div class="empty">Keine Mitteilungen.</div>';
-  return '<button class="lnk" data-act="readall" style="align-self:flex-end">Alle als gelesen markieren</button><div class="list">'+n.map(function(x){return '<button class="li" data-nt="'+e(x.id)+'"><span class="grow"><span class="row" style="gap:6px"><span class="tag '+(x.kind==='Last Shot'?'red':x.kind==='Lizenz'?'gold':'blue')+'">'+e(x.kind)+'</span><span class="s">'+(x.ts?dmy(x.ts):'')+'</span>'+(x.read?'':'<span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block"></span>')+'</span><span class="t" style="display:block;margin-top:4px">'+e(x.title)+'</span><span class="s">'+e(x.text)+'</span></span>'+IC.chev+'</button>';}).join('')+'</div><p class="note">In der echten App kommen diese Mitteilungen als Push aufs Handy – auch wenn die App zu ist.</p>';}
+  return '<button class="lnk" data-act="readall" style="align-self:flex-end">Alle als gelesen markieren</button><div class="list">'+n.map(function(x){return '<button class="li" data-nt="'+e(x.id)+'"><span class="grow"><span class="row" style="gap:6px"><span class="tag '+(x.kind==='Last Shot'?'red':x.kind==='Lizenz'?'gold':'blue')+'">'+e(x.kind)+'</span><span class="s">'+(x.ts?dmy(x.ts):'')+'</span>'+(x.read?'':'<span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block"></span>')+'</span><span class="t" style="display:block;margin-top:4px">'+e(x.title)+'</span><span class="s">'+e(x.text)+'</span>'+(x.img?notifImg(x.img):'')+'</span>'+IC.chev+'</button>';}).join('')+'</div><p class="note">'+(CHAT.mode==='sb'||REAL?'Mitteilung in der App – Push aufs gesperrte Handy folgt.':'In der echten App kommen diese Mitteilungen als Push aufs Handy – auch wenn die App zu ist.')+'</p>';}
+function notifImg(id){var k='d:'+id,u=SBK.files[k];if(okBig(u))return '<img src="'+u+'" alt="Bild" style="display:block;max-width:100%;max-height:180px;border-radius:10px;margin-top:6px">';sbNeed(k);return '<span class="note" style="display:block;margin:4px 0 0">'+(SBK.fload[k]===3?'📷 Bild nicht verfügbar':'📷 Bild wird geladen …')+'</span>';}   // Prüfung 3x: Bild einer Mitteilung (auch ohne Chat-Beitrag)
 function vNews(){return '<div class="list">'+allNews().map(newsLi).join('')+'</div>';}
 function vNewsOne(id){var n=allNews().filter(function(x){return x.id===id;})[0];if(!n)return '<div class="empty">News nicht gefunden.</div>';
   return '<article class="card" style="display:flex;flex-direction:column;gap:10px"><div class="row" style="gap:6px"><span class="tag blue">'+e(n.tag)+'</span><span class="note">'+dmy(n.date)+'</span></div><h2 style="margin:0;font-family:var(--disp);font-size:24px;line-height:1.1;text-wrap:balance">'+e(n.title)+'</h2><p style="margin:0;line-height:1.55">'+e(n.text)+'</p></article>';}
@@ -1417,13 +1420,18 @@ function evVisible(x){return true;}   // Roger 30.10.2026: alle Termine der Loun
 function vEvents(f){f=st.flt.ev||'alle';var L=EVENTS.filter(evVisible).filter(function(x){return f==='alle'||(f==='aw'?x.aw:f==='r100'?x.kind==='Race100':f==='nos'?x.kind==='4h NOS':f==='club'?x.kind==='Club':!x.aw&&x.kind!=='Race100'&&x.kind!=='4h NOS'&&x.kind!=='Club');}),mo='',g='';
   var h='<div class="chips">'+[['alle','Alle'],['aw','AfterWork'],['r100','Race100'],['nos','4h NOS'],['club','Club']].concat([['mehr','Weitere']]).map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-flt="ev:'+c[0]+'">'+c[1]+'</button>';}).join('')+'</div>';
   L.forEach(function(x){var m=x.date?['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][pd(x.date).getUTCMonth()]+' '+x.date.slice(0,4):'Datum folgt';if(m!==mo){if(mo)g+='</div>';g+='<div class="sh"><h2>'+e(m)+'</h2></div><div class="list">';mo=m;}g+=eventLi(x);});if(mo)g+='</div>';
-  return h+(g||'<div class="empty">Keine Termine.</div>')+'<p class="note">Kalender von simracing-events.ch · in der echten App automatisch aus dem TimeTool</p><a class="btn full" href="'+SHOP+'" target="_blank" rel="noopener">Tickets & Gutscheine im Shop '+IC.ext+'</a>';}
+  return h+(g||'<div class="empty">Keine Termine.</div>')+'<p class="note">Kalender von simracing-events.ch'+(REAL?'':' · in der echten App automatisch aus dem TimeTool')+'</p><a class="btn full" href="'+SHOP+'" target="_blank" rel="noopener">Tickets & Gutscheine im Shop '+IC.ext+'</a>';}
 function vEventOne(id){var x=EVENTS.filter(function(y){return y.id===id;})[0];if(!x)return '<div class="empty">Termin nicht gefunden.</div>';
   var reg=isReg(x.date);
   return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><div class="row" style="gap:6px"><span class="tag blue">'+e(x.kind)+'</span></div><h2 style="margin:0;font-family:var(--disp);font-size:24px">'+e(x.title)+'</h2>'+(x.what?'<div style="font-weight:700;font-size:16px">'+e(x.what)+'</div>':'')+'<div class="note">'+(x.date?WDL[pd(x.date).getUTCDay()]+', '+dmy(x.date)+' · ':'')+e(x.time)+'<br>'+e(x.place)+'</div><p style="margin:0">'+e(x.text)+'</p>'
     +(x.aw&&U?(reg?'<button class="btn ok" data-act="unreg" data-d="'+x.date+'">✓ Du bist dabei</button>':'<button class="btn pri" data-act="reg" data-d="'+x.date+'">Ich komme</button>'):'')
     +(x.url?'<a class="btn" href="'+x.url+'" target="_blank" rel="noopener">Anmeldung und mehr Infos '+IC.ext+'</a>':'')+'</div>';}
-function vInfo(){return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">Testversion 0.2 · 30.10.2026</b>'
+function vInfo(){if(REAL)return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">A Plus SimRacing Lounge</b>'   // Prüfung 4: Text für die echte App (die Testversion-Texte waren hier falsch)
+  +'<p class="note" style="margin:0"><b style="color:#fff">Aus dem TimeTool:</b> Bestzeiten, Ranglisten, Lizenz-Rechnung, AfterWork-Abende, Jahresstand und Club-Meisterschaft – Stand '+e(D.meta.stand)+(D.meta.bz?' (Bestzeiten und Ranglisten Stand '+e(D.meta.bz)+')':'')+'.</p>'
+  +(CHAT.mode==='sb'?'<p class="note" style="margin:0"><b style="color:#fff">Live mit der Lounge:</b> Chat, Mitteilungen, News, «Ich komme» und Race Time. Roger und Nici sehen sie im TimeTool. Push aufs gesperrte Handy folgt.</p>'
+    :'<p class="note" style="margin:0"><b style="color:#fff">Noch nicht verbunden:</b> Chat, «Ich komme» und Mitteilungen bleiben vorerst auf diesem Handy.</p>')
+  +'<p class="note" style="margin:0">Ideen und Fehler? Einfach Roger schreiben – am besten mit Bildschirmfoto.</p></div>';
+  return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">Testversion 0.2 · 30.10.2026</b>'
   +'<p class="note" style="margin:0"><b style="color:#fff">Neu:</b> Club-Chat im Bereich Club, Infokanäle Race100 und 4h NOS mit Hinweis «Fragen im Talk», Leiste «Infos zum Kanal», Antworten auf Nachrichten, 54 Emojis, Bilder und YouTube-Links im Chat, Einstellungen (Mitteilung und rote Zahl pro Kanal), Newsletter-Schalter, Datenschutz und Regeln.</p>'
   +'<p class="note" style="margin:0"><b style="color:#fff">Echt:</b> Bestzeiten, Ranglisten, Lizenz-Rechnung, AfterWork-Abende, Jahresstand und Club-Meisterschaft – alles aus dem TimeTool, Stand '+e(D.meta.stand)+(D.meta.bz?' (Bestzeiten und Ranglisten Stand '+e(D.meta.bz)+')':'')+'.</p>'
   +'<p class="note" style="margin:0"><b style="color:#fff">Beispiel:</b> Anmeldung per E-Mail-Code (es wird nichts verschickt), Push aufs geschlossene Handy, News-Texte, «Ich komme», Betreiber-Ansicht. Diese Dinge speichert die Testversion nur auf diesem Handy.</p>'
@@ -1435,26 +1443,26 @@ function rtAdminList(){var a=CHAT.msgs.club.filter(function(m){return isRT(m)&&!
   return a.map(function(m){var g=rtGoing(m.id);return '<div class="card" style="margin-top:8px"><b>'+e(rtLabel(m.rt))+'</b> · '+(g.length?g.length+' kommen':'noch niemand')+(g.length?'<p class="note" style="margin:6px 0 0">'+g.map(function(x){return e(x.n)+' ('+hm(x.ts)+')';}).join(', ')+'</p>':'')+'</div>';}).join('');}
 function vAdmin(){
   var P=st.push=st.push||{to:'all',ch:'',keys:[],title:'',text:'',news:false},nx=(EVENTS[0]||{}).date;
-  var h='<div class="testbar">'+(REAL?'Nur für Roger & Nici. Noch nicht verbunden: Was du hier sendest, bleibt vorerst nur auf diesem Handy – die Fahrer sehen es erst, wenn die App mit dem TimeTool verbunden ist.':'Nur für Roger & Nici. In der echten App liegt dieser Bereich im TimeTool auf dem Command-PC.')+'</div>';
+  var h='<div class="testbar">'+(CHAT.mode==='sb'?'Nur für Roger & Nici. Was du hier sendest, sehen die Fahrer sofort – im TimeTool steht es unter «Gesendet».':REAL?'Nur für Roger & Nici. Noch nicht verbunden: Was du hier sendest, bleibt vorerst nur auf diesem Handy – die Fahrer sehen es erst, wenn die App mit dem TimeTool verbunden ist.':'Nur für Roger & Nici. In der echten App liegt dieser Bereich im TimeTool auf dem Command-PC.')+'</div>';
   // Push
   var chs=CH.filter(function(c){return !c.arch;});
   h+='<section class="sec"><div class="sh"><h2>Push senden</h2></div><form id="fPush2" class="card" style="display:flex;flex-direction:column;gap:10px">'
-    +'<div class="fld"><label for="pTo">An</label><select class="inp" id="pTo">'+[['all','Alle mit der App'],['aw','AfterWork-Fahrer 2026'],['club','Club-Mitglieder'],['ch','Mitglieder eines Kanals'],['keys','Einzelne Fahrer auswählen']].map(function(o){return '<option value="'+o[0]+'"'+(P.to===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></div>'
+    +'<div class="fld"><label for="pTo">An</label><select class="inp" id="pTo">'+[['all','Alle mit der App'],['aw','AfterWork-Fahrer'],['club','Club-Mitglieder'],['ch','Mitglieder eines Kanals'],['keys','Einzelne Fahrer auswählen']].map(function(o){return '<option value="'+o[0]+'"'+(P.to===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select></div>'
     +(P.to==='ch'?'<div class="fld"><label for="pCh">Kanal</label><select class="inp" id="pCh">'+chs.filter(function(c){return c.vis!=='all';}).map(function(c){return '<option value="'+e(c.id)+'"'+(P.ch===c.id?' selected':'')+'>'+e(c.name)+' ('+e(visLabel(c))+')</option>';}).join('')+'</select></div>':'')
     +(P.to==='keys'?pickerH('pk',P.keys):'')
-    +'<div class="fld"><label for="pTi">Titel</label><input class="inp" id="pTi" maxlength="60" placeholder="z.B. Heute noch 4 Sims frei" value="'+e(P.title)+'"></div>'
-    +'<div class="fld"><label for="pTx">Text</label><textarea class="inp" id="pTx" maxlength="200" placeholder="Kurz und klar …">'+e(P.text)+'</textarea></div>'
+    +'<div class="fld"><label for="pTi">Titel</label><input class="inp" id="pTi" maxlength="80" placeholder="z.B. Heute noch 4 Sims frei" value="'+e(P.title)+'"></div>'
+    +'<div class="fld"><label for="pTx">Text</label><textarea class="inp" id="pTx" maxlength="500" placeholder="Kurz und klar …">'+e(P.text)+'</textarea></div>'
     +'<label class="row" style="gap:10px;cursor:pointer"><input type="checkbox" id="pNews"'+(P.news?' checked':'')+' style="width:20px;height:20px;accent-color:#00B2E7"><span><b>Auch im News-Kanal posten</b><span class="note" style="display:block">Dann bleibt die Info im Chat nachlesbar.</span></span></label>'
     +'<div class="note" style="margin:0">Geht an: <b style="color:#fff">'+e(pushCount(P))+'</b></div><button class="btn pri" type="submit">Push senden</button></form></section>';
   // Race Time
   h+='<section class="sec"><div class="sh"><h2>Race Time ausschreiben</h2></div><div class="card">'+rtForm()+'</div>'+rtAdminList()+'</section>';
   // Kanäle
-  h+='<section class="sec"><div class="sh"><h2>Chat-Kanäle</h2><button class="lnk" data-act="chnew">+ Neuer Kanal</button></div><div class="list">'+CH.map(function(c){
+  h+='<section class="sec"><div class="sh"><h2>Chat-Kanäle</h2>'+(CHAT.mode==='sb'?'':'<button class="lnk" data-act="chnew">+ Neuer Kanal</button>')+'</div><div class="list">'+CH.map(function(c){
       return '<button class="li" data-ched="'+e(c.id)+'">'+chTile(c)+'<span class="grow"><span class="t" style="display:block">'+e(c.name)+(c.arch?' <span class="tag">archiviert</span>':'')+'</span><span class="s">'+e(c.vis==='club'?'Club-Mitglieder':c.vis==='members'?(c.members||[]).length+' Mitglieder':'alle')+(c.ro?' · nur Lounge schreibt':' · alle schreiben')+'</span></span>'+IC.chev+'</button>';}).join('')
-    +'</div><p class="note">Neue oder geänderte Kanäle sehen alle sofort – ohne App-Update.</p></section>';
+    +'</div><p class="note">'+(CHAT.mode==='sb'?'Kanäle legst du im TimeTool an und änderst sie dort – die App übernimmt sie automatisch.':'Neue oder geänderte Kanäle sehen alle sofort – ohne App-Update.')+'</p></section>';
   h+='<section class="sec"><div class="sh"><h2>News-Artikel schreiben</h2></div><form id="fNews" class="card" style="display:flex;flex-direction:column;gap:10px"><div class="fld"><label for="nTi">Titel</label><input class="inp" id="nTi" maxlength="80" placeholder="z.B. Neue Strecke im AfterWork"></div><div class="fld"><label for="nTx">Text</label><textarea class="inp" id="nTx" maxlength="600" placeholder="Kurz und klar …"></textarea></div><button class="btn pri" type="submit">Veröffentlichen</button></form></section>';
   var nll=nlList().slice().sort(function(a,b){return (b.ts||0)-(a.ts||0);});
-  h+='<section class="sec"><div class="sh"><h2>Newsletter aus der App</h2></div><div class="card" style="display:flex;flex-direction:column;gap:8px"><p class="note" style="margin:0">Später im TimeTool unter 🔔 Meldungen; mit einem Knopf gehen die Anmeldungen an HubSpot.</p>'
+  h+='<section class="sec"><div class="sh"><h2>Newsletter aus der App</h2></div><div class="card" style="display:flex;flex-direction:column;gap:8px"><p class="note" style="margin:0">'+(CHAT.mode==='sb'?'Kommt auch im TimeTool an (🔔 Meldungen und ✉️ Newsletter).':'Später im TimeTool unter 🔔 Meldungen; mit einem Knopf gehen die Anmeldungen an HubSpot.')+'</p>'
     +(nll.length?nll.map(function(x){return '<div class="row" style="justify-content:space-between"><span>'+e(x.n||x.k)+'</span><span class="tag '+(x.on?'green':'gold')+'">'+(x.on?'angemeldet':'abgemeldet')+' '+(x.ts?dmy(dayKey(x.ts),1):'')+'</span></div>';}).join(''):'<div class="note">Noch niemand.</div>')+'</div></section>';
   var regEv=EVENTS.filter(function(x){return x.date&&(x===nextAW()||Object.keys(regMap(x.date)).length);}).slice(0,6);
   h+='<section class="sec"><div class="sh"><h2>«Ich komme»</h2></div><div class="card" style="display:flex;flex-direction:column;gap:12px"><p class="note" style="margin:0">Freiwillig: Wer auf «Ich komme» tippt, erscheint hier, und du bekommst eine Mitteilung. Wer einfach so vorbeikommt, ist genauso willkommen.</p>'
@@ -1462,7 +1470,7 @@ function vAdmin(){
     +'</div></section>';
   return h;
 }
-function pushCount(P){if(P.to==='all')return 'alle mit der App';if(P.to==='aw')return D.aw.year.length+' AfterWork-Fahrer';if(P.to==='club')return Object.keys(D.people).filter(isClub).length+' Club-Mitglieder';
+function pushCount(P){if(P.to==='all')return 'alle mit der App';if(P.to==='aw')return CHAT.mode==='sb'?'alle, die schon an einem AfterWork waren (laut TimeTool)':D.aw.year.length+' AfterWork-Fahrer';/* Prüfung 3x: eine Definition (die des TimeTools, entscheidet die Zentrale) */if(P.to==='club')return Object.keys(D.people).filter(isClub).length+' Club-Mitglieder';
   if(P.to==='ch'){var c=chOf(P.ch)||CH.filter(function(x){return x.vis!=='all'&&!x.arch;})[0];return c?(c.vis==='club'?'Club-Mitglieder':(c.members||[]).length+' Mitglieder von «'+c.name+'»'):'–';}
   return P.keys.length?(P.keys.length===1?'1 ausgewählter Fahrer':P.keys.length+' ausgewählte Fahrer'):'noch niemand ausgewählt';}
 // Fahrer auswählen (Suche + Chips) – für Push und Kanal-Mitglieder
@@ -1486,7 +1494,7 @@ function bindAdmin(){var f=$('#fPush2');if(!f)return;var P=st.push;
     var cnt=pushCount(P);sendPush({title:P.title.trim(),text:P.text.trim(),to:to});
     if(P.news)chatPost('news',{t:P.title.trim()+(P.text.trim()?'\n'+P.text.trim():''),a:'APlus Lounge',k:'',team:true});
     st.push={to:P.to,ch:P.ch,keys:[],title:'',text:'',news:false};render();
-    dialog('Push gesendet','<p class="note">Geht an '+e(cnt)+'.'+(P.news?' Die Info steht jetzt auch im News-Kanal.':'')+' Wer die App offen hat, sieht sie sofort; in der echten App kommt sie auch bei geschlossener App aufs Handy.</p>',[{t:'OK',cls:'pri'}]);};
+    dialog('Push gesendet','<p class="note">Geht an '+e(cnt)+'.'+(P.news?' Die Info steht jetzt auch im News-Kanal.':'')+(CHAT.mode==='sb'?' Sie steht als Mitteilung in der App (Push aufs gesperrte Handy folgt).':REAL?' Noch nicht mit der Lounge verbunden: die Mitteilung bleibt vorerst auf diesem Handy.':' Wer die App offen hat, sieht sie sofort; in der echten App kommt sie auch bei geschlossener App aufs Handy.')+'</p>',[{t:'OK',cls:'pri'}]);};
   app.querySelectorAll('[data-ched]').forEach(function(b){b.onclick=function(){chEdit(b.getAttribute('data-ched'));};});}
 // Kanal anlegen / ändern
 function chEdit(id){var c=id?chOf(id):null,ed=c?{id:c.id,name:c.name,desc:c.desc||'',col:c.col,ic:c.ic,vis:c.vis||'all',ro:!!c.ro,members:(c.members||[]).slice(),arch:!!c.arch,o:c.o||50}
@@ -1551,7 +1559,7 @@ function chOf(id){for(var i=0;i<CH.length;i++)if(CH[i].id===id)return CH[i];retu
 function isMem(){return !!(U&&isClub(U));}
 function chMember(c,k){if(!c||c.arch)return false;if(c.vis==='club')return !!k&&isClub(k);if(c.vis==='members')return !!k&&(c.members||[]).indexOf(k)>=0;return true;}
 function canSee(c){if(!c||c.arch)return false;return CHAT.admin||chMember(c,U);}
-function canWrite(c){if(!U||!canSee(c))return false;if(c.ro)return CHAT.admin;return true;}
+function canWrite(c){if(!U||!canSee(c))return false;if(c.ro)return CHAT.admin;if(CHAT.gesperrt&&!CHAT.admin)return false;return true;}   // Stufe 2: gesperrt = nicht schreiben
 function visLabel(c){return c.vis==='club'?'nur Club':c.vis==='members'?'nur Eingeladene':'';}
 function isMine(m){return m.team?m.dv===DEV:(!!U&&m.k===U);}
 function nowIso(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -1565,6 +1573,7 @@ function sk(v){return typeof v==='string'&&v.length>0&&v.length<200&&v!=='__prot
 function okDay(d){return typeof d==='string'&&/^\d{4}-\d\d-\d\d$/.test(d);}
 function rxMap(list){var o=Object.create(null);list.forEach(function(x){if(!x||!sk(x.m)||!sk(x.e)||!sk(x.k)||!Object.prototype.hasOwnProperty.call(EMO_IX,x.e))return;var a=o[x.m]=o[x.m]||Object.create(null);(a[x.e]=a[x.e]||[]).push(x.k);});return o;}
 function rtMap(list){var o=Object.create(null);list.forEach(function(x){if(!x||!sk(x.m)||!sk(x.k))return;(o[x.m]=o[x.m]||Object.create(null))[x.k]=x;});return o;}
+function rtZu(rt){return !!(rt&&rt.end);}   // Prüfung 3x: im TimeTool beendet = keine neuen Anmeldungen (wer kommt, bleibt dabei)
 function rtPast(rt){if(!rt||!rt.d)return true;var p=rt.d.split('-'),q=String(rt.t||'23:59').split(':');return Date.now()>new Date(+p[0],+p[1]-1,+p[2],+q[0],+q[1]).getTime();}
 function isRT(m){return !!(m&&m.kind==='rt'&&m.rt&&okDay(m.rt.d));}   // Prüfung 31.10.2026: unvollständige Race Time wie normale Nachricht
 function rtLabel(rt){if(!rt||!rt.d)return 'Race Time';var t=nowIso(),m=dayKey(Date.now()+864e5),d=rt.d;return (d===t?'Heute':d===m?'Morgen':wd(d)+' '+dmy(d,1))+' · '+rt.f+'–'+rt.t;}
@@ -1589,13 +1598,13 @@ var PSEED=[{ch:'race100',kind:'link',title:'Race100 – Infos und Anmeldung',sub
  {ch:'race100',kind:'info',title:'Boxenstopp, Tanken, Off-Track',sub:'Beispiel · Info',text:'Hier kommen die 3–4 Erklärvideos zum Race100 hin (Boxenstopp, Nachtanken, Off-Track). Die Lounge heftet sie als YouTube-Links an.'},
  {ch:'nos',kind:'link',title:'4h NOS – Infos und Anmeldung',sub:'simracing-events.ch',url:'https://www.simracing-events.ch/4h-nordschleife/'}];
 // «Ich komme» (Roger 26.10.2026): freiwillig; im Betrieb mit gemeinsamer Datenbank sieht die Betreiber-Ansicht alle Namen
-function regMap(d){if(CHAT.mode==='db')return (CHAT.reg||{})[d]||{};var o={};if(U&&(ls('reg-'+U)||{})[d])o[U]={k:U,n:ME?ME.n:U};return o;}
+function regMap(d){if(CHAT.mode==='db'||CHAT.mode==='sb')return (CHAT.reg||{})[d]||{};var o={};if(U&&(ls('reg-'+U)||{})[d])o[U]={k:U,n:ME?ME.n:U};return o;}
 function isReg(d){return !!(U&&regMap(d)[U]);}
-function regToggle(d,on){if(!U)return;var r=ls('reg-'+U)||{};if(on)r[d]=true;else delete r[d];ls('reg-'+U,r);
+function regToggle(d,on){if(!U)return;var r=ls('reg-'+U)||{};if(on)r[d]=true;else delete r[d];ls('reg-'+U,r);if(CHAT.mode==='sb'){sbKommen('aw',d,on);return;}   // Stufe 2: → Zentrale → TimeTool (Vormerkung)
   if(CHAT.mode==='db'){CHAT.reg=CHAT.reg||{};var m=CHAT.reg[d]=Object.assign({},CHAT.reg[d]||{});if(on)m[U]={d:d,k:U,n:ME.n,ts:Date.now(),dv:DEV};else delete m[U];
     var ref=CHAT.db.doc('reg/'+d+'~'+U);(on?ref.set({d:d,k:U,n:ME.n,ts:Date.now(),dv:DEV}):ref.delete()).catch(function(){});}}
-function chatInit(){
-  if(CHAT.mode)return;CHAT.mode='local';CHAT.adminReal=REAL?REALROLE:true;applyAdm();localLoad();
+function chatInit(){   // Stufe 2: in der echten App (angemeldet) läuft der Chat über die Zentrale (sbInit), sonst wie bisher
+  if(CHAT.mode)return;if(REAL&&SB){sbInit();return;}CHAT.mode='local';CHAT.adminReal=REAL?REALROLE:true;applyAdm();localLoad();
   var C=window.claude;if(!C||typeof C.use!=='function')return;
   C.use('assets').then(function(a){CHAT.assets=a||null;}).catch(function(){});
   Promise.all([C.use('db'),C.use('user')]).then(function(r){
@@ -1623,9 +1632,16 @@ function nlWatch(){if(CHAT.nlw||!CHAT.db)return;CHAT.nlw=1;CHAT.db.collection('n
     CHAT.first.nl=true;chatRefresh();},function(){});}
 function applyAdm(){CHAT.admin=!!CHAT.adminReal&&!ls('asdriver');}
 function subCh(id){if(CHAT.subs[id]||!CHAT.db)return;CHAT.subs[id]=Date.now()-10*60e3;CHAT.db.collection('chat/'+id+'/m').orderBy('ts','desc').limit(200).onSnapshot(function(s){onMsgs(id,s);},function(){});}
-function pushFor(p){var t=(p&&p.to)||{};if(!U)return t.t==='all';if(t.t==='aw')return !!yr(U);if(t.t==='club')return isMem();if(t.t==='ch')return chMember(chOf(t.ch),U);if(t.t==='keys')return (t.keys||[]).indexOf(U)>=0;return true;}
-function notifyPush(p){if(p.dv===DEV||!pushFor(p)||setting().gen===false)return;showPush({id:'p'+p.id,title:p.title,text:p.text,go:'notif'});}
-function lpush(){var r=ls('pushread-'+(U||'gast'))||{};return (CHAT.push||[]).filter(pushFor).map(function(p){return {id:'p'+p.id,ts:dayKey(p.ts),kind:'Lounge',title:p.title,text:p.text,go:'notif',read:!!r['p'+p.id]||p.dv===DEV};});}
+function pushFor(p){if(CHAT.mode==='sb')return !(p&&p.dv===DEV&&p.to&&p.to.t!=='all');/* Prüfung 3x: die Zentrale schickt nur, was an mich geht (alle ausser, AfterWork-Fahrer, Club, Kanal, einzeln); selbst gesendete nur, wenn an alle */var t=(p&&p.to)||{};if(U&&(t.ausser||[]).indexOf(U)>=0)return false;/* Stufe 2 */if(!U)return t.t==='all';if(t.t==='aw')return !!yr(U);if(t.t==='club')return isMem();if(t.t==='ch')return chMember(chOf(t.ch),U);if(t.t==='keys')return (t.keys||[]).indexOf(U)>=0;return true;}
+function notifyPush(p){if(p.dv===DEV||!pushFor(p)||!pushErlaubt(p))return;showPush({id:'p'+p.id,title:p.title,text:p.text,go:pushZiel(p),url:p.url||'',img:p.img||''});}
+// Prüfung 3x (C5): die Schalter der App gelten auch für die automatischen Mitteilungen aus dem TimeTool (Art «typ»), Kanal stumm = keine Mitteilung
+function pushErlaubt(p){var S=setting(),t=(p&&p.to)||{};if(p.typ==='awErinnerung')return S.awrem;if(p.typ==='awResultat')return S.awres;if(p.typ==='lastShot')return S.ls;
+  if(p.typ==='raceTime')return S.push.club!==false;if(t.t==='ch'&&t.ch)return S.push[t.ch]!==false;return S.gen;}
+// Prüfung 3x (C4): «Antippen öffnet» (im TimeTool gewählt) – AfterWork-Erinnerung öffnet den Abend mit «Ich komme»
+function pushZiel(p){var a=p&&p.link,d=p&&p.tag;if(a==='termine')return 'events';if(a==='bestzeiten')return 'times';if(a==='club')return 'club';
+  if(a==='aw'){if(okDay(d)){if(d>=nowIso()){var ev=EVENTS.filter(function(x){return x.aw&&x.date===d;})[0];if(ev)return 'ev/'+ev.id;}else if(D&&D.aw&&(D.aw.evenings||[]).some(function(v){return v.d===d;}))return 'aw/abend/'+d;}return 'aw';}
+  return 'notif';}
+function lpush(){var r=ls('pushread-'+(U||'gast'))||{};return (CHAT.push||[]).filter(pushFor).map(function(p){return {id:'p'+p.id,ts:dayKey(p.ts),t:+p.ts||0,kind:'Lounge',title:p.title,text:p.text,go:pushZiel(p),url:p.url||'',img:p.img||'',read:!!r['p'+p.id]||p.dv===DEV};});}
 function onMsgs(ch,s){
   CHAT.msgs[ch]=s.docs.map(function(d){var x=Object.assign({},d.data());x.id=d.id;return x;}).reverse();   // neueste 200, alt nach neu
   if(CHAT.first[ch])s.docChanges().forEach(function(c){if(c.type==='added'){var x=Object.assign({},c.doc.data());x.id=c.doc.id;if(!CHAT.seen[x.id]&&+x.ts>(CHAT.subs[ch]||0))notifyMsg(ch,x);}});
@@ -1636,31 +1652,32 @@ function localLoad(){var s=ls('chat-v1');if(!s||!s.m){s={m:[],rx:{},rt:{}};var t
   s.m.forEach(function(m){CHAT.seen[m.id]=1;});(s.push||[]).forEach(function(p){CHAT.seen['p'+p.id]=1;});}
 function fromLocal(){var s=CHAT.local;CFG=s.cfg||{};rebuildCH();CHAT.push=s.push||[];if(!s.pins){s.pins=PSEED.map(function(x,i){return Object.assign({id:'ps'+i,o:i+1,ts:0},x);});ls('chat-v1',s);}CHAT.pins=s.pins;CH.forEach(function(c){CHAT.msgs[c.id]=s.m.filter(function(m){return m.ch===c.id;}).sort(function(a,b){return a.ts-b.ts;});});
   var sx=s.rx||{},st2=s.rt||{};CHAT.rx=rxMap(Object.keys(sx).map(function(id){return sx[id];}));CHAT.rt=rtMap(Object.keys(st2).map(function(id){return st2[id];}));}
-function localSave(){try{localStorage.setItem('apl-chat-v1',JSON.stringify(CHAT.local));}catch(x){alertD('Speicher voll','Der Testmodus kann auf diesem Gerät nichts mehr speichern (zu viele Bilder).');}fromLocal();chatRefresh();}
+function localSave(){try{localStorage.setItem('apl-chat-v1',JSON.stringify(CHAT.local));}catch(x){alertD('Speicher voll',(REAL?'Die App':'Der Testmodus')+' kann auf diesem Gerät nichts mehr speichern (zu viele Bilder).');}fromLocal();chatRefresh();}
 window.addEventListener('storage',function(ev){if(CHAT.mode!=='local'||ev.key!=='apl-chat-v1')return;var s=ls('chat-v1');if(!s)return;CHAT.local=s;
   s.m.forEach(function(m){if(!CHAT.seen[m.id]){CHAT.seen[m.id]=1;notifyMsg(m.ch,m);}});(s.push||[]).forEach(function(p){if(!CHAT.seen['p'+p.id]){CHAT.seen['p'+p.id]=1;notifyPush(p);}});fromLocal();chatRefresh();});
 function notifyMsg(ch,m){var c=chOf(ch);if(!c||isMine(m)||!U||!canSee(c))return;
   if((st.path||'')===chPath(ch)&&document.visibilityState!=='hidden')return;
   if(setting().push[ch]===false)return;
-  showPush({id:'c'+(m.id||Date.now()),title:isRT(m)?'Neue Race Time 🏁':(m.team?'APlus Lounge':m.a)+' · '+c.name,text:isRT(m)?rtLabel(m.rt)+(m.rt.sims?' · '+m.rt.sims+' Sims frei':'')+' – tippe auf «Ich komme».':(m.img&&!m.t?'📷 Bild':m.t),go:chPath(ch)});}
+  showPush({id:'c'+(m.id||Date.now()),title:isRT(m)?'Neue Race Time 🏁':(m.team?'APlus Lounge':m.a)+' · '+c.name,text:isRT(m)?rtLabel(m.rt)+(m.rt.sims?' · '+m.rt.sims+' Sims frei':'')+' – tippe auf «Ich komme».':((m.img||m.lz)&&!m.t?'📷 Bild':m.t),go:chPath(ch)});}
 function dbErr(err,ch){var c=chOf(ch);dialog('Nicht gesendet',(err&&err.code==='invalid_argument'&&c&&c.ro)?'<p class="note">In «'+e(c.name)+'» schreibt nur die Lounge.</p>':(err&&(err.code==='quota_exceeded'||err.code==='invalid_argument'))?'<p class="note">Die Nachricht oder das Bild ist zu gross. Versuche ein kleineres Bild.</p>':'<p class="note">Die Nachricht konnte nicht gesendet werden. Prüfe die Verbindung und versuche es nochmals.</p>',[{t:'OK',cls:'pri'}]);}
-function chatPost(ch,obj){obj.ts=Date.now();obj.dv=DEV;if(!obj.kind)obj.kind='msg';
+function chatPost(ch,obj){obj.ts=Date.now();obj.dv=DEV;if(!obj.kind)obj.kind='msg';if(CHAT.mode==='sb')return sbPost(ch,obj);/* Stufe 2 */
   if(CHAT.mode==='db')return CHAT.db.collection('chat/'+ch+'/m').add(obj).then(function(){return true;},function(err){dbErr(err,ch);return false;});
   obj.id='l'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);obj.ch=ch;CHAT.seen[obj.id]=1;CHAT.local.m.push(obj);localSave();return Promise.resolve();}
-function sendPush(p){p.ts=Date.now();p.dv=DEV;
+function sendPush(p){p.ts=Date.now();p.dv=DEV;if(CHAT.mode==='sb')return sbPush(p);/* Stufe 2 */
   if(CHAT.mode==='db')return CHAT.db.collection('push').add(p).catch(function(){dialog('Nicht gesendet','<p class="note">Push senden darf nur die Lounge.</p>',[{t:'OK',cls:'pri'}]);});
   p.id='l'+Date.now().toString(36);CHAT.seen['p'+p.id]=1;(CHAT.local.push=CHAT.local.push||[]).push(p);localSave();return Promise.resolve();}
-function cfgSave(id,obj){if(CHAT.mode==='db')return CHAT.db.doc('chcfg/'+id).set(obj).catch(function(){dialog('Nicht gespeichert','<p class="note">Kanäle ändern darf nur die Lounge.</p>',[{t:'OK',cls:'pri'}]);});
+function cfgSave(id,obj){if(CHAT.mode==='sb'){alertD('Im TimeTool ändern','Kanäle legst du im TimeTool an und änderst sie dort (Kommunikation → Chats → Einstellungen). Die App übernimmt sie automatisch.');return Promise.resolve();}/* Stufe 2 */if(CHAT.mode==='db')return CHAT.db.doc('chcfg/'+id).set(obj).catch(function(){dialog('Nicht gespeichert','<p class="note">Kanäle ändern darf nur die Lounge.</p>',[{t:'OK',cls:'pri'}]);});
   (CHAT.local.cfg=CHAT.local.cfg||{})[id]=obj;localSave();return Promise.resolve();}
-function chatDelete(ch,id){if(CHAT.mode==='db')return CHAT.db.doc('chat/'+ch+'/m/'+id).delete().catch(function(err){dbErr(err,ch);});CHAT.local.m=CHAT.local.m.filter(function(m){return m.id!==id;});Object.keys(CHAT.local.rx||{}).forEach(function(r){if(CHAT.local.rx[r]&&CHAT.local.rx[r].m===id)delete CHAT.local.rx[r];});localSave();}
-function rxToggle(mid,emo){if(!U)return;var id=mid+'~'+U+'~'+emo,on=((CHAT.rx[mid]||{})[emo]||[]).indexOf(U)>=0;
+function chatDelete(ch,id){if(CHAT.mode==='sb')return sbDelete(ch,id);/* Stufe 2: Markierung */if(CHAT.mode==='db')return CHAT.db.doc('chat/'+ch+'/m/'+id).delete().catch(function(err){dbErr(err,ch);});CHAT.local.m=CHAT.local.m.filter(function(m){return m.id!==id;});Object.keys(CHAT.local.rx||{}).forEach(function(r){if(CHAT.local.rx[r]&&CHAT.local.rx[r].m===id)delete CHAT.local.rx[r];});localSave();}
+function rxToggle(mid,emo){if(!U)return;var id=mid+'~'+U+'~'+emo,on=((CHAT.rx[mid]||{})[emo]||[]).indexOf(U)>=0;if(CHAT.mode==='sb'){if(!on&&CHAT.gesperrt&&!CHAT.admin){sbGesperrtHinweis();return;}sbRx(mid,emo,!on);return;}/* Stufe 2 */
   if(CHAT.mode==='db'){var r=CHAT.db.doc('rx/'+id);(on?r.delete():r.set({m:mid,k:U,e:emo})).catch(function(){});return;}
   if(on)delete CHAT.local.rx[id];else CHAT.local.rx[id]={m:mid,k:U,e:emo};localSave();}
 function rtToggle(mid){if(!U)return;var id=mid+'~'+U,on=!!(CHAT.rt[mid]||{})[U];var body={m:mid,k:U,n:ME.n,ts:Date.now(),dv:DEV};
+  if(CHAT.mode==='sb'){sbKommen('rt',mid,!on).then(function(ok){if(ok&&!on)dialog('Du kommst 🏁','<p class="note">Die Lounge sieht jetzt, dass du kommst. Bis gleich!</p>',[{t:'Super',cls:'pri'}]);});return;}   // Stufe 2
   if(CHAT.mode==='db'){var r=CHAT.db.doc('rt/'+id);(on?r.delete():r.set(body)).catch(function(){});}
   else{if(on)delete CHAT.local.rt[id];else CHAT.local.rt[id]=body;localSave();}
   if(!on)dialog('Du kommst 🏁','<p class="note">Die Lounge sieht jetzt, dass du kommst. Bis gleich!</p>',[{t:'Super',cls:'pri'}]);}
-function chatReport(ch,m){var body={m:m.id,ch:ch,k:U||'',t:String(m.t||'').slice(0,200),img:!!m.img,ts:Date.now()};
+function chatReport(ch,m){var body={m:m.id,ch:ch,k:U||'',t:String(m.t||'').slice(0,200),img:!!m.img,ts:Date.now()};if(CHAT.mode==='sb'){sbReport(m);return;}/* Stufe 2 */
   if(CHAT.mode==='db')CHAT.db.collection('rep').add(body).catch(function(){});else{(CHAT.local.rep=CHAT.local.rep||[]).push(body);ls('chat-v1',CHAT.local);}
   dialog('Gemeldet','<p class="note">Danke. Die Lounge schaut sich die Nachricht an.</p>',[{t:'OK',cls:'pri'}]);}
 function dirtyForm(){return [].some.call(app.querySelectorAll('#view input,#view textarea,#view select'),function(x){if(x.tagName==='SELECT')return [].some.call(x.options,function(o){return o.selected!==o.defaultSelected;});if(x.type==='checkbox'||x.type==='radio')return x.checked!==x.defaultChecked;return x.type!=='file'&&x.value!==x.defaultValue;});}
@@ -1668,16 +1685,197 @@ function chatRefresh(){var p=st.path||'';
   var cid=curChId();if(cid){var box=$('#msgs');if(!box)return;var near=window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-160;
     box.innerHTML=msgsH(chOf(cid));var pb=$('#pins');if(pb)pb.outerHTML=pinsH(chOf(cid));bindMsgs();markChRead(cid);if(near)window.scrollTo(0,document.documentElement.scrollHeight);updNavBadge();return;}
   var a=document.activeElement;if(!U||(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))||dirtyForm())return updNavBadge();
-  if(['chat','club','home','admin'].indexOf(p.split('/')[0])>=0&&p.indexOf('/')<0){var y=window.scrollY;render();window.scrollTo(0,y);}else updNavBadge();}
+  if(['chat','club','home','admin','notif'].indexOf(p.split('/')[0])>=0&&p.indexOf('/')<0){var y=window.scrollY;render();window.scrollTo(0,y);}else updNavBadge();}   // notif: neue Mitteilungen/Bilder gleich sichtbar (Prüfung 3x)
 function updNavBadge(){setBadge();[['chat',unreadAll()],['club',U?unreadOf(chOf('club')):0]].forEach(function(q){var b=app.querySelector('.nav [data-tab="'+q[0]+'"]');if(!b)return;var n=q[1],x=b.querySelector('.nb');if(!n){if(x)x.remove();return;}if(!x){x=document.createElement('span');x.className='nb';b.appendChild(x);}x.textContent=n>99?'99+':n;});}
+
+// ---------------------------------------------------------------- Stufe 2 (01.11.2026): gemeinsamer Chat über die Zentrale (Supabase)
+// Nur in der echten App (angemeldet). Lesen und Schreiben mit den Regeln der Zentrale (06_kommunikation.sql): nur Freigeschaltete, nur als
+// eigener Fahrer, nicht gesperrt, nur erlaubte Kanäle; Race Time, Push, News, Kanal-Infos nur Betreiber. Löschen = Markierung (nichts geht verloren).
+// Live: die Zentrale meldet Änderungen (Realtime) → die App holt nur die neuen Zeilen; zusätzlich jede Minute und beim Zurückkehren in die App.
+// Prüfung 01.11.2026: jede Anfrage an die Zentrale bricht nach 15 Sek. ab (der Chat bleibt nie hängen); «Live» nur, solange die
+// Zentrale erreichbar ist; Name und Gerät schickt die App nicht mehr mit (Name kommt aus der Freischaltung, «eigene» = eigenes Kürzel).
+var SBK={sendet:{},cur:{},pend:{},done:{},busy:false,again:false,t:null,files:{},fload:{},kom:{},rx:{},mi:{},mail:'',live:false,online:true,nlMine:null,start:Date.now(),probe:0,chErst:{},
+  cols:'id,kanal,art,lounge,fahrer,name,titel,text,mit_bild,datei,antwort,rt_tag,rt_von,rt_bis,rt_sims,rt_notiz,rt_beendet,erstellt,geaendert,geloescht'};
+function sbSig(){try{if(window.AbortSignal&&AbortSignal.timeout)return AbortSignal.timeout(15000);}catch(x){}try{var c=new AbortController();setTimeout(function(){try{c.abort();}catch(x){}},15000);return c.signal;}catch(x){return null;}}
+function sbT(q){try{var s=sbSig();return s&&q&&typeof q.abortSignal==='function'?q.abortSignal(s):q;}catch(x){return q;}}   // 15 Sek. Zeitlimit für eine Anfrage
+function sbNetz(e){var m=String((e&&(e.message||e.msg))||e||'');return !e||e.status===0||e.status>=500||/abort|timeout|failed to fetch|networkerror|network request|load failed|fetch/i.test(m);}   // Zentrale nicht erreichbar (nicht: Regel verletzt)
+function sbOnline(on){on=!!on&&navigator.onLine!==false;if(SBK.online!==on){SBK.online=on;chatRefresh();}}
+var SB_TAB=['km_kanal','km_nachricht','km_reaktion','km_kommen','km_mitteilung','km_pin','km_sperre','km_newsletter'];
+function sbInit(){CHAT.mode='sb';CHAT.adminReal=!!REALROLE;applyAdm();CHAT.local=null;CFG={};CHAT.push=[];CHAT.pins=[];CHAT.rx={};CHAT.rt={};CHAT.reg={};CHAT.nl=[];CHAT.news=[];CHAT.kan={};CHAT.gesperrt=false;
+  CH.forEach(function(c){CHAT.msgs[c.id]=[];});rebuildCH();
+  // Gibt es die Tabellen der Stufe 2 noch nicht (06 nicht eingespielt)? Dann wie bisher «nur auf diesem Handy» – nie halb verbunden.
+  var lokal=function(){if(CHAT.mode!=='sb'||SBK.ok)return;CHAT.mode='local';CHAT.adminReal=!!REALROLE;applyAdm();clearInterval(SBK.iv);try{if(SBK.ch)SB.removeChannel(SBK.ch);}catch(x){}SBK.ch=null;localLoad();chatRefresh();};
+  // Prüfung 01.11.2026: erst nach 3 Mal «Tabelle fehlt» (über ~10 Sek.) zurück auf «nur auf diesem Handy» – ein kurzer Fehler gleich nach
+  // dem Einspielen von 06 wirft die Sitzung nicht mehr hinaus. Netzfehler zählen nicht (dann bleibt die App verbunden und zeigt «Offline»).
+  var fehlt=0,probe=function(){if(CHAT.mode!=='sb'||SBK.ok)return;var q;try{q=sbT(SB.from('km_kanal').select('id').limit(1));}catch(x){lokal();return;}
+    Promise.resolve(q).then(function(r){if(r&&!r.error){SBK.ok=true;return;}
+      if(r&&r.error&&(r.status===404||/PGRST205|42P01/.test(String(r.error.code||'')))){if(++fehlt>=3){lokal();return;}SBK.probe=setTimeout(probe,fehlt*3000);}
+      else SBK.probe=setTimeout(probe,15000);},function(){SBK.probe=setTimeout(probe,15000);});};
+  probe();
+  window.addEventListener('offline',function(){sbOnline(false);});window.addEventListener('online',function(){sbSoon('*');});
+  sbSoon('*');
+  try{var ch=SB.channel('km-live');['km_nachricht','km_kommen','km_mitteilung','km_pin','km_kanal','km_reaktion','km_sperre'].forEach(function(t){ch.on('postgres_changes',{event:'*',schema:'public',table:t},function(){sbSoon(t);});});   /* km_sperre: Sperre wirkt sofort (Prüfung 3x) */
+    ch.subscribe(function(s){var war=SBK.live;SBK.live=s==='SUBSCRIBED';if(SBK.live&&!war&&SBK.done.km_nachricht)sbSoon('*');});SBK.ch=ch;}catch(x){}
+  SBK.iv=setInterval(function(){if(document.visibilityState!=='hidden')sbSoon('*');},60000);
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')sbSoon('*');});}
+function sbSoon(t){if(CHAT.mode!=='sb')return;if(t==='*')SB_TAB.forEach(function(x){SBK.pend[x]=1;});else SBK.pend[t]=1;clearTimeout(SBK.t);SBK.t=setTimeout(sbLoad,t==='*'?50:250);}
+function sbCur(k,ts){if(ts&&(!SBK.cur[k]||Date.parse(ts)>Date.parse(SBK.cur[k])))SBK.cur[k]=ts;}
+function sbQ(t,cols,firstFn){var q=SB.from(t).select(cols),c=SBK.cur[t];   // 30 Sek. Überlappung: nichts geht verloren (Doppelte werden erkannt)
+  if(SBK.done[t]&&c)return sbT(q.gt('geaendert',new Date(Date.parse(c)-30000).toISOString()).order('geaendert',{ascending:true}).limit(1000));return sbT(firstFn(q));}
+// Prüfung 3x (C1): erstes Laden pro Kanal (je die neuesten 300) und alle offenen Race-Time-Karten extra – ein voller Talk verdrängt
+// weder News/Info-Kanäle noch Race-Time-Karten (vorher: die neuesten 1500 aller Kanäle zusammen)
+function sbKanalIds(){var o={};CH.forEach(function(c){if(sk(c.id))o[c.id]=1;});Object.keys(CHAT.kan||{}).forEach(function(id){if(sk(id))o[id]=1;});return Object.keys(o);}
+function sbKanalQ(id){return sbT(SB.from('km_nachricht').select(SBK.cols).eq('kanal',id).is('geloescht',null).order('erstellt',{ascending:false}).limit(300));}
+function sbErstLaden(){var ids=sbKanalIds(),qs=ids.map(sbKanalQ);
+  qs.push(sbT(SB.from('km_nachricht').select(SBK.cols).eq('art','rt').is('geloescht',null).gte('rt_tag',dayKey(Date.now()-864e5)).order('erstellt',{ascending:false}).limit(200)));
+  return Promise.all(qs.map(function(q){return Promise.resolve(q);})).then(function(rs){var rows=[],err=null;
+    rs.forEach(function(r){if(!r||r.error){if(!err){err=(r&&r.error)||new Error('keine Antwort');try{if(err.status==null)err.status=r&&r.status;}catch(x){}}}else rows=rows.concat(r.data||[]);});
+    if(err)return {error:err,status:err.status};ids.forEach(function(id){SBK.chErst[id]=1;});return {data:rows};});}
+function sbKanalNach(){sbKanalIds().forEach(function(id){if(SBK.chErst[id])return;SBK.chErst[id]=1;   // Kanal, der beim ersten Laden noch nicht bekannt war (neu aus dem TimeTool): einmal seine Nachrichten holen
+  Promise.resolve(sbKanalQ(id)).then(function(r){if(r&&!r.error){sbMsgsMerge(r.data||[],false);chatRefresh();}else delete SBK.chErst[id];},function(){delete SBK.chErst[id];});});}
+function sbLoad(){if(CHAT.mode!=='sb')return;if(SBK.busy){SBK.again=true;return;}var ts=Object.keys(SBK.pend);SBK.pend={};if(!ts.length)return;SBK.busy=true;
+  var ago=function(d){return new Date(Date.now()-d*864e5).toISOString();},fehler=false,netz=false;
+  Promise.all(ts.map(function(t){var q;try{   // Fehler beim Bauen einer Abfrage: nur diese Tabelle später nochmals (nie hängen bleiben)
+    if(t==='km_nachricht')q=(SBK.done[t]&&SBK.cur[t])?sbQ(t,SBK.cols,null):sbErstLaden();
+    else if(t==='km_reaktion')q=sbQ(t,'nachricht,fahrer,emoji,weg,geaendert',function(q){return q.is('weg',null).order('geaendert',{ascending:false}).limit(5000);});
+    else if(t==='km_kommen')q=sbQ(t,'id,art,bezug,fahrer,name,erstellt,geaendert,abgesagt',function(q){return q.gte('erstellt',ago(120)).limit(3000);});
+    else if(t==='km_mitteilung')q=sbQ(t,'id,art,typ,titel,text,ziel,ziel_kanal,link_art,link_url,link_tag,datei,fahrer,erstellt,geaendert',function(q){return q.order('erstellt',{ascending:false}).limit(300);});   // Prüfung 3x: ziel_fahrer/ausser liest die App nicht mehr (entscheidet die Zentrale)
+    else if(t==='km_kanal')q=sbT(SB.from(t).select('id,name,farbe,sicht,schreiben,archiv,reihe,geaendert'));
+    else if(t==='km_pin')q=sbT(SB.from(t).select('id,kanal,art,titel,untertitel,text,url,datei,reihe,geaendert,geloescht'));
+    else if(t==='km_sperre')q=sbT(SB.from(t).select('fahrer,aufgehoben'));
+    else q=sbT(SB.from(t).select('email,fahrer,name,an,geaendert'));}catch(x){q=Promise.reject(x);}
+    return Promise.resolve(q).then(function(r){if(r.error){var er=r.error;try{if(er&&typeof er==='object'&&er.status==null)er.status=r.status;}catch(x){}throw er;}sbMerge(t,r.data||[]);}).then(null,function(e){fehler=true;if(sbNetz(e))netz=true;SBK.pend[t]=1;if(window.console)console.warn('Zentrale: '+t+' – '+((e&&e.message)||e));});
+  })).then(function(){SBK.busy=false;sbOnline(!netz);chatRefresh();
+    if(SBK.again){SBK.again=false;sbLoad();}else if(fehler){clearTimeout(SBK.t);SBK.t=setTimeout(sbLoad,netz?20000:30000);}},function(){SBK.busy=false;sbOnline(false);clearTimeout(SBK.t);SBK.t=setTimeout(sbLoad,20000);});}
+function sbMerge(t,rows){var was=!!SBK.done[t];SBK.done[t]=true;
+  if(t==='km_kanal'){var vorK=CHAT.kan||{};CHAT.kan=Object.create(null);rows.forEach(function(k){if(k&&sk(k.id)){CHAT.kan[k.id]=k;var a=vorK[k.id];if(a&&((a.archiv&&!k.archiv)||a.sicht!==k.sicht))delete SBK.chErst[k.id];}});/* Prüfung 4: wieder aktiv / neu sichtbar → Nachrichten neu holen */sbKanCfg();if(SBK.done.km_nachricht)sbKanalNach();return;}
+  if(t==='km_sperre'){var gs=!CHAT.adminReal&&rows.some(function(x){return x&&!x.aufgehoben;}),gw=!!CHAT.gesperrt;CHAT.gesperrt=gs;if(gw!==gs){var gc=curChId();if(gc)cmpRefresh(gc,false);}return;}   // Fahrer sehen nur die eigene Sperre; Prüfung 3x: Eingabefeld gleich neu zeichnen (getippter Text bleibt)
+  if(t==='km_pin'){CHAT.pins=rows.filter(function(x){return x&&sk(x.id)&&sk(x.kanal)&&!x.geloescht;}).map(function(x){return {id:x.id,ch:x.kanal,kind:x.art,title:String(x.titel||''),sub:String(x.untertitel||''),text:String(x.text||''),url:x.url||'',file:x.datei||'',o:+x.reihe||0,ts:Date.parse(x.geaendert)||0};});return;}
+  if(t==='km_newsletter'){var mine=null;CHAT.nl=rows.map(function(x){if(String(x.email||'').toLowerCase()===SBK.mail)mine=x;return {n:x.name||x.fahrer,k:x.fahrer,on:!!x.an,ts:Date.parse(x.geaendert)||0,dv:x.fahrer===U?DEV:''};});
+    SBK.nlMine=mine;if(mine&&U&&setting().nl!==!!mine.an)settingSave(function(s){s.nl=!!mine.an;});return;}
+  if(t==='km_nachricht'){sbMsgsMerge(rows,was);rows.forEach(function(r){if(r)sbCur(t,r.geaendert);});if(!was)sbKanalNach();return;}
+  if(t==='km_reaktion'){rows.forEach(function(r){if(!r||!sk(r.nachricht)||!sk(r.fahrer)||!sk(r.emoji))return;SBK.rx[r.nachricht+'|'+r.fahrer+'|'+r.emoji]=r;sbCur(t,r.geaendert);});
+    CHAT.rx=rxMap(Object.keys(SBK.rx).filter(function(k){return !SBK.rx[k].weg;}).map(function(k){var r=SBK.rx[k];return {m:r.nachricht,k:r.fahrer,e:r.emoji};}));return;}
+  if(t==='km_kommen'){rows.forEach(function(r){if(!r||!sk(r.bezug)||!sk(r.fahrer))return;var k=r.art+'|'+r.bezug+'|'+r.fahrer,old=SBK.kom[k];SBK.kom[k]=r;sbCur(t,r.geaendert);
+      if(was&&CHAT.admin&&!r.abgesagt&&(!old||old.abgesagt)&&r.fahrer!==U){var n=(person(r.fahrer)||{}).n||r.name||'Jemand';
+        showPush(r.art==='aw'?{id:'reg'+r.id,title:n+' kommt',text:'«Ich komme» für '+dmy(r.bezug)+'. Alle Namen in der Betreiber-Ansicht.',go:'admin'}:{id:'rt'+r.id,title:'Race Time: '+n+' kommt',text:'Tippe hier, um zu sehen, wer alles kommt.',go:'club/chat'});}});
+    sbKomBuild();return;}
+  if(t==='km_mitteilung'){var pT=SBK.start-10*60e3;rows.forEach(function(r){if(!r||!sk(r.id))return;var neu=!SBK.mi[r.id];SBK.mi[r.id]=r;sbCur(t,r.geaendert);
+      if(neu&&was&&r.art==='push'&&Date.parse(r.erstellt)>pT)notifyPush(sbPushObj(r));});
+    var all=Object.keys(SBK.mi).map(function(k){return SBK.mi[k];});
+    CHAT.push=all.filter(function(r){return r.art==='push';}).map(sbPushObj).sort(function(a,b){return a.ts-b.ts;}).slice(-300);
+    CHAT.news=all.filter(function(r){return r.art==='news';}).sort(function(a,b){return Date.parse(b.erstellt)-Date.parse(a.erstellt);}).map(function(r){var ts=Date.parse(r.erstellt)||0;return {id:'km'+r.id,date:dayKey(ts),tag:'Lounge',title:String(r.titel||''),text:String(r.text||''),local:Date.now()-ts<3*864e5};});}}
+function sbKanCfg(){var o={};Object.keys(CHAT.kan).forEach(function(id){var k=CHAT.kan[id],d=null;DEFCH.forEach(function(c){if(c.id===id)d=c;});
+    var c={ro:k.schreiben==='lounge',arch:!!k.archiv,vis:k.sicht==='club'?'club':((k.sicht==='einladung'||(d&&d.vis==='members'))?'members':'all')};   // einladung (Jugendcamp): nur auf Einladung
+    if(!d){c.name=String(k.name||id).slice(0,40);c.col=k.farbe;c.o=50+(+k.reihe||0);c.desc='';}   // neue Kanäle aus dem TimeTool; Standard-Kanäle behalten Name/Farbe der App (Entscheid Roger offen)
+    o[id]=c;});
+  CFG=o;rebuildCH();}
+function sbKomBuild(){var reg=Object.create(null),rt=Object.create(null);Object.keys(SBK.kom).forEach(function(k){var r=SBK.kom[k];if(r.abgesagt)return;
+    var x={k:r.fahrer,n:(person(r.fahrer)||{}).n||r.name||r.fahrer,ts:Date.parse(r.erstellt)||0,m:r.bezug,d:r.bezug};
+    if(r.art==='aw')(reg[r.bezug]=reg[r.bezug]||Object.create(null))[r.fahrer]=x;else (rt[r.bezug]=rt[r.bezug]||Object.create(null))[r.fahrer]=x;});
+  CHAT.reg=reg;CHAT.rt=rt;}
+function sbPushObj(r){var to={t:{alle:'all',aw:'aw',club:'club',kanal:'ch',fahrer:'keys'}[r.ziel]||'all'};if(r.ziel==='kanal')to.ch=r.ziel_kanal;
+  return {id:r.id,title:String(r.titel||''),text:String(r.text||''),to:to,typ:String(r.typ||'info'),link:sk(r.link_art)?r.link_art:'',url:r.link_art==='url'&&okUrl(r.link_url)?String(r.link_url):'',tag:okDay(String(r.link_tag||'').slice(0,10))?String(r.link_tag).slice(0,10):'',img:sk(r.datei)?r.datei:'',
+    ts:Date.parse(r.erstellt)||0,dv:(r.fahrer&&r.fahrer===U)?DEV:''};}   // eigene Push (in der App gesendet) = eigenes Kürzel; Prüfung 3x: Art, «Antippen öffnet» und Bild kommen mit
+function sbMsg(r){var m={id:r.id,ch:r.kanal,kind:r.art==='rt'?'rt':'msg',team:!!r.lounge,k:r.lounge?'':String(r.fahrer||''),dv:(r.lounge&&r.fahrer&&r.fahrer===U)?DEV:'',ts:Date.parse(r.erstellt)||Date.now(),t:String(r.text||'')};   // eigener Lounge-Post = mit eigenem Kürzel geschrieben (keine Geräte-Kennung mehr)
+  m.a=r.lounge?'APlus Lounge':((person(r.fahrer)||{}).n||String(r.name||'Fahrer'));   // Name aus den Fahrerdaten, nicht vom Handy des Absenders
+  if(r.titel&&r.art!=='rt')m.t=String(r.titel)+(m.t?'\n'+m.t:'');
+  if(r.antwort&&typeof r.antwort==='object')m.re=r.antwort;
+  if(r.art==='rt')m.rt={d:String(r.rt_tag||'').slice(0,10),f:r.rt_von,t:r.rt_bis,sims:+r.rt_sims||0,note:String(r.rt_notiz||''),end:!!r.rt_beendet};
+  var k=r.mit_bild?'n:'+r.id:(r.datei?'d:'+r.datei:'');if(k){m.lz=k;var u=SBK.files[k];if(okBig(u)){m.img=u;m.imgOk=true;}}   // Bild wird erst beim Anzeigen geholt
+  return m;}
+function sbMsgsMerge(rows,was){var ix={};rows.forEach(function(r){if(!r||!sk(r.id)||!sk(r.kanal))return;var a=CHAT.msgs[r.kanal]||(CHAT.msgs[r.kanal]=[]),i=-1;for(var j=0;j<a.length;j++)if(a[j].id===r.id){i=j;break;}
+    if(r.geloescht){if(i>=0){a.splice(i,1);ix[r.kanal]=1;}return;}
+    var m=sbMsg(r);if(i>=0)a[i]=m;else{a.push(m);if(was&&!CHAT.seen[m.id])notifyMsg(r.kanal,m);}CHAT.seen[m.id]=1;ix[r.kanal]=1;});
+  Object.keys(ix).forEach(function(c){var a=CHAT.msgs[c];a.sort(function(x,y){return x.ts-y.ts;});if(a.length>400)CHAT.msgs[c]=a.slice(0,a.length-400).filter(function(m){return isRT(m)&&!rtPast(m.rt);}).concat(a.slice(-400));});}   // Prüfung 3x: offene Race-Time-Karten bleiben immer
+function okBig(u){return typeof u==='string'&&u.length<8e6&&/^data:image\/(jpeg|png|webp|gif);base64,[A-Za-z0-9+\/=]+$/.test(u);}
+function sbImgWait(m){sbNeed(m.lz);return '<span class="note" style="display:block;margin:2px 0">'+(SBK.fload[m.lz]===3?'📷 Bild nicht verfügbar':'📷 Bild wird geladen …')+'</span>';}
+function sbNeed(k){if(!k||SBK.files[k]||SBK.fload[k])return;SBK.fload[k]=1;clearTimeout(SBK.ft);SBK.ft=setTimeout(sbFiles,60);}
+function sbFiles(){var ks=Object.keys(SBK.fload).filter(function(k){return SBK.fload[k]===1;});if(!ks.length)return;ks.forEach(function(k){SBK.fload[k]=2;});
+  var nid=ks.filter(function(k){return k.indexOf('n:')===0;}).map(function(k){return k.slice(2);}),did=ks.filter(function(k){return k.indexOf('d:')===0;}).map(function(k){return k.slice(2);}),ps=[];
+  var fehler=false,chk=function(r){if(!r||r.error){fehler=true;return [];}return r.data||[];};
+  if(nid.length)ps.push(sbT(SB.from('km_nachricht').select('id,bild').in('id',nid)).then(function(r){chk(r).forEach(function(x){if(okImg(x.bild))SBK.files['n:'+x.id]=x.bild;});}));
+  if(did.length)ps.push(sbT(SB.from('km_datei').select('id,mime,daten').in('id',did)).then(function(r){chk(r).forEach(function(x){var u='data:'+x.mime+';base64,'+x.daten;if(okBig(u))SBK.files['d:'+x.id]=u;});}));
+  var nochmal=function(){setTimeout(function(){ks.forEach(function(k){if(!SBK.files[k]&&SBK.fload[k]===2)delete SBK.fload[k];});chatRefresh();},20000);};   // Netz weg / Zeitlimit: in 20 Sek. nochmals
+  Promise.all(ps).then(function(){if(fehler){nochmal();return;}ks.forEach(function(k){if(!SBK.files[k])SBK.fload[k]=3;});var ch=false;
+    Object.keys(CHAT.msgs).forEach(function(c){CHAT.msgs[c].forEach(function(m){if(m.lz&&!m.img&&okBig(SBK.files[m.lz])){m.img=SBK.files[m.lz];m.imgOk=true;ch=true;}});});chatRefresh();},nochmal);}
+function sbFile(id,title){var k='d:'+id,go=function(u){if(!u){alertD('Nicht verfügbar','Die Datei konnte nicht geladen werden. Prüfe die Verbindung und versuche es nochmals.');return;}   // Kanal-Info mit Datei (PDF oder Bild)
+    if(okBig(u)){sheet('<h3>'+e(title||'Bild')+'</h3><img src="'+u+'" alt="" style="width:100%;border-radius:12px"><button class="btn full" id="imX">Schliessen</button>',function(d){d.querySelector('#imX').onclick=function(){d.hidden=true;};});return;}
+    try{var bin=atob(u.split(',')[1]),arr=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)arr[i]=bin.charCodeAt(i);var url=URL.createObjectURL(new Blob([arr],{type:'application/pdf'})),a=document.createElement('a');
+      a.href=url;a.target='_blank';a.rel='noopener';a.download=(String(title||'Dokument').replace(/[^\w\säöüÄÖÜ.-]/g,'').trim().slice(0,60)||'Dokument')+'.pdf';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(url);a.remove();},60000);}
+    catch(x){alertD('Nicht verfügbar','Die Datei konnte nicht geöffnet werden.');}};
+  if(SBK.files[k]){go(SBK.files[k]);return;}
+  sbT(SB.from('km_datei').select('id,mime,daten').eq('id',id).maybeSingle()).then(function(r){var x=r&&r.data;if(!x||!/^[A-Za-z0-9+\/=]+$/.test(String(x.daten||''))||!/^(image\/(jpeg|png|webp|gif)|application\/pdf)$/.test(x.mime)){go(null);return;}var u='data:'+x.mime+';base64,'+x.daten;SBK.files[k]=u;go(u);},function(){go(null);});}
+function sbNochLeer(){return CHAT.mode==='sb'&&!!SBK.done.km_kanal&&!Object.keys(CHAT.kan||{}).length;}   // Prüfung 4: das TimeTool hat die Kanäle noch nie geschickt
+function sbErr(err,ch){var m=String((err&&(err.message||err.msg))||err||''),c=chOf(ch),t;
+  if(/heute/i.test(m)&&/zu viele/i.test(m))t='Heute hast du schon sehr viele Bilder oder Nachrichten geschickt. Morgen geht es wieder.';
+  else if(/zu viele/i.test(m))t='Du hast gerade sehr viele Nachrichten geschickt. Bitte warte eine Minute.';
+  else if(/abort|timeout|failed to fetch|networkerror|network request|load failed/i.test(m))t='Keine Verbindung. Prüfe WLAN oder mobile Daten und versuche es nochmals.';
+  else if(CHAT.gesperrt&&!CHAT.admin)t='Du kannst im Moment nicht schreiben. Fragen? Melde dich bei der Lounge.';
+  else if(sbNochLeer()||(err&&err.code==='23503'))t='Die Lounge richtet den Chat gerade ein – bitte später nochmals.';   // Prüfung 4 (VERIF3 N7)
+  else if(/Vergangenheit/i.test(m))t='Diese Zeit ist schon vorbei. Bitte einen Tag ab heute wählen.';   // Prüfung 4 (VERIF3 N8)
+  else if((err&&err.code==='42501')||/row-level security|permission denied/i.test(m))t=c&&c.ro?'In «'+e(c.name)+'» schreibt nur die Lounge.':'Das darfst du hier nicht.';
+  else if(/check constraint|too long/i.test(m))t='Die Nachricht oder das Bild ist zu gross. Versuche es kürzer oder mit einem kleineren Bild.';
+  else t='Die Nachricht konnte nicht gesendet werden. Prüfe die Verbindung und versuche es nochmals.';
+  dialog('Nicht gesendet','<p class="note">'+t+'</p>',[{t:'OK',cls:'pri'}]);}
+function sbPost(ch,obj){var row={kanal:ch,art:obj.kind==='rt'?'rt':'msg',lounge:!!obj.team,fahrer:U,text:String(obj.t||'').trim().slice(0,1000)};   // ohne Name/Gerät: der Name kommt aus der Freischaltung; Prüfung 4 (VERIF4 N2): getrimmt wie in der Datenbank (sonst findet die Doppel-Prüfung nichts)
+  if(okImg(obj.img))row.bild=obj.img;var re=reOf(obj);if(re)row.antwort={id:re.id};   // Prüfung 4: nur die Kennung – das Zitat baut die Zentrale aus der echten Nachricht
+  if(obj.kind==='rt'&&obj.rt){row.rt_tag=obj.rt.d;row.rt_von=obj.rt.f;row.rt_bis=obj.rt.t;row.rt_sims=obj.rt.sims;row.rt_notiz=obj.rt.note||null;}
+  var t0=new Date(Date.now()-120000).toISOString(),ok=function(d){sbMsgsMerge([d],false);chatRefresh();sbSoon('km_nachricht');return true;};
+  // Prüfung 4 (VERIF3 N3): kam keine Antwort (Zeitlimit), zuerst nachsehen, ob die Nachricht schon angekommen ist – dann kein Doppel
+  var nach=function(err){if(!sbNetz(err)||!row.text)return sbErrNach(err,ch);var q=SB.from('km_nachricht').select(SBK.cols).eq('kanal',ch).eq('fahrer',U).eq('text',row.text).gte('erstellt',t0).limit(1);if(typeof q.retry==='function')q=q.retry(false);   /* nur ein Versuch: ohne Netz sofort «Nicht gesendet» (sonst wartet supabase-js 3× bis 7 Sek.) */
+  return Promise.resolve(sbT(q)).then(function(r){return r&&!r.error&&r.data&&r.data.length?ok(r.data[0]):sbErrNach(err,ch);},function(){return sbErrNach(err,ch);});};
+  return sbT(SB.from('km_nachricht').insert(row).select(SBK.cols).single()).then(function(r){if(r.error||!r.data)return nach(r.error);return ok(r.data);},function(x){return nach(x);});}
+// Prüfung 3x (C2): «nicht erlaubt» → zuerst die Sperre neu laden (richtige Meldung, Eingabefeld weg), dann melden; liefert false
+function sbErrNach(err,ch){var m=String((err&&(err.message||err.msg))||err||'');
+  if(CHAT.admin||!((err&&err.code==='42501')||/row-level security|permission denied/i.test(m))){sbErr(err,ch);return false;}
+  return Promise.resolve(sbT(SB.from('km_sperre').select('fahrer,aufgehoben'))).then(function(r){if(r&&!r.error)sbMerge('km_sperre',r.data||[]);},function(){}).then(function(){sbErr(err,ch);return false;});}
+function sbPush(p){var to=p.to||{},z={all:'alle',aw:'aw',club:'club',ch:'kanal',keys:'fahrer'}[to.t]||'alle',row={art:'push',titel:String(p.title||'').slice(0,80),text:String(p.text||'').slice(0,500),ziel:z,fahrer:U};   // Prüfung 3x: wie im TimeTool (Titel 80, Text 500)
+  if(z==='kanal')row.ziel_kanal=to.ch;if(z==='fahrer')row.ziel_fahrer=(to.keys||[]).slice(0,300);
+  return sbT(SB.from('km_mitteilung').insert(row)).then(function(r){if(r.error){dialog('Nicht gesendet','<p class="note">Die Mitteilung konnte nicht gesendet werden. '+e(String(r.error.message||'').slice(0,100))+'</p>',[{t:'OK',cls:'pri'}]);return false;}sbSoon('km_mitteilung');return true;});}
+function sbNews(t,x){sbT(SB.from('km_mitteilung').insert({art:'news',titel:t.slice(0,80),text:x.slice(0,2000),ziel:'alle',fahrer:U})).then(function(r){
+  if(r.error){dialog('Nicht veröffentlicht','<p class="note">Die News konnte nicht gespeichert werden. '+e(String(r.error.message||'').slice(0,100))+'</p>',[{t:'OK',cls:'pri'}]);return;}
+  sbSoon('km_mitteilung');dialog('Veröffentlicht','<p class="note">Die News steht jetzt zuoberst unter «News» – für alle mit der App.</p>',[{t:'Ansehen',cls:'pri',f:function(){go('news');}},{t:'OK'}]);});}
+function sbNewsList(){return CHAT.news||[];}
+function sbDelete(ch,id){return sbT(SB.from('km_nachricht').update({geloescht:new Date().toISOString()}).eq('id',id).select('id')).then(function(r){
+  if(r.error||!r.data||!r.data.length){alertD('Nicht gelöscht','Die Nachricht konnte nicht gelöscht werden.');return;}CHAT.msgs[ch]=(CHAT.msgs[ch]||[]).filter(function(m){return m.id!==id;});chatRefresh();sbSoon('km_nachricht');});}
+function sbRx(mid,emo,on){var k=mid+'|'+U+'|'+emo,old=SBK.rx[k],q;
+  if(old)q=sbT(SB.from('km_reaktion').update({weg:on?null:new Date().toISOString()}).eq('nachricht',mid).eq('fahrer',U).eq('emoji',emo));
+  else if(on)q=sbT(SB.from('km_reaktion').insert({nachricht:mid,fahrer:U,emoji:emo}));else return;
+  SBK.rx[k]=Object.assign({},old||{nachricht:mid,fahrer:U,emoji:emo},{weg:on?null:'x'});sbMerge('km_reaktion',[]);chatRefresh();
+  q.then(function(r){if(r.error){if(old)SBK.rx[k]=old;else delete SBK.rx[k];sbMerge('km_reaktion',[]);chatRefresh();   // Prüfung 4 (VERIF3 N4): nicht still verschwinden lassen
+      if(on&&!CHAT.admin&&!sbNetz(r.error))Promise.resolve(sbT(SB.from('km_sperre').select('fahrer,aufgehoben'))).then(function(r2){if(r2&&!r2.error)sbMerge('km_sperre',r2.data||[]);},function(){}).then(function(){if(CHAT.gesperrt)sbGesperrtHinweis();else alertD('Nicht gespeichert','Die Reaktion hat nicht geklappt. Bitte nochmals versuchen.');});}
+    sbSoon('km_reaktion');},function(){if(old)SBK.rx[k]=old;else delete SBK.rx[k];sbMerge('km_reaktion',[]);chatRefresh();});}
+function sbGesperrtHinweis(){alertD('Im Moment nicht möglich','Du kannst im Moment nicht schreiben – auch keine Reaktionen. Fragen? Melde dich bei der Lounge.');}
+function sbKommen(art,bez,on){var k=art+'|'+bez+'|'+U,old=SBK.kom[k],q,cols='id,art,bezug,fahrer,name,erstellt,geaendert,abgesagt';
+  if(old&&old.id)q=sbT(SB.from('km_kommen').update({abgesagt:on?null:new Date().toISOString()}).eq('id',old.id).select(cols));
+  else if(on)q=sbT(SB.from('km_kommen').insert({art:art,bezug:bez,fahrer:U}).select(cols));else return Promise.resolve(true);   // Name setzt die Zentrale
+  SBK.kom[k]=Object.assign({},old||{id:0,art:art,bezug:bez,fahrer:U,name:(ME&&ME.n)||'',erstellt:new Date().toISOString()},{abgesagt:on?null:'x'});sbKomBuild();chatRefresh();
+  var back=function(){if(old)SBK.kom[k]=old;else delete SBK.kom[k];sbKomBuild();chatRefresh();};
+  var weiter=function(r){   // Prüfung 4 (VERIF3 N2): schon auf einem anderen Handy gesetzt (23505) → vorhandene Zeile holen und weiter
+    if(!(r&&r.error&&r.error.code==='23505'&&on))return Promise.resolve(r);
+    return Promise.resolve(sbT(SB.from('km_kommen').select(cols).eq('art',art).eq('bezug',bez).eq('fahrer',U).limit(1))).then(function(r2){var x=r2&&!r2.error&&r2.data&&r2.data[0];if(!x)return r;
+      if(!x.abgesagt)return {data:[x]};return sbT(SB.from('km_kommen').update({abgesagt:null}).eq('id',x.id).select(cols));},function(){return r;});};
+  return q.then(weiter).then(function(r){if(r.error||!r.data||!r.data.length){back();var em=String((r.error&&r.error.message)||'');if(sbNochLeer()){alertD('Noch nicht möglich','Die Lounge richtet den Chat gerade ein – bitte später nochmals.');return false;}dialog('Nicht gespeichert','<p class="note">'+(/zu viele/i.test(em)?'Du hast gerade oft «Ich komme» geändert. Bitte warte eine Minute.':sbNetz(r.error)&&r.error?'Keine Verbindung. Prüfe WLAN oder mobile Daten und versuche es nochmals.':art==='rt'?'Das geht nicht mehr – die Race Time ist vorbei oder beendet.':'Das hat nicht geklappt. Für diesen Tag ist «Ich komme» in der App nicht (mehr) möglich – frag bei Bedarf an der Theke.')+'</p>',[{t:'OK',cls:'pri'}]);return false;}
+      SBK.kom[k]=r.data[0];sbKomBuild();chatRefresh();sbSoon('km_kommen');return true;},function(){back();return false;});}
+function sbReport(m){sbT(SB.from('km_meldung').insert({nachricht:m.id,fahrer:U})).then(function(r){
+  if(r.error&&r.error.code!=='23505'){dialog('Nicht gemeldet','<p class="note">Das Melden hat nicht geklappt. Prüfe die Verbindung und versuche es nochmals.</p>',[{t:'OK',cls:'pri'}]);return;}
+  dialog('Gemeldet','<p class="note">Danke. Die Lounge schaut sich die Nachricht an.</p>',[{t:'OK',cls:'pri'}]);});}
+function sbNl(on,fail){var c='email,fahrer,name,an,geaendert',mine=SBK.nlMine,q=sbT(mine?SB.from('km_newsletter').update({an:!!on,fahrer:U}).eq('email',mine.email).select(c):SB.from('km_newsletter').insert({fahrer:U,an:!!on}).select(c));
+  q.then(function(r){if(r.error||!r.data||!r.data.length){fail();return;}SBK.nlMine=r.data[0];nlOk(on);sbSoon('km_newsletter');},fail);}
+function sbPinSave(id,o){var row={art:o.kind,titel:String(o.title||'').slice(0,80),untertitel:o.sub||null,text:o.text||null,url:o.url||null,reihe:Math.max(0,Math.min(999,+o.o||0))},ex=(CHAT.pins||[]).some(function(x){return x.id===id;});
+  var q=sbT(ex?SB.from('km_pin').update(row).eq('id',id).select('id'):SB.from('km_pin').insert(Object.assign({id:id,kanal:o.ch},row)).select('id'));
+  return q.then(function(r){if(r.error||!r.data||!r.data.length){alertD('Nicht gespeichert','Anheften darf nur die Lounge.'+(r.error?' ('+String(r.error.message||'').slice(0,80)+')':''));return;}sbSoon('km_pin');});}
+function sbPinDel(id){return sbT(SB.from('km_pin').update({geloescht:new Date().toISOString()}).eq('id',id).select('id')).then(function(r){
+  if(r.error||!r.data||!r.data.length){alertD('Nicht entfernt','Entfernen darf nur die Lounge.');return;}CHAT.pins=(CHAT.pins||[]).filter(function(x){return x.id!==id;});chatRefresh();sbSoon('km_pin');});}
 
 // ---- Ansichten
 function chTile(c){return '<span class="tile" style="background:'+c.col+'">'+IC[c.ic]+'</span>';}
 function lastLine(c){var a=CHAT.msgs[c.id],m=a[a.length-1];if(!m)return {t:c.desc,ts:0};
-  return {t:isRT(m)?'🏁 Race Time · '+rtLabel(m.rt):(m.team?'Lounge':first(m.a))+': '+(m.t||(m.img?'📷 Bild':'')),ts:m.ts};}
+  return {t:isRT(m)?'🏁 Race Time · '+rtLabel(m.rt):(m.team?'Lounge':first(m.a))+': '+(m.t||(m.img||m.lz?'📷 Bild':'')),ts:m.ts};}
 function vChatList(){
   if(!U)return needLogin('Der Lounge-Chat');
-  var h='<div class="row" style="justify-content:space-between"><span class="livep">'+(CHAT.mode==='db'?'<i></i>Live · alle mit der Test-App sehen die Nachrichten':'Testmodus · Nachrichten bleiben auf diesem Gerät')+'</span></div>';
+  var h='<div class="row" style="justify-content:space-between"><span class="livep">'+(CHAT.mode==='sb'?(sbNochLeer()?'Die Lounge richtet den Chat gerade ein – bitte später nochmals':SBK.online?'<i></i>Live · alle mit der App sehen die Nachrichten':'Offline · neue Nachrichten kommen, sobald die Verbindung wieder da ist'):CHAT.mode==='db'?'<i></i>Live · alle mit der Test-App sehen die Nachrichten':REAL?'Noch nicht verbunden · Nachrichten bleiben vorerst auf diesem Handy':'Testmodus · Nachrichten bleiben auf diesem Gerät')+'</span></div>';   // Prüfung: «Live» nur, wenn die Zentrale erreichbar ist
   h+='<div class="list chl">'+CH.filter(function(c){return !c.arch&&c.id!=='club'&&canSee(c);}).map(function(c){var lk=!canSee(c),l=lastLine(c),n=unreadOf(c);
     return '<button class="li" data-go="chat/'+c.id+'">'+chTile(c)+'<span class="grow"><span class="row" style="gap:6px"><span class="t ell">'+e(c.name)+'</span>'+(visLabel(c)?'<span class="tag" style="border-color:'+c.col+';color:'+c.col+'">'+e(visLabel(c))+'</span>':'')+(c.ro?'<span class="tag gold">Info</span>':'')+'<span class="grow"></span><span class="s num">'+(l.ts?(dayKey(l.ts)===nowIso()?hm(l.ts):dmy(dayKey(l.ts),1)):'')+'</span></span>'
       +'<span class="row" style="gap:8px;margin-top:2px"><span class="s ell grow" style="display:block">'+(lk?(c.vis==='club'?'🔒 Nur für Club-Mitglieder':'🔒 Nur für eingeladene Mitglieder'):e(l.t))+'</span>'+(n?'<span class="ubadge">'+n+'</span>':'')+'</span></span></button>';}).join('')+'</div>';
@@ -1693,28 +1891,32 @@ function msgsH(c){
     var rx=CHAT.rx[m.id]||{},rxh=EMO.filter(function(x){return (rx[x[0]]||[]).length;}).map(function(x){var ks=rx[x[0]];return '<button class="rxc'+(ks.indexOf(U)>=0?' mine':'')+'" data-rx="'+e(m.id)+'|'+x[0]+'">'+x[1]+' '+ks.length+'</button>';}).join('');
     h+='<div class="msg'+(me?' me':'')+(cont?' cont':'')+(m.team?' team':'')+'">'+(me?'':(m.team?'<img class="av mav" src="icon-192.png" alt="" style="padding:0;object-fit:cover">':'<span class="av mav" style="color:'+col+'">'+e(ini(m.a))+'</span>'))
       +'<div class="col"><div class="bub" data-mid="'+e(m.id)+'">'+(!me&&!cont?'<div class="who" style="color:'+col+'">'+e(m.team?'APlus Lounge':m.a)+(m.team?' <span class="lteam">LOUNGE</span>':'')+(ld?'<span class="ld" style="background:'+ld+'" title="'+e(y.l)+'"></span>':'')+'</div>':'')
-      +reH(m,ix)+(okImg(m.img)?'<img class="cimg" data-img="'+e(m.id)+'" src="'+m.img+'" alt="Bild">':'')+(m.t?'<span class="tx">'+linkify(m.t)+'</span>':'')+ytCard(m.t)+'<span class="tm">'+hm(m.ts)+'</span></div>'+(rxh?'<div class="rxs">'+rxh+'</div>':'')+'</div></div>';
+      +reH(m,ix)+((m.imgOk||okImg(m.img))?'<img class="cimg" data-img="'+e(m.id)+'" src="'+m.img+'" alt="Bild">':(m.lz?sbImgWait(m):''))+(m.t?'<span class="tx">'+linkify(m.t)+'</span>':'')+ytCard(m.t)+'<span class="tm">'+hm(m.ts)+'</span></div>'+(rxh?'<div class="rxs">'+rxh+'</div>':'')+'</div></div>';
     prev=m;});
+  if(CHAT.mode==='sb'&&SBK.sendet[c.id])h+='<div class="msg me" id="msgSend"><div class="col"><div class="bub" style="opacity:.55"><span class="tx">'+e(SBK.sendet[c.id])+'</span><span class="tm">wird gesendet …</span></div></div></div>';   // Prüfung 4 (N3)
   return h;}
 // 31.10.2026: Antworten – die Nachricht trägt eine kleine Kopie der Original-Nachricht (re), damit das Zitat auch bleibt, wenn das Original weg ist
 function reOf(m){var r=m&&m.re;if(!r||typeof r!=='object'||typeof r.id!=='string'||!r.id)return null;
-  return {id:r.id.slice(0,80),a:String(r.a||'').slice(0,60),k:String(r.k||'').slice(0,40),team:!!r.team,t:String(r.t||'').slice(0,160)};}
+  return {id:r.id.slice(0,80),a:String(r.a||'').slice(0,60),k:String(r.k||'').slice(0,40),team:!!r.team,t:String(r.t||'').slice(0,160),weg:r.weg===true};}
 function reSnap(m){var t=String(m.t||'').replace(/\s+/g,' ').trim();if(t.length>160)t=t.slice(0,157)+'…';
-  return {id:String(m.id),a:m.team?'APlus Lounge':String(m.a||'').slice(0,60),k:m.team?'':String(m.k||'').slice(0,40),team:!!m.team,t:t||(okImg(m.img)?'📷 Bild':'…')};}
+  return {id:String(m.id),a:m.team?'APlus Lounge':String(m.a||'').slice(0,60),k:m.team?'':String(m.k||'').slice(0,40),team:!!m.team,t:t||((m.imgOk||okImg(m.img)||m.lz)?'📷 Bild':'…')};}
 function reCol(r){return r.team?'#FFBE32':ncol(r.k);}
-function reName(r){return !r.team&&!!U&&r.k===U?'Du':(r.team?'APlus Lounge':(r.a||'Fahrer'));}
-function reH(m,ix){var r=reOf(m);if(!r)return '';var o=ix&&ix[r.id];if(o)r=reSnap(o);else{r.team=false;r.k='';if(r.a==='APlus Lounge')r.a='Lounge';}var col=reCol(r);
-  return '<div class="rq" data-rq="'+e(r.id)+'" style="border-left-color:'+col+'"><b style="color:'+col+'">'+e(reName(r))+'</b><span>'+e(r.t)+'</span></div>';}
+function reName(r){return !r.team&&!!U&&r.k===U?'Du':(r.team?'APlus Lounge':((CHAT.mode==='sb'&&r.k&&(person(r.k)||{}).n)||r.a||'Fahrer'));}
+function reH(m,ix){var r=reOf(m);if(!r)return '';var o=null,weg;
+  if(CHAT.mode==='sb')weg=r.weg||!r.t;   // Prüfung 4 (VERIF3 H1): nur das Zitat der Zentrale (aus der echten Nachricht gebaut) – nie, was ein Handy geschickt hat
+  else{o=ix&&ix[r.id];if(o)r=reSnap(o);else{r.team=false;r.k='';if(r.a==='APlus Lounge')r.a='Lounge';}weg=!o&&(r.weg||!r.t);}
+  var col=reCol(r);   // Prüfung 3x: gelöschte Nachricht → «Nachricht gelöscht» (die Zentrale leert auch das Zitat)
+  return '<div class="rq" data-rq="'+e(r.id)+'" style="border-left-color:'+col+'"><b style="color:'+col+'">'+e(reName(r))+'</b><span>'+(weg?'<i>Nachricht gelöscht</i>':e(r.t))+'</span></div>';}
 function startReply(ch,m){st.reply={ch:ch,re:reSnap(m)};cmpRefresh(ch,true);}
-function cmpRefresh(ch,focus){if(curChId()!==ch)return;var c=chOf(ch),old=app.querySelector('.cmp');if(!c||!old)return;var t0=$('#cmpT');if(t0){st.draft=st.draft||{};st.draft[ch]=t0.value;}
+function cmpRefresh(ch,focus,draft){if(curChId()!==ch)return;var c=chOf(ch),old=app.querySelector('.cmp');if(!c||!old)return;var t0=$('#cmpT');st.draft=st.draft||{};if(typeof draft==='string')st.draft[ch]=draft;else if(t0)st.draft[ch]=t0.value;   // Prüfung 3x: «draft» = Text, der wieder ins Feld soll (nach «nicht gesendet»)
   var near=window.innerHeight+window.scrollY>=document.documentElement.scrollHeight-160;
   old.outerHTML=composerH(c);bindComposer(c);var v=$('#view');if(v)v.classList.toggle('rep',!!(st.reply&&st.reply.ch===ch));
   if(near)window.scrollTo(0,document.documentElement.scrollHeight);var t=$('#cmpT');if(focus&&t)t.focus();}
-function rtCard(m,compact){var rt=m.rt||{},g=rtGoing(m.id),past=rtPast(rt),me=!!U&&!!(CHAT.rt[m.id]||{})[U];
-  return '<div class="rt'+(past?' past':'')+'" data-rtm="'+e(m.id)+'"><div class="row"><span class="rt-k">RACE TIME</span><span class="grow"></span>'+(past?'<span class="tag">vorbei</span>':'<span class="tag green">gratis mit Club-Pass</span>')+'</div>'
+function rtCard(m,compact){var rt=m.rt||{},g=rtGoing(m.id),past=rtPast(rt),zu=!past&&rtZu(rt),me=!!U&&!!(CHAT.rt[m.id]||{})[U];
+  return '<div class="rt'+(past?' past':'')+'" data-rtm="'+e(m.id)+'"><div class="row"><span class="rt-k">RACE TIME</span><span class="grow"></span>'+(past?'<span class="tag">vorbei</span>':zu?'<span class="tag gold">keine neuen Anmeldungen</span>':'<span class="tag green">gratis mit Club-Pass</span>')+'</div>'
     +'<div class="rt-when">'+e(rtLabel(rt))+'</div><div class="note" style="margin:0;color:#DDE6F3">'+(rt.sims?'<b>'+e(rt.sims)+' Sims</b> frei':'Sims frei')+(rt.note?' · '+e(rt.note):'')+'</div>'
     +'<div class="row" style="gap:10px"><span class="avs">'+g.slice(0,6).map(function(x){return '<span class="av" style="color:'+ncol(x.k)+'">'+e(ini(x.n))+'</span>';}).join('')+'</span><span class="note" style="margin:0">'+(g.length?(g.length===1?e(first(g[0].n))+' kommt':g.length+' kommen'):'Noch niemand angemeldet')+'</span></div>'
-    +(!past&&U&&(isMem()||CHAT.admin)?(me?'<button class="btn ok" data-rtgo="'+e(m.id)+'">✓ Ich komme · absagen</button>':'<button class="btn pri" data-rtgo="'+e(m.id)+'">Ich komme</button>'):'')
+    +(!past&&U&&(isMem()||CHAT.admin)?(me?'<button class="btn ok" data-rtgo="'+e(m.id)+'">'+(zu?'✓ Du kommst · absagen':'✓ Ich komme · absagen')+'</button>':(zu?'':'<button class="btn pri" data-rtgo="'+e(m.id)+'">Ich komme</button>')):'')
     +(compact?'<button class="lnk" data-go="club/chat" style="align-self:flex-start">Im Club-Chat ansehen ›</button>':'<div class="note" style="margin:0;font-size:11.5px">ausgeschrieben von der Lounge · '+hm(m.ts)+'</div>')+'</div>';}
 function vChannel(id){var c=chOf(id);if(!c)return '<div class="empty">Kanal nicht gefunden.</div>';if(!U)return needLogin('Der Lounge-Chat');
   if(!canSee(c))return c.vis==='club'?'<div class="card" style="display:flex;flex-direction:column;gap:10px"><div class="row">'+IC.lockic+'<b>Nur für Club-Mitglieder</b></div><p class="note" style="margin:0">Im Club-Bereich schreiben die Club-Mitglieder untereinander, und die Lounge kündigt die Race Time an – gratis fahren mit dem Club-Pass.</p><button class="btn" data-go="club">Mehr zum Club</button></div>'
@@ -1722,19 +1924,21 @@ function vChannel(id){var c=chOf(id);if(!c)return '<div class="empty">Kanal nich
   markChRead(id);
   return pinsH(c)+'<div id="msgs" class="msgs">'+msgsH(c)+'</div>';}
 function composerH(c){if(!c||!U||!canSee(c))return '';var t=(st.draft||{})[c.id]||'';
-  if(!canWrite(c))return '<div class="cmp"><div class="cmp-in">'+(c.ro?'<div class="roinfo"><p class="note">Hier schreibt nur die Lounge. Fragen dazu?</p><button class="btn pri" data-go="chat/talk" id="cmpTalk">Frage im Talk stellen</button></div>':'<div class="cmp-ro">Nur für Mitglieder</div>')+'</div></div>';
+  if(!canWrite(c))return '<div class="cmp"><div class="cmp-in">'+(CHAT.gesperrt&&!CHAT.admin&&!c.ro?'<div class="cmp-ro">Du kannst im Moment nicht schreiben. Fragen? Melde dich bei der Lounge.</div>':c.ro?'<div class="roinfo"><p class="note">Hier schreibt nur die Lounge. Fragen dazu?</p><button class="btn pri" data-go="chat/talk" id="cmpTalk">Frage im Talk stellen</button></div>':'<div class="cmp-ro">Nur für Mitglieder</div>')+'</div></div>';
   var rp=st.reply&&st.reply.ch===c.id?st.reply.re:null,rc=rp?reCol(rp):'';
   return '<div class="cmp"><div class="cmp-in">'+(rp?'<div class="cmp-re" style="border-left-color:'+rc+'"><span class="q"><b style="color:'+rc+'">'+(reName(rp)==='Du'?'Antwort auf deine Nachricht':'Antwort an '+e(reName(rp)))+'</b><span>'+e(rp.t)+'</span></span><button type="button" id="cmpReX" aria-label="Antwort abbrechen" title="Antwort abbrechen">×</button></div>':'')+(c.id==='club'&&CHAT.admin?'<button class="cbtn" id="cmpRT" aria-label="Race Time ausschreiben" title="Race Time ausschreiben">'+IC.plus+'</button>':'')
     +'<button class="cbtn" id="cmpImg" aria-label="Bild senden" title="Bild senden">'+IC.img+'</button><input type="file" id="cmpFile" accept="image/*" hidden>'
-    +'<textarea id="cmpT" rows="1" maxlength="1000" placeholder="'+(c.ro?'Info an alle …':'Nachricht an '+e(c.name)+' …')+'">'+e(t)+'</textarea><button class="cbtn send" id="cmpS" aria-label="Senden"'+(t.trim()?'':' disabled')+'>'+IC.send+'</button></div></div>';}
+    +'<textarea id="cmpT" rows="1" maxlength="1000" placeholder="'+(c.ro?'Info an alle …':'Nachricht an '+e(c.name)+' …')+'">'+e(t)+'</textarea><button class="cbtn send" id="cmpS" aria-label="Senden"'+(t.trim()&&!(CHAT.mode==='sb'&&SBK.sendet[c.id])?'':' disabled')+'>'+IC.send+'</button></div></div>';}
 function rtForm(){var d=new Date(),h=Math.min(21,d.getHours()+1);
   return '<form id="fRT" style="display:flex;flex-direction:column;gap:10px"><div class="row" style="gap:8px"><div class="fld grow"><label for="rtD">Datum</label><input class="inp" type="date" id="rtD" value="'+nowIso()+'"></div><div class="fld" style="width:96px"><label for="rtS">Sims frei</label><input class="inp" type="number" id="rtS" min="1" max="12" value="4"></div></div>'
     +'<div class="row" style="gap:8px"><div class="fld grow"><label for="rtF">von</label><input class="inp" type="time" id="rtF" value="'+String(h).padStart(2,'0')+':00"></div><div class="fld grow"><label for="rtT">bis</label><input class="inp" type="time" id="rtT" value="'+String(Math.min(23,h+3)).padStart(2,'0')+':00"></div></div>'
     +'<div class="fld"><label for="rtN">Notiz (optional)</label><input class="inp" id="rtN" maxlength="120" placeholder="z.B. Porsche Cup auf Spa läuft"></div>'
-    +'<button class="btn pri" type="submit">Race Time ausschreiben</button><p class="note" style="margin:0">Alle Club-Mitglieder bekommen eine Mitteilung und können «Ich komme» tippen. Du siehst sofort, wer kommt.</p></form>';}
+    +'<button class="btn pri" type="submit">Race Time ausschreiben</button><p class="note" style="margin:0">Alle Club-Mitglieder bekommen eine Mitteilung'+(CHAT.mode==='sb'?' in der App':'')+' und können «Ich komme» tippen. Du siehst sofort, wer kommt.</p></form>';}
 function bindRTForm(root,done){var f=root.querySelector('#fRT');if(!f)return;f.onsubmit=function(ev){ev.preventDefault();var rt={d:$('#rtD').value||nowIso(),f:$('#rtF').value||'18:00',t:$('#rtT').value||'21:00',sims:Math.max(1,Math.min(12,parseInt($('#rtS').value,10)||4)),note:($('#rtN').value||'').trim().slice(0,120)};
   if(rt.t<=rt.f){dialog('Zeit prüfen','<p class="note">«bis» muss später sein als «von».</p>',[{t:'OK',cls:'pri'}]);return;}
-  chatPost('club',{kind:'rt',rt:rt,a:'APlus Lounge',k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
+  var jz=new Date(),hm0=String(jz.getHours()).padStart(2,'0')+':'+String(jz.getMinutes()).padStart(2,'0');
+  if(rt.d<nowIso()||(rt.d===nowIso()&&rt.t<=hm0)){dialog('Zeit prüfen','<p class="note">Diese Zeit ist schon vorbei. Bitte einen Tag ab heute wählen.</p>',[{t:'OK',cls:'pri'}]);return;}   // Prüfung 4 (VERIF3 N8)
+  chatPost('club',{kind:'rt',rt:rt,a:'APlus Lounge',k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung'+(CHAT.mode==='sb'?' in der App (Push aufs gesperrte Handy folgt)':'')+'. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
 function sheet(html,binder){var d=$('#dlg');if($('#fMail')||$('#fCode')||$('.login.who'))lgGuard();d.innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';d.hidden=false;d.onclick=function(ev){if(ev.target===d)d.hidden=true;};if(binder)binder(d);}
 function msgActions(ch,id){var m=CHAT.msgs[ch].filter(function(x){return x.id===id;})[0];if(!m||!U)return;var rx=CHAT.rx[id]||{},mine=isMine(m),cw=canWrite(chOf(ch));
   var eb=function(x){return '<button type="button" data-se="'+x[0]+'" class="'+((rx[x[0]]||[]).indexOf(U)>=0?'mine':'')+'" aria-label="Reaktion '+x[1]+'">'+x[1]+'</button>';};
@@ -1747,7 +1951,7 @@ function msgActions(ch,id){var m=CHAT.msgs[ch].filter(function(x){return x.id===
       var mb=d.querySelector('[data-emore]'),ga=d.querySelector('.emo-all');if(mb&&ga)mb.onclick=function(){ga.hidden=!ga.hidden;mb.classList.toggle('on',!ga.hidden);mb.setAttribute('aria-expanded',String(!ga.hidden));};
       d.querySelectorAll('[data-sa]').forEach(function(b){b.onclick=function(){var a=b.getAttribute('data-sa');d.hidden=true;if(a==='re')startReply(ch,m);if(a==='rep')chatReport(ch,m);if(a==='del')dialog('Löschen?','<p class="note">Die Nachricht verschwindet für alle.</p>',[{t:'Abbrechen'},{t:'Löschen',cls:'pri',f:function(){chatDelete(ch,id);}}]);};});});}
 function bindMsgs(){var ch=curChId();bindPins(ch);
-  app.querySelectorAll('#msgs [data-img]').forEach(function(im){im.onclick=function(ev){ev.stopPropagation();var m=(CHAT.msgs[ch]||[]).filter(function(x){return x.id===im.getAttribute('data-img');})[0];if(m&&okImg(m.img))sheet('<img src="'+m.img+'" alt="Bild" style="width:100%;border-radius:12px"><button class="btn full" id="imX">Schliessen</button>',function(d){d.querySelector('#imX').onclick=function(){d.hidden=true;};});};});
+  app.querySelectorAll('#msgs [data-img]').forEach(function(im){im.onclick=function(ev){ev.stopPropagation();var m=(CHAT.msgs[ch]||[]).filter(function(x){return x.id===im.getAttribute('data-img');})[0];if(m&&(m.imgOk||okImg(m.img)))sheet('<img src="'+m.img+'" alt="Bild" style="width:100%;border-radius:12px"><button class="btn full" id="imX">Schliessen</button>',function(d){d.querySelector('#imX').onclick=function(){d.hidden=true;};});};});
   app.querySelectorAll('#msgs .ytc').forEach(function(a){a.onclick=function(ev){ev.stopPropagation();};});
   app.querySelectorAll('#msgs [data-rq]').forEach(function(q){q.onclick=function(ev){ev.stopPropagation();var id=q.getAttribute('data-rq'),t=null;
     app.querySelectorAll('#msgs [data-mid]').forEach(function(b){if(!t&&b.getAttribute('data-mid')===id)t=b;});
@@ -1760,9 +1964,11 @@ function bindMsgs(){var ch=curChId();bindPins(ch);
 function takeReply(c,o){if(!(st.reply&&st.reply.ch===c.id))return false;o.re=st.reply.re;st.reply=null;return true;}
 function bindComposer(c){var tb=$('#cmpTalk');if(tb)tb.onclick=function(){go('chat/talk');};var t=$('#cmpT'),s=$('#cmpS');if(!t||!s)return;st.draft=st.draft||{};
   var fit=function(){t.style.height='44px';t.style.height=Math.min(132,t.scrollHeight)+'px';};fit();
-  t.oninput=function(){st.draft[c.id]=t.value;s.disabled=!t.value.trim();fit();};
-  var send=function(){var v=t.value.replace(/\s+$/,'');if(!v.trim())return;t.value='';st.draft[c.id]='';s.disabled=true;fit();
-    var o=c.ro?{t:v.slice(0,1000),a:'APlus Lounge',k:'',team:true}:{t:v.slice(0,1000),a:ME.n,k:U},hadRe=takeReply(c,o);chatPost(c.id,o).then(function(ok){if(ok!==false)return;st.draft[c.id]=v;if(o.re&&!st.reply)st.reply={ch:c.id,re:o.re};var t2=$('#cmpT');if(curChId()===c.id&&t2&&!t2.value)cmpRefresh(c.id,false);});if(hadRe)cmpRefresh(c.id,true);else t.focus();setTimeout(function(){window.scrollTo(0,document.documentElement.scrollHeight);},60);};
+  t.oninput=function(){st.draft[c.id]=t.value;s.disabled=!t.value.trim()||!!(CHAT.mode==='sb'&&SBK.sendet[c.id]);fit();};
+  var send=function(){var v=t.value.replace(/\s+$/,'');if(!v.trim())return;if(CHAT.mode==='sb'&&SBK.sendet[c.id])return;t.value='';st.draft[c.id]='';s.disabled=true;fit();
+    var o=c.ro?{t:v.slice(0,1000),a:'APlus Lounge',k:'',team:true}:{t:v.slice(0,1000),a:ME.n,k:U},hadRe=takeReply(c,o);
+    if(CHAT.mode==='sb'){SBK.sendet[c.id]=v.slice(0,1000);chatRefresh();}   // Prüfung 4 (VERIF3 N3): «wird gesendet …», Senden gesperrt bis zur Antwort
+    chatPost(c.id,o).then(function(ok){if(CHAT.mode==='sb'){delete SBK.sendet[c.id];chatRefresh();if(curChId()===c.id&&ok!==false)cmpRefresh(c.id,false);}if(ok!==false)return;var t2=$('#cmpT');if(t2&&t2.value)return;st.draft[c.id]=v;if(o.re&&!st.reply)st.reply={ch:c.id,re:o.re};if(curChId()===c.id)cmpRefresh(c.id,false,v);});/* Prüfung 3x: der Text kommt wieder ins Feld (nicht vom leeren Feld überschrieben) */if(hadRe)cmpRefresh(c.id,true);else t.focus();setTimeout(function(){window.scrollTo(0,document.documentElement.scrollHeight);},60);};
   s.onclick=send;t.onkeydown=function(ev){if(ev.key==='Enter'&&!ev.shiftKey&&!('ontouchstart' in window)){ev.preventDefault();send();}else if(ev.key==='Escape'&&st.reply&&st.reply.ch===c.id){st.reply=null;cmpRefresh(c.id,true);}};
   var rx=$('#cmpReX');if(rx)rx.onclick=function(){st.reply=null;cmpRefresh(c.id,true);};
   var bi=$('#cmpImg'),fi=$('#cmpFile');if(bi&&fi){bi.onclick=function(){fi.value='';fi.click();};fi.onchange=function(){var f=fi.files&&fi.files[0];if(f)imgPick(c,f);};}
@@ -1774,14 +1980,14 @@ function ytId(t){var m=/(?:youtube\.com\/(?:watch\?(?:[^\s#]*&)?v=|shorts\/|live
 function ytCard(t){var id=ytId(t);if(!id)return '';var sh=/youtube\.com\/shorts\//.test(t);
   return '<a class="ytc" href="https://www.youtube.com/'+(sh?'shorts/':'watch?v=')+id+'" target="_blank" rel="noopener"><span class="yti"><img src="https://i.ytimg.com/vi/'+id+'/hqdefault.jpg" alt="" loading="lazy" onerror="this.remove()"><span class="ytb">'+IC.play+'</span></span><span class="ytt">'+(sh?'YouTube Short':'YouTube-Video')+'<span>Antippen zum Abspielen auf YouTube</span></span></a>';}
 // Leiste «Infos zum Kanal» (früher «Wichtig»): angeheftete Einträge pro Kanal (die Lounge pflegt sie; später im TimeTool)
-var PINK=[['pdf','Dokument / Briefing (PDF)'],['video','Video (YouTube-Link)'],['playlist','Playlist (YouTube)'],['link','Link / Rangliste'],['info','Info']];
+var PINK=[['pdf','Dokument / Briefing (PDF)'],['bild','Bild'],['video','Video (YouTube-Link)'],['playlist','Playlist (YouTube)'],['link','Link / Rangliste'],['info','Info']];   // Prüfung 3x: «Bild» (z.B. aus dem TimeTool)
 function pinsOf(ch){return (CHAT.pins||[]).filter(function(x){return x.ch===ch;}).sort(function(a,b){return (a.o||0)-(b.o||0)||(a.ts||0)-(b.ts||0);});}
 function okUrl(u){return /^https:\/\/[^\s"'<>]+$/.test(String(u||''));}
 function pinHref(x){return x.asset&&/^[A-Za-z0-9]{32}$/.test(x.asset)?'/_blob/'+x.asset:(okUrl(x.url)?x.url:'');}
 function pinsH(c){if(!c)return '<div id="pins"></div>';var a=pinsOf(c.id);if(!a.length&&!CHAT.admin)return '<div id="pins"></div>';
   return '<div class="pins" id="pins"><div class="pins-h">'+IC.infoc+'INFOS ZUM KANAL<span class="grow"></span>'+(CHAT.admin?'<button class="lnk" data-pinedit="1" style="letter-spacing:0;font-family:var(--body)">'+(st.pinEdit?'Fertig':'Bearbeiten')+'</button>':'')+'</div><div class="pinrow">'
-    +a.map(function(x){var vid=x.kind==='video'||x.kind==='playlist',th=vid?'<span class="pth vid"><span class="ytb">'+IC.play+'</span></span>':'<span class="pth">'+(x.kind==='pdf'?IC.doc:x.kind==='info'?IC.info:IC.link)+'</span>';
-      var sub=x.sub||(x.kind==='pdf'?'Dokument':x.kind==='video'?'Video':x.kind==='playlist'?'Playlist':x.kind==='info'?'Info':'Link');
+    +a.map(function(x){var vid=x.kind==='video'||x.kind==='playlist',th=vid?'<span class="pth vid"><span class="ytb">'+IC.play+'</span></span>':'<span class="pth">'+(x.kind==='pdf'?IC.doc:x.kind==='bild'?IC.img:x.kind==='info'?IC.info:IC.link)+'</span>';
+      var sub=x.sub||(x.kind==='pdf'?'Dokument':x.kind==='bild'?'Bild':x.kind==='video'?'Video':x.kind==='playlist'?'Playlist':x.kind==='info'?'Info':'Link');
       var inner=th+'<span class="ptx">'+e(x.title)+'<span>'+e(sub)+'</span></span>';
       return pinHref(x)&&!(CHAT.admin&&st.pinEdit)?'<a class="pin" href="'+e(pinHref(x))+'" target="_blank" rel="noopener" data-pin="'+e(x.id)+'">'+inner+'</a>':'<button class="pin" type="button" data-pin="'+e(x.id)+'">'+inner+'</button>';}).join('')
     +(CHAT.admin?'<button class="pin add" type="button" data-pinadd="'+e(c.id)+'">+ Hinzufügen</button>':'')+'</div></div>';}
@@ -1789,7 +1995,7 @@ function bindRec(){var a=app.querySelector('[data-act="recmore"],[data-act="recl
 function bindPins(ch){var a=app.querySelector('[data-pinadd]');if(a)a.onclick=function(){pinEdit(ch,null);};var pe=app.querySelector('[data-pinedit]');if(pe)pe.onclick=function(){st.pinEdit=!st.pinEdit;var pb=$('#pins');if(pb){pb.outerHTML=pinsH(chOf(ch));bindPins(ch);}};
   app.querySelectorAll('[data-pin]').forEach(function(b){var id=b.getAttribute('data-pin'),x=(CHAT.pins||[]).filter(function(y){return y.id===id;})[0];if(!x)return;
     var show=function(){dialog(x.title,'<p class="note" style="white-space:pre-wrap">'+e(x.text||x.sub||'')+'</p>',[{t:'OK',cls:'pri'}]);};
-    if(b.tagName==='BUTTON')b.onclick=function(){if(CHAT.admin&&st.pinEdit)pinMenu(ch,x,x.text?show:null);else if(pinHref(x))window.open(pinHref(x),'_blank','noopener');else show();};
+    if(b.tagName==='BUTTON')b.onclick=function(){if(CHAT.admin&&st.pinEdit)pinMenu(ch,x,x.text?show:null);else if(pinHref(x))window.open(pinHref(x),'_blank','noopener');else if(x.file)sbFile(x.file,x.title);/* Stufe 2: PDF/Bild aus dem TimeTool */else show();};
     else if(CHAT.admin)b.oncontextmenu=function(ev){ev.preventDefault();pinMenu(ch,x,null);};});}
 function pinMenu(ch,x,show){sheet('<h3>'+e(x.title)+'</h3><div class="list">'+(show?'<button class="li" data-pm="show"><span class="grow t">Ansehen</span></button>':'')+'<button class="li" data-pm="ed"><span class="grow t">Bearbeiten</span></button><button class="li" data-pm="del"><span class="grow t" style="color:var(--red)">Entfernen</span></button><button class="li" data-pm="x"><span class="grow t">Schliessen</span></button></div>',
   function(d){d.querySelectorAll('[data-pm]').forEach(function(b){b.onclick=function(){var a=b.getAttribute('data-pm');d.hidden=true;if(a==='show')show();if(a==='ed')pinEdit(ch,x);if(a==='del')dialog('Entfernen?','<p class="note">Der Eintrag verschwindet aus «Infos zum Kanal».</p>',[{t:'Abbrechen'},{t:'Entfernen',cls:'pri',f:function(){pinDel(x.id);}}]);};});});}
@@ -1797,6 +2003,7 @@ function pinEdit(ch,x){var ed=x?Object.assign({},x):{kind:'video',title:'',url:'
   sheet('<h3>'+(x?'Eintrag bearbeiten':'Zu den Infos zum Kanal hinzufügen')+'</h3><form id="fPin" style="display:flex;flex-direction:column;gap:10px">'
     +'<div class="fld"><label for="pkK">Art</label><select class="inp" id="pkK">'+PINK.map(function(k){return '<option value="'+k[0]+'"'+(ed.kind===k[0]?' selected':'')+'>'+k[1]+'</option>';}).join('')+'</select></div>'
     +'<div class="fld"><label for="pkT">Titel</label><input class="inp" id="pkT" maxlength="50" value="'+e(ed.title)+'" placeholder="z.B. So geht der Boxenstopp"></div>'
+    +(ed.file&&CHAT.mode==='sb'?'<div class="fld"><label>Datei</label><span class="note">📎 Datei aus dem TimeTool angehängt ✓ (ändern im TimeTool)</span></div>':'')
     +(CHAT.assets?'<div class="fld"><label>Datei (PDF oder Bild)</label><div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn" id="pkF">📎 Datei vom Computer wählen</button><span class="note" id="pkFn">'+(ed.asset?'Datei angehängt ✓':'')+'</span></div><input type="file" id="pkFi" accept="application/pdf,image/*" hidden></div>':'')
     +'<div class="fld"><label for="pkU">'+(CHAT.assets?'oder Link (https://…)':'Link (https://…)')+'</label><input class="inp" id="pkU" maxlength="500" value="'+e(ed.url)+'" placeholder="YouTube, Rangliste, Webseite …"></div>'
     +'<div class="fld"><label for="pkS">Kurzinfo (optional)</label><input class="inp" id="pkS" maxlength="40" value="'+e(ed.sub)+'" placeholder="z.B. 3:20 · YouTube"></div>'
@@ -1813,11 +2020,11 @@ function pinEdit(ch,x){var ed=x?Object.assign({},x):{kind:'video',title:'',url:'
     var o={ch:ch,asset:ed.asset||'',kind:d.querySelector('#pkK').value,title:d.querySelector('#pkT').value.trim().slice(0,50),url:d.querySelector('#pkU').value.trim().slice(0,500),sub:d.querySelector('#pkS').value.trim().slice(0,40),text:d.querySelector('#pkX').value.trim().slice(0,600),o:x?(x.o||0):pinsOf(ch).length+1,ts:x?(x.ts||Date.now()):Date.now()};
     if(!o.title){er('Bitte einen Titel eingeben.');return;}
     if(o.url&&!okUrl(o.url)){if(/^[a-z0-9.-]+\.[a-z]{2,}(\/|$)/i.test(o.url)){o.url='https://'+o.url;d.querySelector('#pkU').value=o.url;}else{er('Der Link muss mit https:// beginnen.');return;}}
-    if(!o.url&&!o.text&&!o.asset){er('Bitte eine Datei wählen, einen Link oder einen Text eingeben.');return;}
+    if(!o.url&&!o.text&&!o.asset&&!ed.file){er('Bitte eine Datei wählen, einen Link oder einen Text eingeben.');return;}   // Prüfung 3x: Datei aus dem TimeTool gilt als angehängt
     d.hidden=true;pinSave(x?x.id:'p'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),o);};});}
-function pinSave(id,o){if(CHAT.mode==='db')return CHAT.db.doc('pins/'+id).set(o).catch(function(){alertD('Nicht gespeichert','Anheften darf nur die Lounge.');});
+function pinSave(id,o){if(CHAT.mode==='sb')return sbPinSave(id,o);/* Stufe 2 */if(CHAT.mode==='db')return CHAT.db.doc('pins/'+id).set(o).catch(function(){alertD('Nicht gespeichert','Anheften darf nur die Lounge.');});
   CHAT.local.pins=(CHAT.local.pins||[]).filter(function(x){return x.id!==id;});o.id=id;CHAT.local.pins.push(o);localSave();}
-function pinDel(id){if(CHAT.mode==='db')return CHAT.db.doc('pins/'+id).delete().catch(function(){alertD('Nicht entfernt','Entfernen darf nur die Lounge.');});
+function pinDel(id){if(CHAT.mode==='sb')return sbPinDel(id);/* Stufe 2: Markierung */if(CHAT.mode==='db')return CHAT.db.doc('pins/'+id).delete().catch(function(){alertD('Nicht entfernt','Entfernen darf nur die Lounge.');});
   CHAT.local.pins=(CHAT.local.pins||[]).filter(function(x){return x.id!==id;});localSave();}
 // Bild senden: wird auf dem Handy verkleinert (höchstens ca. 1000 Pixel), damit es schnell lädt
 function imgPick(c,f){if(!/^image\//.test(f.type||'')){alertD('Kein Bild','Bitte ein Bild auswählen (JPG, PNG …).');return;}
@@ -1836,7 +2043,7 @@ function setting(){var s=(U&&ls('set2-'+U))||{};return {gen:s.gen!==false,awrem:
 function settingSave(f){if(!U)return;var s=setting();f(s);ls('set2-'+U,s);}
 function vSettings(){if(!U)return needLogin('Die Einstellungen');var S=setting();
   var tg=function(key,on,lab,sub){return '<button class="li" data-st="'+key+'" role="switch" aria-checked="'+(on?'true':'false')+'"><span class="grow"><span class="t" style="display:block">'+lab+'</span>'+(sub?'<span class="s">'+sub+'</span>':'')+'</span><span class="tgl'+(on?' on':'')+'"></span></button>';};
-  var h='<section class="sec"><div class="sh"><h2>Mitteilungen</h2></div><div class="list">'+tg('gen',S.gen,'Allgemeine Infos der Lounge','Veranstaltungen, Neuigkeiten, Infos – nicht aus einem Chat')+tg('awrem',S.awrem,'AfterWork-Erinnerung','Dienstag am Mittag, mit Strecke und Auto')+tg('awres',S.awres,'AfterWork-Resultat','Rangliste nach dem Abend')+tg('ls',S.ls,'Last Shot','sofort, wenn du im Fenster bist')+'</div><p class="note">Erinnerung, Resultat und Last Shot kommen mit der echten App aufs Handy.</p></section>';
+  var h='<section class="sec"><div class="sh"><h2>Mitteilungen</h2></div><div class="list">'+tg('gen',S.gen,'Allgemeine Infos der Lounge','Veranstaltungen, Neuigkeiten, Infos – nicht aus einem Chat')+tg('awrem',S.awrem,'AfterWork-Erinnerung','Dienstag am Mittag, mit Strecke und Auto')+tg('awres',S.awres,'AfterWork-Resultat','Rangliste nach dem Abend')+tg('ls',S.ls,'Last Shot','sofort, wenn du im Fenster bist')+'</div><p class="note">'+(CHAT.mode==='sb'?'Die Schalter gelten für die Mitteilungen in der App – Push aufs gesperrte Handy folgt.':'Erinnerung, Resultat und Last Shot kommen mit der echten App aufs Handy.')+'</p></section>';
   var chs=CH.filter(function(c){return !c.arch&&(canSee(c)||c.id==='club');});   // Club-Chat immer zeigen, für Nicht-Mitglieder ausgegraut
   h+='<section class="sec"><div class="sh"><h2>Kanäle</h2></div><p class="note" style="margin:0 0 8px">Pro Kanal einstellbar: <b style="color:#fff">Mitteilung</b> = Ton und Hinweis am Handy<br><b style="color:#fff">Rote Zahl</b> = Zähler für neue Nachrichten <span class="ubadge" style="display:inline-grid;vertical-align:middle;background:#ff4d4d;color:#fff">3</span></p><div class="list stbl"><div class="li" style="padding-top:8px;padding-bottom:8px;background:var(--bg2)"><span class="grow note" style="margin:0">Kanal</span><span class="sc sh2">Mitteilung</span><span class="sc sh2">Rote Zahl</span></div>'
     +chs.map(function(c){var lk=c.id==='club'&&!isMem()&&!CHAT.admin,pu=!lk&&S.push[c.id]!==false,ba=!lk&&S.badge[c.id]!==false;   // Roger 31.10.2026: Club-Chat für Nicht-Mitglieder ausgegraut
@@ -1844,18 +2051,19 @@ function vSettings(){if(!U)return needLogin('Die Einstellungen');var S=setting()
     +'<div class="note" style="margin-top:10px;display:flex;flex-direction:column;gap:5px"><span><b style="color:#fff">Mitteilung aus</b> = kein Ton und kein Hinweis am Handy. Die rote Zahl zeigt trotzdem, dass etwas Neues da ist.</span><span><b style="color:#fff">Rote Zahl aus</b> = keine Zahl bei diesem Kanal und auf dem App-Symbol.</span><span><b style="color:#fff">Beides aus</b> = der Kanal ist stumm.</span></div></section>';
   h+='<section class="sec"><div class="sh"><h2>Newsletter</h2></div><div class="list">'+tg('nl',S.nl,'Newsletter per E-Mail',S.nl?'✓ Angemeldet – du bekommst den Newsletter der Lounge per E-Mail. Ausschalten = abmelden, dann kommt er nicht mehr.':'Nicht angemeldet. Einschalten = du bekommst den Newsletter der Lounge zusätzlich per E-Mail. In der App bekommst du die News sowieso.')+'</div></section>';
   h+='<section class="sec"><div class="sh"><h2>Rechtliches</h2></div><div class="list">'+[['ds','Datenschutzerklärung'],['nr','Nutzungs- und Chat-Regeln'],['imp','Impressum']].map(function(x){return '<button class="li" data-legal="'+x[0]+'"><span class="grow t">'+x[1]+'</span>'+IC.chev+'</button>';}).join('')+'</div></section>';
-  return h+'<p class="note">Testversion: Die Einstellungen gelten auf diesem Handy. Push aufs geschlossene Handy kommt mit der echten App.</p>';}
+  return h+'<p class="note">'+(CHAT.mode==='sb'||REAL?'Die Einstellungen gelten auf diesem Handy.':'Testversion: Die Einstellungen gelten auf diesem Handy. Push aufs geschlossene Handy kommt mit der echten App.')+'</p>';}
 function bindSettings(){app.querySelectorAll('[data-st]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-st');settingSave(function(s){s[k]=!s[k];});if(k==='nl')nlSet(setting().nl);render();};});
   app.querySelectorAll('[data-stp]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-stp');settingSave(function(s){s.push[k]=s.push[k]===false;});render();};});
   app.querySelectorAll('[data-stb]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-stb');settingSave(function(s){s.badge[k]=s.badge[k]===false;});render();};});}
 // Newsletter: An-/Abmeldung geht an die Lounge (später ins TimeTool unter 🔔 Meldungen, von dort mit Knopf an HubSpot)
 function nlSet(on){if(!U)return;var body={k:U,n:ME.n,on:!!on,ts:Date.now(),dv:DEV};
   var fail=function(){settingSave(function(s){s.nl=!on;});render();alertD('Nicht gespeichert','Die Änderung konnte nicht gespeichert werden. Prüfe die Verbindung und versuche es nochmals.');};
+  if(CHAT.mode==='sb'){sbNl(on,fail);return;}   // Stufe 2: Newsletter → Zentrale → TimeTool
   if(CHAT.mode==='db'){(CHAT.uidP||Promise.resolve(CHAT.uid)).then(function(id){if(!id){fail();return;}return CHAT.db.doc('nl/'+id).set(body).then(function(){nlOk(on);});}).catch(fail);return;}
   if(CHAT.local){(CHAT.local.nl=CHAT.local.nl||{})[U]=body;ls('chat-v1',CHAT.local);}nlOk(on);}
 function nlOk(on){
   dialog(on?'Newsletter bestellt':'Newsletter abbestellt','<p class="note">'+(on?'Du bekommst die News der Lounge ab jetzt auch per E-Mail. Abbestellen kannst du jederzeit hier.':'Du bekommst keinen Newsletter mehr per E-Mail. In der App bekommst du die News weiterhin.')+'</p>',[{t:'OK',cls:'pri'}]);}
-function nlList(){if(CHAT.mode==='db')return CHAT.nl||[];var o=(CHAT.local&&CHAT.local.nl)||{};return Object.keys(o).map(function(k){return o[k];});}
+function nlList(){if(CHAT.mode==='db'||CHAT.mode==='sb')return CHAT.nl||[];var o=(CHAT.local&&CHAT.local.nl)||{};return Object.keys(o).map(function(k){return o[k];});}
 // Rechtstexte (Entwurf 30.10.2026, Doc «App – Datenschutz, Nutzungsregeln und Impressum»)
 var LEGAL={
  ds:['Datenschutzerklärung','<p><b>Kurz gesagt:</b> Wir brauchen deinen Namen und deine E-Mail-Adresse, damit du deine Zeiten siehst und in der Community mitreden kannst. Deine Daten bleiben bei uns und werden nicht verkauft. Dein Konto kannst du jederzeit löschen.</p><p>Diese Erklärung gilt für die App. Für unsere Webseite gilt die Datenschutzerklärung auf simracing-events.ch.</p>'
@@ -1890,7 +2098,7 @@ function bind(){
   app.querySelectorAll('[data-sub]').forEach(function(x){x.onclick=function(){var p=x.getAttribute('data-sub');go(p,false);};});
   app.querySelectorAll('[data-flt]').forEach(function(x){x.onclick=function(){var p=x.getAttribute('data-flt').split(':');st.flt[p[0]]=p[1];render();};});
   app.querySelectorAll('[data-tgl]').forEach(function(x){x.onclick=function(){var s=ls('set-'+U)||{aw:true,ls:true,ev:true,news:true,chat:true,club:true},k=x.getAttribute('data-tgl');s[k]=!s[k];ls('set-'+U,s);render();};});
-  app.querySelectorAll('[data-nt]').forEach(function(x){x.onclick=function(){var id=x.getAttribute('data-nt'),n=notifs().filter(function(y){return y.id===id;})[0];markRead(id);if(n&&n.go)go(n.go);else render();};});
+  app.querySelectorAll('[data-nt]').forEach(function(x){x.onclick=function(){var id=x.getAttribute('data-nt'),n=notifs().filter(function(y){return y.id===id;})[0];markRead(id);if(pushOeffnen(n)){render();return;}if(n&&n.go&&n.go!=='notif')go(n.go);else render();};});
   app.querySelectorAll('[data-sec]').forEach(function(x){x.onclick=function(){var c=D.combos[+(st.path.split('/')[2])],r=c.top[+x.getAttribute('data-sec')],box=$('#secBox');if(!box)return;box.innerHTML='<div class="card"><b>'+e(r[0])+' · '+fmt(r[1])+'</b><div class="refs" style="margin-top:8px"><div class="ref"><span class="note">Sektor 1</span><b class="num">'+sec(r[2])+'</b></div><div class="ref"><span class="note">Sektor 2</span><b class="num">'+sec(r[3])+'</b></div><div class="ref"><span class="note">Sektor 3</span><b class="num">'+sec(r[4])+'</b></div></div><p class="note" style="margin:8px 0 0">Gefahren am '+tsD(r[5])+'</p></div>';box.scrollIntoView({behavior:'smooth',block:'nearest'});};});
   app.querySelectorAll('[data-pg]').forEach(function(x){x.onclick=function(){var q=x.getAttribute('data-pg').split(':');st.pg=st.pg||{};st.pg[+q[0]]=+q[1];render();var t=$('.tw');if(t)t.scrollIntoView({block:'start'});window.scrollBy(0,-70);};});
   var ib=$('#iBoard');if(ib)ib.oninput=function(){st.q[ib.getAttribute('data-q')||'board']=ib.value;var pos=ib.selectionStart;render();var n=$('#iBoard');n.focus();try{n.setSelectionRange(pos,pos);}catch(x){}};
@@ -1899,7 +2107,8 @@ function bind(){
   bindAdmin();bindSettings();
   app.querySelectorAll('[data-legal]').forEach(function(x){x.onclick=function(ev){ev.preventDefault();legalSheet(x.getAttribute('data-legal'));};});
   var fn=$('#fNews');if(fn)fn.onsubmit=function(ev){ev.preventDefault();var t=$('#nTi').value.trim(),x=$('#nTx').value.trim();if(!t||!x){dialog('Noch nicht vollständig','<p class="note">Titel und Text brauchen beide etwas Inhalt.</p>',[{t:'OK',cls:'pri'}]);return;}
-    var a=ls('admin-news')||[];a.unshift({id:'loc'+Date.now(),date:TODAY,tag:'Lounge',title:t,text:x,local:true});ls('admin-news',a);dialog('Veröffentlicht','<p class="note">Die News steht jetzt zuoberst unter «News» (in der Testversion nur auf diesem Handy).</p>',[{t:'Ansehen',cls:'pri',f:function(){go('news');}},{t:'OK'}]);};
+    if(CHAT.mode==='sb'){sbNews(t,x);return;}   // Stufe 2: für alle (Zentrale)
+    var a=ls('admin-news')||[];a.unshift({id:'loc'+Date.now(),date:TODAY,tag:'Lounge',title:t,text:x,local:true});ls('admin-news',a);dialog('Veröffentlicht','<p class="note">Die News steht jetzt zuoberst unter «News» ('+(REAL?'vorerst nur auf diesem Handy':'in der Testversion nur auf diesem Handy')+').</p>',[{t:'Ansehen',cls:'pri',f:function(){go('news');}},{t:'OK'}]);};
   bindRec();wrInit();bindTroph();try{trCheck();}catch(x){if(window.console)console.error(x);}
   if($('#qr')&&window.QRCode){try{new QRCode($('#qr'),{text:'APLUS-LOUNGE:'+U,width:168,height:168,colorDark:'#0B1424',colorLight:'#ffffff',correctLevel:QRCode.CorrectLevel.M});}catch(x){}}
   else if($('#qr'))$('#qr').innerHTML='<div style="width:168px;height:168px;display:grid;place-items:center;color:#0B1424;font-weight:700">QR</div>';
@@ -1910,7 +2119,7 @@ function act(a,x){
   if(a==='login'){st.guest=false;L.step='mail';ls('user',null);render();}
   if(a==='logout')dialog('Abmelden?','<p class="note">Du kannst dich jederzeit wieder mit deiner E-Mail und einem Code anmelden.</p>',[{t:'Abbrechen'},{t:'Abmelden',cls:'pri',f:function(){if(REAL){realLogout();return;}ls('user',null);U=null;ME=null;st={tab:'home',stack:[],sub:{},q:{},flt:{}};L={step:'mail',mail:'',err:'',q:''};render();}}]);
   if(a==='switch'){if(REAL&&REALKEYS.length<2)return;U=null;ME=null;st.guest=false;st.reply=null;st.draft={};L={step:'who',mail:(ls('user')||{}).mail||'test@aplus.ch',err:'',q:''};st.stack=[];st.path='home';drawLogin();}
-  if(a==='reg'||a==='unreg'){var d=x.getAttribute('data-d');regToggle(d,a==='reg');if(a==='reg')dialog('Du bist dabei','<p class="note">Wir freuen uns auf dich am '+WDL[pd(d).getUTCDay()]+', '+dmy(d)+'. In der echten App stehst du damit in der Gästeliste dieses AfterWorks im TimeTool.</p>',[{t:'Super',cls:'pri'}]);render();}
+  if(a==='reg'||a==='unreg'){var d=x.getAttribute('data-d');regToggle(d,a==='reg');if(a==='reg')dialog('Du bist dabei','<p class="note">Wir freuen uns auf dich am '+WDL[pd(d).getUTCDay()]+', '+dmy(d)+'. Die Lounge sieht, dass du kommst.</p>',[{t:'Super',cls:'pri'}]);render();}
   if(a==='chnew')chEdit('');
   if(a==='asdriver'){ls('asdriver',ls('asdriver')?null:true);applyAdm();st.pinEdit=false;render();}
   if(a==='view'){ls('asdriver',x.getAttribute('data-v')==='fahrer'?true:null);applyAdm();st.pinEdit=false;render();}
@@ -1950,7 +2159,7 @@ function lgCodeErr(err,c){var r=realErr(err,'code'),t=lgSent();L.info='';
 function realMsg(t){app.innerHTML='<div class="login"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2><p class="muted">'+e(t)+'</p></div></div>';}
 function realLogout(){var done=function(){try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('apl-')===0)localStorage.removeItem(k);});}catch(x){}MEMU=null;location.reload();};try{SB.auth.signOut({scope:'local'}).then(done,done);}catch(x){done();}}   // Prüfung 01.11.: alles von der App auf diesem Handy löschen, andere Geräte bleiben angemeldet
 function realBlocked(mail,why){app.innerHTML='<div class="login"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px">'+(why==='nodata'?'<b>Deine Fahrerdaten fehlen noch</b><p class="note" style="margin:0"><b>'+e(mail)+'</b> ist freigeschaltet, aber wir finden deine Fahrerdaten noch nicht. Bitte melde dich an der Theke – danach tippe auf «Nochmals prüfen».</p>':'<b>Diese E-Mail kennen wir noch nicht</b><p class="note" style="margin:0"><b>'+e(mail)+'</b> ist bei uns noch nicht für die App freigeschaltet. Hast du in der Lounge vielleicht eine andere E-Mail angegeben? Dann versuche es damit. Sonst melde dich an der Theke – sobald wir dich freigeschaltet haben, tippe auf «Nochmals prüfen».</p>')+'<button class="btn pri full" id="bAgain">Nochmals prüfen</button><button class="btn full" id="bOut">Andere E-Mail versuchen</button></div></div>';var b=$('#bOut');if(b)b.onclick=realLogout;var a=$('#bAgain');if(a)a.onclick=function(){location.reload();};}
-function realAfter(s){var mail=String((s&&s.user&&s.user.email)||'').toLowerCase();L.mail=mail;realMsg('Deine Daten werden geladen …');
+function realAfter(s){var mail=String((s&&s.user&&s.user.email)||'').toLowerCase();L.mail=mail;SBK.mail=mail;realMsg('Deine Daten werden geladen …');
   SB.from('freigabe').select('fahrer,name,rolle').then(function(r){if(r.error)throw r.error;var rows=r.data||[];if(!rows.length){realBlocked(mail);return;}
     REALROLE=rows.some(function(x){return x.rolle==='betreiber';});
     return SB.from('app_daten').select('inhalt').eq('id','main').maybeSingle().then(function(d){if(d.error)throw d.error;if(!d.data||!d.data.inhalt)throw new Error('Noch keine Daten in der Zentrale');return d.data.inhalt;}).then(function(txt){prepData(JSON.parse(txt));
