@@ -815,7 +815,7 @@ function header(){
 function navbar(){if(!U)return '';   // Schaufenster: keine Reiter
 var n=U?unreadAll():0,nc=U?unreadOf(chOf('club')):0;setBadge();return '<div class="nav"><nav aria-label="Hauptmenü">'+TABS.map(function(t){var x=t[0]==='chat'?n:t[0]==='club'?nc:0;return '<button data-tab="'+t[0]+'" class="'+(st.tab===t[0]?'on':'')+'" aria-label="'+t[1]+'">'+IC[t[0]]+'<span>'+t[1]+'</span>'+(x?'<span class="nb">'+(x>99?'99+':x)+'</span>':'')+'</button>';}).join('')+'</nav></div>';}
 // Rote Zahl auf dem App-Symbol (wenn die App auf dem Startbildschirm liegt und das Handy es kann)
-function setBadge(){try{var n=U?unreadAll()+unreadOf(chOf('club')):0;if(navigator.setAppBadge){if(n)navigator.setAppBadge(n).catch(function(){});else if(navigator.clearAppBadge)navigator.clearAppBadge().catch(function(){});}}catch(x){}}
+function setBadge(){try{var n=U?unreadAll()+unreadOf(chOf('club')):0;if(navigator.setAppBadge){if(n)navigator.setAppBadge(n).catch(function(){});else if(navigator.clearAppBadge)navigator.clearAppBadge().catch(function(){});}wpBadge(n);}catch(x){}}   // wpBadge: Stufe 3 (Zähler für sw.js)
 function render(){
   var p=st.path||'home',parts=p.split('/'),v='';
   try{
@@ -846,7 +846,7 @@ function needLogin(what){return '<div class="card" style="display:flex;flex-dire
 // ---------------------------------------------------------------- Start
 function vHome(){
   var h='';
-  if(U){var a=awState(U);h+=a?licCard(a,true):welcomeCard();var rtn=nextRT();if(rtn&&isMem())h+=rtCard(rtn,true);}
+  if(U){var a=awState(U);h+=a?licCard(a,true):welcomeCard();var rtn=nextRT();if(rtn&&isMem())h+=rtCard(rtn,true);h+=wpKarte();}   // wpKarte: Stufe 3
   else h+='<div class="card next" style="display:flex;flex-direction:column;gap:8px"><b style="font-family:var(--disp);font-size:20px">Willkommen in der A Plus SimRacing Lounge</b><p class="note" style="margin:0">Melde dich an und sieh deine Bestzeiten, deine Lizenz und deinen AfterWork-Stand – alles aus dem TimeTool der Lounge.</p><button class="btn pri" data-act="login">Anmelden</button></div>';
   // News – gleich nach der Lizenz (Roger 30.10.2026)
   h+='<section class="sec"><div class="sh"><h2>News</h2><a href="#" data-go="news">Alle</a></div><div class="list">'+allNews().slice(0,3).map(newsLi).join('')+'</div></section>';
@@ -1411,7 +1411,7 @@ function testCard(){return '<section class="sec"><div class="sh"><h2>'+(REAL?'Ap
 
 // ---------------------------------------------------------------- Mitteilungen, News, Termine
 function vNotif(){var n=notifs();if(!n.length)return '<div class="empty">Keine Mitteilungen.</div>';
-  return '<button class="lnk" data-act="readall" style="align-self:flex-end">Alle als gelesen markieren</button><div class="list">'+n.map(function(x){return '<button class="li" data-nt="'+e(x.id)+'"><span class="grow"><span class="row" style="gap:6px"><span class="tag '+(x.kind==='Last Shot'?'red':x.kind==='Lizenz'?'gold':'blue')+'">'+e(x.kind)+'</span><span class="s">'+(x.ts?dmy(x.ts):'')+'</span>'+(x.read?'':'<span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block"></span>')+'</span><span class="t" style="display:block;margin-top:4px">'+e(x.title)+'</span><span class="s">'+e(x.text)+'</span>'+(x.img?notifImg(x.img):'')+'</span>'+IC.chev+'</button>';}).join('')+'</div><p class="note">'+(CHAT.mode==='sb'||REAL?'Mitteilung in der App – Push aufs gesperrte Handy folgt.':'In der echten App kommen diese Mitteilungen als Push aufs Handy – auch wenn die App zu ist.')+'</p>';}
+  return '<button class="lnk" data-act="readall" style="align-self:flex-end">Alle als gelesen markieren</button><div class="list">'+n.map(function(x){return '<button class="li" data-nt="'+e(x.id)+'"><span class="grow"><span class="row" style="gap:6px"><span class="tag '+(x.kind==='Last Shot'?'red':x.kind==='Lizenz'?'gold':'blue')+'">'+e(x.kind)+'</span><span class="s">'+(x.ts?dmy(x.ts):'')+'</span>'+(x.read?'':'<span style="width:8px;height:8px;border-radius:50%;background:var(--red);display:inline-block"></span>')+'</span><span class="t" style="display:block;margin-top:4px">'+e(x.title)+'</span><span class="s">'+e(x.text)+'</span>'+(x.img?notifImg(x.img):'')+'</span>'+IC.chev+'</button>';}).join('')+'</div><p class="note">'+(CHAT.mode==='sb'||REAL?(wpZustand()==='an'?'Diese Mitteilungen kommen auch aufs Handy, wenn die App zu ist.':'Diese Mitteilungen kommen auch aufs Handy, wenn du unter «Einstellungen» die «Mitteilungen aufs Handy» einschaltest.'):'In der echten App kommen diese Mitteilungen als Push aufs Handy – auch wenn die App zu ist.')+'</p>';}
 function notifImg(id){var k='d:'+id,u=SBK.files[k];if(okBig(u))return '<img src="'+u+'" alt="Bild" style="display:block;max-width:100%;max-height:180px;border-radius:10px;margin-top:6px">';sbNeed(k);return '<span class="note" style="display:block;margin:4px 0 0">'+(SBK.fload[k]===3?'📷 Bild nicht verfügbar':'📷 Bild wird geladen …')+'</span>';}   // Prüfung 3x: Bild einer Mitteilung (auch ohne Chat-Beitrag)
 function vNews(){return '<div class="list">'+allNews().map(newsLi).join('')+'</div>';}
 function vNewsOne(id){var n=allNews().filter(function(x){return x.id===id;})[0];if(!n)return '<div class="empty">News nicht gefunden.</div>';
@@ -1428,7 +1428,7 @@ function vEventOne(id){var x=EVENTS.filter(function(y){return y.id===id;})[0];if
     +(x.url?'<a class="btn" href="'+x.url+'" target="_blank" rel="noopener">Anmeldung und mehr Infos '+IC.ext+'</a>':'')+'</div>';}
 function vInfo(){if(REAL)return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">A Plus SimRacing Lounge</b>'   // Prüfung 4: Text für die echte App (die Testversion-Texte waren hier falsch)
   +'<p class="note" style="margin:0"><b style="color:#fff">Aus dem TimeTool:</b> Bestzeiten, Ranglisten, Lizenz-Rechnung, AfterWork-Abende, Jahresstand und Club-Meisterschaft – Stand '+e(D.meta.stand)+(D.meta.bz?' (Bestzeiten und Ranglisten Stand '+e(D.meta.bz)+')':'')+'.</p>'
-  +(CHAT.mode==='sb'?'<p class="note" style="margin:0"><b style="color:#fff">Live mit der Lounge:</b> Chat, Mitteilungen, News, «Ich komme» und Race Time. Roger und Nici sehen sie im TimeTool. Push aufs gesperrte Handy folgt.</p>'
+  +(CHAT.mode==='sb'?'<p class="note" style="margin:0"><b style="color:#fff">Live mit der Lounge:</b> Chat, Mitteilungen, News, «Ich komme» und Race Time. Roger und Nici sehen sie im TimeTool. Mitteilungen aufs Handy schaltest du unter «Einstellungen» ein.</p>'
     :'<p class="note" style="margin:0"><b style="color:#fff">Noch nicht verbunden:</b> Chat, «Ich komme» und Mitteilungen bleiben vorerst auf diesem Handy.</p>')
   +'<p class="note" style="margin:0">Ideen und Fehler? Einfach Roger schreiben – am besten mit Bildschirmfoto.</p></div>';
   return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">Testversion 0.2 · 30.10.2026</b>'
@@ -1494,7 +1494,7 @@ function bindAdmin(){var f=$('#fPush2');if(!f)return;var P=st.push;
     var cnt=pushCount(P);sendPush({title:P.title.trim(),text:P.text.trim(),to:to});
     if(P.news)chatPost('news',{t:P.title.trim()+(P.text.trim()?'\n'+P.text.trim():''),a:'APlus Lounge',k:'',team:true});
     st.push={to:P.to,ch:P.ch,keys:[],title:'',text:'',news:false};render();
-    dialog('Push gesendet','<p class="note">Geht an '+e(cnt)+'.'+(P.news?' Die Info steht jetzt auch im News-Kanal.':'')+(CHAT.mode==='sb'?' Sie steht als Mitteilung in der App (Push aufs gesperrte Handy folgt).':REAL?' Noch nicht mit der Lounge verbunden: die Mitteilung bleibt vorerst auf diesem Handy.':' Wer die App offen hat, sieht sie sofort; in der echten App kommt sie auch bei geschlossener App aufs Handy.')+'</p>',[{t:'OK',cls:'pri'}]);};
+    dialog('Push gesendet','<p class="note">Geht an '+e(cnt)+'.'+(P.news?' Die Info steht jetzt auch im News-Kanal.':'')+(CHAT.mode==='sb'?' Sie steht als Mitteilung in der App und kommt aufs Handy (bei allen, die die Mitteilungen eingeschaltet haben).':REAL?' Noch nicht mit der Lounge verbunden: die Mitteilung bleibt vorerst auf diesem Handy.':' Wer die App offen hat, sieht sie sofort; in der echten App kommt sie auch bei geschlossener App aufs Handy.')+'</p>',[{t:'OK',cls:'pri'}]);};
   app.querySelectorAll('[data-ched]').forEach(function(b){b.onclick=function(){chEdit(b.getAttribute('data-ched'));};});}
 // Kanal anlegen / ändern
 function chEdit(id){var c=id?chOf(id):null,ed=c?{id:c.id,name:c.name,desc:c.desc||'',col:c.col,ic:c.ic,vis:c.vis||'all',ro:!!c.ro,members:(c.members||[]).slice(),arch:!!c.arch,o:c.o||50}
@@ -1717,7 +1717,8 @@ function sbInit(){CHAT.mode='sb';CHAT.adminReal=!!REALROLE;applyAdm();CHAT.local
   try{var ch=SB.channel('km-live');['km_nachricht','km_kommen','km_mitteilung','km_pin','km_kanal','km_reaktion','km_sperre'].forEach(function(t){ch.on('postgres_changes',{event:'*',schema:'public',table:t},function(){sbSoon(t);});});   /* km_sperre: Sperre wirkt sofort (Prüfung 3x) */
     ch.subscribe(function(s){var war=SBK.live;SBK.live=s==='SUBSCRIBED';if(SBK.live&&!war&&SBK.done.km_nachricht)sbSoon('*');});SBK.ch=ch;}catch(x){}
   SBK.iv=setInterval(function(){if(document.visibilityState!=='hidden')sbSoon('*');},60000);
-  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')sbSoon('*');});}
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible')sbSoon('*');});
+  wpStart();}   // Stufe 3: Mitteilungen aufs Handy
 function sbSoon(t){if(CHAT.mode!=='sb')return;if(t==='*')SB_TAB.forEach(function(x){SBK.pend[x]=1;});else SBK.pend[t]=1;clearTimeout(SBK.t);SBK.t=setTimeout(sbLoad,t==='*'?50:250);}
 function sbCur(k,ts){if(ts&&(!SBK.cur[k]||Date.parse(ts)>Date.parse(SBK.cur[k])))SBK.cur[k]=ts;}
 function sbQ(t,cols,firstFn){var q=SB.from(t).select(cols),c=SBK.cur[t];   // 30 Sek. Überlappung: nichts geht verloren (Doppelte werden erkannt)
@@ -1938,7 +1939,7 @@ function bindRTForm(root,done){var f=root.querySelector('#fRT');if(!f)return;f.o
   if(rt.t<=rt.f){dialog('Zeit prüfen','<p class="note">«bis» muss später sein als «von».</p>',[{t:'OK',cls:'pri'}]);return;}
   var jz=new Date(),hm0=String(jz.getHours()).padStart(2,'0')+':'+String(jz.getMinutes()).padStart(2,'0');
   if(rt.d<nowIso()||(rt.d===nowIso()&&rt.t<=hm0)){dialog('Zeit prüfen','<p class="note">Diese Zeit ist schon vorbei. Bitte einen Tag ab heute wählen.</p>',[{t:'OK',cls:'pri'}]);return;}   // Prüfung 4 (VERIF3 N8)
-  chatPost('club',{kind:'rt',rt:rt,a:'APlus Lounge',k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung'+(CHAT.mode==='sb'?' in der App (Push aufs gesperrte Handy folgt)':'')+'. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
+  chatPost('club',{kind:'rt',rt:rt,a:'APlus Lounge',k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung'+(CHAT.mode==='sb'?' in der App und aufs Handy (wer die Mitteilungen eingeschaltet hat)':'')+'. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
 function sheet(html,binder){var d=$('#dlg');if($('#fMail')||$('#fCode')||$('.login.who'))lgGuard();d.innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';d.hidden=false;d.onclick=function(ev){if(ev.target===d)d.hidden=true;};if(binder)binder(d);}
 function msgActions(ch,id){var m=CHAT.msgs[ch].filter(function(x){return x.id===id;})[0];if(!m||!U)return;var rx=CHAT.rx[id]||{},mine=isMine(m),cw=canWrite(chOf(ch));
   var eb=function(x){return '<button type="button" data-se="'+x[0]+'" class="'+((rx[x[0]]||[]).indexOf(U)>=0?'mine':'')+'" aria-label="Reaktion '+x[1]+'">'+x[1]+'</button>';};
@@ -2039,11 +2040,11 @@ function imgPick(c,f){if(!/^image\//.test(f.type||'')){alertD('Kein Bild','Bitte
     im.onerror=function(){alertD('Bild nicht lesbar','Dieses Bild kann die App nicht öffnen. Versuche ein anderes (JPG oder PNG).');};im.src=fr.result;};fr.readAsDataURL(f);}
 
 // Einstellungen (Roger 30.10.2026): alles ist eingeschaltet; pro Kanal «Mitteilung» und «Rote Zahl»; beides aus = stumm
-function setting(){var s=(U&&ls('set2-'+U))||{};return {gen:s.gen!==false,awrem:s.awrem!==false,awres:s.awres!==false,ls:s.ls!==false,push:s.push||{},badge:s.badge||{},nl:!!s.nl};}
-function settingSave(f){if(!U)return;var s=setting();f(s);ls('set2-'+U,s);}
+function setting(){var s=(U&&ls('set2-'+U))||{};return {gen:s.gen!==false,awrem:s.awrem!==false,awres:s.awres!==false,ls:s.ls!==false,push:s.push||{},badge:s.badge||{},nl:!!s.nl,ton:s.ton!==false};}   // ton: Stufe 3
+function settingSave(f){if(!U)return;var s=setting();f(s);ls('set2-'+U,s);wpPrefsBald();}   // Stufe 3: Schalter gehen auch an die Mitteilungen aufs Handy
 function vSettings(){if(!U)return needLogin('Die Einstellungen');var S=setting();
   var tg=function(key,on,lab,sub){return '<button class="li" data-st="'+key+'" role="switch" aria-checked="'+(on?'true':'false')+'"><span class="grow"><span class="t" style="display:block">'+lab+'</span>'+(sub?'<span class="s">'+sub+'</span>':'')+'</span><span class="tgl'+(on?' on':'')+'"></span></button>';};
-  var h='<section class="sec"><div class="sh"><h2>Mitteilungen</h2></div><div class="list">'+tg('gen',S.gen,'Allgemeine Infos der Lounge','Veranstaltungen, Neuigkeiten, Infos – nicht aus einem Chat')+tg('awrem',S.awrem,'AfterWork-Erinnerung','Dienstag am Mittag, mit Strecke und Auto')+tg('awres',S.awres,'AfterWork-Resultat','Rangliste nach dem Abend')+tg('ls',S.ls,'Last Shot','sofort, wenn du im Fenster bist')+'</div><p class="note">'+(CHAT.mode==='sb'?'Die Schalter gelten für die Mitteilungen in der App – Push aufs gesperrte Handy folgt.':'Erinnerung, Resultat und Last Shot kommen mit der echten App aufs Handy.')+'</p></section>';
+  var h=wpSektion(S)+'<section class="sec"><div class="sh"><h2>Mitteilungen</h2></div><div class="list">'+tg('gen',S.gen,'Allgemeine Infos der Lounge','Veranstaltungen, Neuigkeiten, Infos – nicht aus einem Chat')+tg('awrem',S.awrem,'AfterWork-Erinnerung','Dienstag am Mittag, mit Strecke und Auto')+tg('awres',S.awres,'AfterWork-Resultat','Rangliste nach dem Abend')+tg('ls',S.ls,'Last Shot','sofort, wenn du im Fenster bist')+'</div><p class="note">'+(CHAT.mode==='sb'?'Die Schalter gelten in der App und für die Mitteilungen aufs Handy.':'Erinnerung, Resultat und Last Shot kommen mit der echten App aufs Handy.')+'</p></section>';
   var chs=CH.filter(function(c){return !c.arch&&(canSee(c)||c.id==='club');});   // Club-Chat immer zeigen, für Nicht-Mitglieder ausgegraut
   h+='<section class="sec"><div class="sh"><h2>Kanäle</h2></div><p class="note" style="margin:0 0 8px">Pro Kanal einstellbar: <b style="color:#fff">Mitteilung</b> = Ton und Hinweis am Handy<br><b style="color:#fff">Rote Zahl</b> = Zähler für neue Nachrichten <span class="ubadge" style="display:inline-grid;vertical-align:middle;background:#ff4d4d;color:#fff">3</span></p><div class="list stbl"><div class="li" style="padding-top:8px;padding-bottom:8px;background:var(--bg2)"><span class="grow note" style="margin:0">Kanal</span><span class="sc sh2">Mitteilung</span><span class="sc sh2">Rote Zahl</span></div>'
     +chs.map(function(c){var lk=c.id==='club'&&!isMem()&&!CHAT.admin,pu=!lk&&S.push[c.id]!==false,ba=!lk&&S.badge[c.id]!==false;   // Roger 31.10.2026: Club-Chat für Nicht-Mitglieder ausgegraut
@@ -2125,8 +2126,122 @@ function act(a,x){
   if(a==='view'){ls('asdriver',x.getAttribute('data-v')==='fahrer'?true:null);applyAdm();st.pinEdit=false;render();}
   if(a==='jump'){var r2=$('#meRow');if(r2)r2.scrollIntoView({behavior:'smooth',block:'center'});}
   if(a==='readall'){markRead(null);render();}
+  if(a==='wpein')wpEin();   // Stufe 3: Mitteilungen aufs Handy
+  if(a==='wpaus')wpAus();
+  if(a==='wpkarte'){if(U)ls('pushkarte-'+U,1);render();}
   if(a==='pushdemo'){var list=notifs();dialog('Push-Nachricht ausprobieren','<p class="note">Welche Mitteilung soll erscheinen? Tippe danach auf die Nachricht oben.</p>',list.slice(0,4).map(function(n){return {t:n.kind,f:function(){showPush(n);}};}));}
 }
+
+// ---------------------------------------------------------------- Stufe 3: Mitteilungen aufs Handy (Web-Push, Roger 30.10./02.11.2026)
+// Einschalten nur auf Tippen (das Handy fragt dann um Erlaubnis). Das Gerät meldet sich in der Zentrale an (km_push_abo, nur eigene
+// Einträge, E-Mail aus der Anmeldung); die Schalter (Lounge-Infos, Arten, Kanäle, rote Zahl, Ton) gehen mit. Ausschalten und Abmelden
+// = in der Zentrale inaktiv (nie gelöscht). iPhone: nur mit der App auf dem Home-Bildschirm (iOS 16.4+). Die rote Zahl auf dem
+// App-Symbol zählt sw.js hoch; beim Öffnen setzt die App sie auf die echte Zahl ungelesener Nachrichten.
+var WP={go:0,reg:null,sub:null,pub:'',stand:'',busy:false,fehler:'',row:null,t:null,zahl:-1};
+function wpIos(){var u=navigator.userAgent||'';return /iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1);}
+function wpHome(){try{return !!(navigator.standalone||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches));}catch(x){return false;}}
+function wpKann(){try{return !!('serviceWorker' in navigator&&window.PushManager&&window.Notification&&window.isSecureContext!==false);}catch(x){return false;}}
+function wpErlaubnis(){try{return window.Notification?Notification.permission:'default';}catch(x){return 'default';}}
+function wpZustand(){if(!REAL||CHAT.mode!=='sb'||!U)return 'bald';if(wpIos()&&!wpHome())return 'ios';if(!wpKann())return 'nicht';
+  if(wpErlaubnis()==='denied')return 'blockiert';if(WP.stand==='kein')return 'bald';if(!WP.pub||!WP.reg)return 'pruefe';
+  return (wpErlaubnis()==='granted'&&WP.sub&&WP.row&&WP.row.aktiv)?'an':'aus';}
+function wpB64(s){s=String(s).replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var b=atob(s),a=new Uint8Array(b.length);for(var i=0;i<b.length;i++)a[i]=b.charCodeAt(i);return a;}
+function wpU64(buf){if(!buf)return '';var a=new Uint8Array(buf),t='';for(var i=0;i<a.length;i++)t+=String.fromCharCode(a[i]);return btoa(t).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function wpN64(x){return String(x||'').replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');}
+function wpJson(s){var j=(s&&s.toJSON)?s.toJSON():{},k=j.keys||{};return {endpoint:String((s&&s.endpoint)||j.endpoint||''),p256dh:wpN64(k.p256dh||(s&&s.getKey?wpU64(s.getKey('p256dh')):'')),auth:wpN64(k.auth||(s&&s.getKey?wpU64(s.getKey('auth')):''))};}
+function wpGleich(a,b){var c=function(o){if(!o||typeof o!=='object')return JSON.stringify(o===undefined?null:o);return '{'+Object.keys(o).sort().map(function(k){return JSON.stringify(k)+':'+c(o[k]);}).join(',')+'}';};return c(a)===c(b);}
+function wpPrefs(){var S=setting(),k={},z={};Object.keys(S.push).forEach(function(c){if(S.push[c]===false&&/^[a-z0-9_-]{1,40}$/.test(c))k[c]=false;});Object.keys(S.badge).forEach(function(c){if(S.badge[c]===false&&/^[a-z0-9_-]{1,40}$/.test(c))z[c]=false;});
+  return {info:!!S.gen,ton:!!S.ton,typen:{awErinnerung:!!S.awrem,awResultat:!!S.awres,lastShot:!!S.ls},kanaele:k,zahl:z};}
+function wpPlattform(){var u=navigator.userAgent||'';return (wpIos()?'iPhone':/Android/.test(u)?'Android':/Windows/.test(u)?'Windows':/Mac/.test(u)?'Mac':'Geraet')+(wpHome()?' App':' Browser');}
+function wpFehlerText(e){var m=String((e&&(e.message||e.msg))||e||''),n=String((e&&e.name)||'');
+  if(n==='NotAllowedError')return 'Das Handy hat die Mitteilungen nicht erlaubt.';
+  if(n==='AbortError'||/push service|registration failed/i.test(m))return 'Der Mitteilungs-Dienst dieses Geräts antwortet gerade nicht – bitte später nochmals.';
+  if(/Zu viele/.test(m))return m.slice(0,120);
+  if(sbNetz(e))return 'Keine Verbindung – bitte später nochmals.';
+  return 'Das hat nicht geklappt'+(m?' ('+m.slice(0,80)+')':'')+'.';}
+function wpKv(k,v){return new Promise(function(ok){try{var r=indexedDB.open('apl-push',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv');};
+  r.onsuccess=function(){var db=r.result;try{var t=db.transaction('kv',v===undefined?'readonly':'readwrite'),st2=t.objectStore('kv'),q=v===undefined?st2.get(k):st2.put(v,k);t.oncomplete=function(){db.close();ok(v===undefined?q.result:v);};t.onerror=t.onabort=function(){db.close();ok(null);};}catch(x){db.close();ok(null);}};
+  r.onerror=function(){ok(null);};}catch(x){ok(null);}});}
+function wpStart(){if(WP.go||!REAL||CHAT.mode!=='sb'||!U||!SB)return;WP.go=1;wpStartZiel();
+  if(!wpKann()){wpRefresh();return;}
+  try{navigator.serviceWorker.addEventListener('message',wpNachricht);if(navigator.serviceWorker.startMessages)navigator.serviceWorker.startMessages();}catch(x){}
+  navigator.serviceWorker.register('sw.js').then(function(){return navigator.serviceWorker.ready;}).then(function(reg){WP.reg=reg;return wpAbgleich();})
+    .then(null,function(e){WP.fehler=wpFehlerText(e);}).then(function(){wpBadge(-1);wpRefresh();});
+  document.addEventListener('visibilitychange',function(){if(document.visibilityState==='visible'&&WP.reg){wpBadge(-1);wpAbgleich().then(wpRefresh,wpRefresh);}});}
+function wpSchluessel(){return Promise.resolve(sbT(SB.from('km_push_konfig').select('vapid_public').eq('id',1).maybeSingle())).then(function(r){
+  if(r&&r.error){if(r.status===404||/PGRST205|42P01/.test(String(r.error.code||'')))WP.stand='kein';throw r.error;}
+  var p=r&&r.data&&r.data.vapid_public;if(p&&/^[A-Za-z0-9_-]{87}$/.test(p)){WP.pub=p;WP.stand='ok';}else WP.stand='kein';});}
+function wpSchluesselGleich(s){try{var o=s&&s.options&&s.options.applicationServerKey;return !o||wpU64(o)===WP.pub;}catch(x){return true;}}
+function wpTot(g){return /HTTP|ungültig|nicht erlaubt|abgelehnt|Schlüssel/.test(String(g||''));}   // vom Push-Dienst abgemeldet → neu anmelden
+function wpAbgleich(){if(!WP.reg||!U||!SB)return Promise.resolve();   // Stand im Browser ↔ Eintrag in der Zentrale
+  return (WP.pub?Promise.resolve():wpSchluessel().then(null,function(){})).then(function(){if(!WP.pub)return null;return Promise.all([WP.reg.pushManager.getSubscription(),wpKv('neu')]);}).then(function(x){if(!x)return;
+    var s=x[0],neu=x[1],aus=!!ls('push-aus-'+U),an=!!ls('push-an-'+U),ok=wpErlaubnis()==='granted';WP.sub=s;
+    if(s&&(neu||!wpSchluesselGleich(s)))return wpZeileAus(wpJson(s).endpoint).then(function(){return s.unsubscribe();}).then(null,function(){}).then(function(){WP.sub=null;WP.row=null;wpKv('neu',0);return (ok&&!aus&&an)?wpAnmelden():null;});
+    if(!s){WP.row=null;if(neu)wpKv('neu',0);return (ok&&!aus&&an)?wpAnmelden():null;}
+    return wpZeile(s,aus);});}
+function wpZeileAus(ep){return ep&&SB?Promise.resolve(sbT(SB.from('km_push_abo').update({aktiv:false}).eq('endpoint',ep))).then(null,function(){}):Promise.resolve();}   // eigener Eintrag inaktiv (RLS: nur eigene)
+function wpMerken(ep){var alt=ls('push-ep-'+U);ls('push-ep-'+U,ep);return (alt&&alt!==ep)?wpZeileAus(alt):Promise.resolve();}   // neue Adresse dieses Geräts → die alte (z.B. vom Browser erneuert) inaktiv
+function wpZeileLesen(ep){return Promise.resolve(sbT(SB.from('km_push_abo').select('id,aktiv,prefs,inaktiv_grund').eq('endpoint',ep).order('id',{ascending:false}))).then(function(r){if(r.error)throw r.error;var L=r.data||[];return L.filter(function(z){return z.aktiv;})[0]||L[0]||null;});}
+function wpZeile(s,aus,frisch){var j=wpJson(s);
+  return wpZeileLesen(j.endpoint).then(function(row){WP.row=row;
+    if(aus)return;   // auf diesem Gerät ausgeschaltet
+    if(!row)return Promise.resolve(sbT(SB.from('km_push_abo').insert({endpoint:j.endpoint,p256dh:j.p256dh,auth:j.auth,plattform:wpPlattform(),prefs:wpPrefs()}))).then(function(r){if(r.error&&String(r.error.code)!=='23505')throw r.error;return wpZeileLesen(j.endpoint);}).then(function(r2){WP.row=r2;return wpMerken(j.endpoint);});
+    if(!row.aktiv){
+      if(wpTot(row.inaktiv_grund)&&!frisch)return s.unsubscribe().then(null,function(){}).then(function(){WP.sub=null;WP.row=null;return wpAnmelden();});   // Eintrag ist schon inaktiv
+      if(/ausgeschaltet/.test(row.inaktiv_grund||'')&&!ls('push-an-'+U)&&!frisch)return;
+      return Promise.resolve(sbT(SB.from('km_push_abo').update({aktiv:true,p256dh:j.p256dh,auth:j.auth,plattform:wpPlattform(),prefs:wpPrefs()}).eq('endpoint',j.endpoint).eq('id',row.id))).then(function(r){if(r.error)throw r.error;return wpZeileLesen(j.endpoint);}).then(function(r2){WP.row=r2;return wpMerken(j.endpoint);});}
+    return wpMerken(j.endpoint).then(function(){if(!wpGleich(row.prefs,wpPrefs()))return wpPrefsSpeichern();});});}
+function wpAnmelden(){return WP.reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:wpB64(WP.pub)}).then(function(s){WP.sub=s;ls('push-an-'+U,1);ls('push-aus-'+U,null);return wpZeile(s,false,true);});}
+function wpEin(){if(WP.busy||!U)return;if(!WP.reg||!WP.pub){wpRefresh();return;}WP.busy=true;WP.fehler='';
+  var perm=wpErlaubnis()==='granted'?Promise.resolve('granted'):new Promise(function(ok){try{var r=Notification.requestPermission(ok);if(r&&r.then)r.then(ok,function(){ok('default');});}catch(x){ok('default');}});   // direkt beim Tippen fragen
+  wpRefresh();
+  perm.then(function(p){if(p!=='granted')return;ls('push-aus-'+U,null);return wpAnmelden();}).then(null,function(e){WP.fehler=wpFehlerText(e);})
+    .then(function(){WP.busy=false;ls('pushkarte-'+U,1);wpRefresh();});}
+function wpAus(){if(WP.busy||!U)return;WP.busy=true;wpRefresh();ls('push-aus-'+U,1);ls('push-an-'+U,null);
+  wpWeg().then(function(){WP.busy=false;WP.fehler='';wpRefresh();});}
+function wpWeg(){   // dieses Gerät abmelden: Eintrag inaktiv, Abo im Browser beenden, rote Zahl weg
+  var reg=WP.reg;return (reg?reg.pushManager.getSubscription().then(null,function(){return null;}):Promise.resolve(WP.sub)).then(function(s){s=s||WP.sub;
+    var ep=s?wpJson(s).endpoint:'';return (ep&&SB?Promise.resolve(sbT(SB.from('km_push_abo').update({aktiv:false}).eq('endpoint',ep))):Promise.resolve()).then(null,function(){})
+      .then(function(){return s?s.unsubscribe():null;}).then(null,function(){});})
+    .then(function(){WP.sub=null;WP.row=null;ls('push-ep-'+U,null);try{if(navigator.clearAppBadge)navigator.clearAppBadge().catch(function(){});}catch(x){}return wpKv('zahl',0);});}
+function wpAbmelden(cb){var fertig=false,f=function(){if(fertig)return;fertig=true;cb();};setTimeout(f,4000);try{if(!WP.reg){f();return;}wpWeg().then(f,f);}catch(x){f();}}   // beim Abmelden aus der App
+function wpPrefsBald(){if(!WP.row)return;clearTimeout(WP.t);WP.t=setTimeout(function(){wpPrefsSpeichern();},800);}
+function wpPrefsSpeichern(){if(!WP.sub||!WP.row||!WP.row.aktiv||!SB)return Promise.resolve();var p=wpPrefs();if(wpGleich(WP.row.prefs,p))return Promise.resolve();var ep=wpJson(WP.sub).endpoint;
+  return Promise.resolve(sbT(SB.from('km_push_abo').update({prefs:p}).eq('endpoint',ep))).then(function(r){if(r&&r.error)throw r.error;WP.row.prefs=p;}).then(null,function(e){WP.fehler=wpFehlerText(e);wpRefresh();});}
+function wpUngelesen(c){if(!c||!CHAT.msgs[c.id])return 0;var r=readMap()[c.id]||0;return CHAT.msgs[c.id].filter(function(m){return m.ts>r&&!isMine(m);}).length;}
+function wpBadge(n){if(!REAL||!U||document.visibilityState==='hidden')return;if(n<0)n=unreadAll()+unreadOf(chOf('club'));   // App ist offen: Zähler = echte Zahl
+  if(n!==WP.zahl){WP.zahl=n;wpKv('zahl',n);}
+  if(WP.reg&&WP.reg.getNotifications)WP.reg.getNotifications().then(function(L){L.forEach(function(nf){var d=nf.data||{};if(d.typ==='chat'&&d.k){var c=chOf(d.k);if(!c||!wpUngelesen(c))nf.close();}});},function(){});}   // gelesene Kanäle: Mitteilungen weg
+function wpNachricht(ev){var m=(ev&&ev.data)||{};if(m.typ==='apl-go')wpGo(m.u);else if(m.typ==='apl-push')wpVorne(m.d||{});}
+// Prüfung REV5 (b): App offen und vorne → sw.js zeigt keine Mitteilung, sondern meldet sie hierher. Die App holt das Neue sofort ab (der Hinweis oben
+// kommt dann wie bisher – nie doppelt, auch wenn die Live-Verbindung gerade hängt); der Test-Push aus dem TimeTool hat keine Daten → direkt als Hinweis.
+function wpVorne(d){if(!U)return;
+  if(d.typ==='test'){showPush({id:'wpt'+Date.now(),title:String(d.t||'APlus Lounge').slice(0,80),text:String(d.b||'').slice(0,300),go:'notif'});return;}
+  try{sbSoon(d.typ==='chat'?'km_nachricht':'km_mitteilung');}catch(x){}
+  setTimeout(function(){wpBadge(-1);},3000);}
+function wpGo(u){u=String(u||'');var m;if(!U)return;
+  if((m=/^c:([a-z0-9_-]{1,40})$/.exec(u))){var c=chOf(m[1]);go(c&&canSee(c)?chPath(m[1]):'chat');return;}
+  if((m=/^m:([a-z]{0,12})\|(\d{4}-\d{2}-\d{2})?$/.exec(u))){go(pushZiel({link:m[1],tag:m[2]||''})||'notif');return;}
+  go('notif');}
+function wpStartZiel(){var g='';try{g=new URLSearchParams(location.search).get('go')||'';}catch(x){}if(!g)return;
+  try{var q=new URLSearchParams(location.search);q.delete('go');history.replaceState(history.state,'',location.pathname+(q.toString()?'?'+q.toString():'')+location.hash);}catch(x){}
+  setTimeout(function(){wpGo(g);},700);}
+function wpRefresh(){var p=st.path||'home';if(p==='settings'||p==='home')render();}
+function wpKarte(){if(!U||ls('pushkarte-'+U)||wpZustand()!=='aus'||wpErlaubnis()!=='default')return '';   // Start-Seite, einmal nach dem Anmelden
+  return '<div class="card" id="wpKarte" style="display:flex;flex-direction:column;gap:10px;border-color:rgba(0,178,231,.55)"><b style="font-family:var(--disp);font-size:19px">🔔 Mitteilungen einschalten?</b><p class="note" style="margin:0">Dann kommen neue Chat-Nachrichten, Race Time und Infos der Lounge sofort aufs Handy – auch wenn die App zu ist. Ausschalten geht jederzeit unter «Einstellungen».</p><div class="row" style="gap:8px"><button class="btn pri grow" data-act="wpein"'+(WP.busy?' disabled':'')+'>Einschalten</button><button class="btn" data-act="wpkarte">Später</button></div></div>';}
+function wpSektion(S){if(!REAL)return '';var z=wpZustand(),h='<section class="sec" id="wpSek"><div class="sh"><h2>Mitteilungen aufs Handy</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px">';
+  var lab={an:['✓ An','green'],aus:['Aus',''],blockiert:['Blockiert','red'],nicht:['Auf diesem Gerät nicht möglich',''],ios:['Auf diesem Gerät nicht möglich',''],bald:['Kommt bald',''],pruefe:['Wird geprüft …','']}[z];
+  h+='<div class="row" style="justify-content:space-between;gap:10px"><b>Status</b><span class="tag'+(lab[1]?' '+lab[1]:'')+'" id="wpStatus" data-z="'+z+'">'+lab[0]+'</span></div>';
+  if(z==='an')h+='<p class="note" style="margin:0">Du bekommst Mitteilungen aufs Handy, auch wenn die App zu ist. Welche, stellst du unten ein.</p><button class="btn" data-act="wpaus"'+(WP.busy?' disabled':'')+'>Mitteilungen ausschalten</button>';
+  else if(z==='aus')h+='<p class="note" style="margin:0">Neue Chat-Nachrichten, Race Time und Infos der Lounge kommen sofort aufs Handy – auch wenn die App zu ist. Mit roter Zahl auf dem App-Symbol.</p><button class="btn pri" data-act="wpein"'+(WP.busy?' disabled':'')+'>'+(WP.busy?'Einen Moment …':'Mitteilungen einschalten')+'</button>';
+  else if(z==='blockiert')h+='<p class="note" style="margin:0">Du hast die Mitteilungen für diese App abgelehnt. So erlaubst du sie wieder:</p><ol class="note" style="margin:0;padding-left:20px;line-height:1.5">'+(wpIos()?'<li>iPhone: <b style="color:#fff">Einstellungen → Mitteilungen → APlus Lounge</b> → «Mitteilungen erlauben» einschalten.</li>':/Android/.test(navigator.userAgent||'')?'<li>Android: lange auf das App-Symbol tippen → <b style="color:#fff">App-Info → Benachrichtigungen</b> → erlauben (im Browser: Schloss neben der Adresse → Berechtigungen).</li>':'<li>Computer: links neben der Adresse auf das <b style="color:#fff">Schloss</b> klicken → Benachrichtigungen «Zulassen».</li>')+'<li>Dann die App neu öffnen.</li></ol>';
+  else if(z==='ios')h+='<p class="note" style="margin:0"><b style="color:#fff">Zuerst die App zum Home-Bildschirm hinzufügen</b> – auf dem iPhone gehen Mitteilungen nur so:</p><ol class="note" style="margin:0;padding-left:20px;line-height:1.5"><li>Unten in Safari auf <b style="color:#fff">«Teilen»</b> tippen (Viereck mit Pfeil nach oben).</li><li><b style="color:#fff">«Zum Home-Bildschirm»</b> wählen und «Hinzufügen» tippen.</li><li>Die App über das neue Symbol öffnen und hier <b style="color:#fff">«Mitteilungen einschalten»</b> tippen.</li></ol>';
+  else if(z==='nicht')h+='<p class="note" style="margin:0">'+(wpIos()?'Auf diesem iPhone geht das erst ab iOS 16.4 (Einstellungen → Allgemein → Softwareupdate).':'Dieser Browser kann keine Mitteilungen aufs Handy. Tipp: auf Android Chrome verwenden, auf dem iPhone Safari (App auf dem Home-Bildschirm).')+'</p>';
+  else if(z==='bald')h+='<p class="note" style="margin:0">Die Lounge richtet die Mitteilungen aufs Handy gerade ein – bitte später nochmals schauen.</p>';
+  if(WP.fehler&&z!=='an')h+='<p class="note" style="margin:0;color:#FF9F43">'+e(WP.fehler)+'</p>';
+  h+='</div>';
+  if(z==='an'||z==='aus')h+='<div class="list" style="margin-top:8px"><button class="li" data-st="ton" role="switch" aria-checked="'+(S.ton?'true':'false')+'"><span class="grow"><span class="t" style="display:block">Ton</span><span class="s">'+(wpIos()?'Auf dem iPhone stellst du den Ton hier ein: Einstellungen → Mitteilungen → APlus Lounge':'Mit Ton und Vibration (aus = still, nur anzeigen)')+'</span></span><span class="tgl'+(S.ton?' on':'')+'"></span></button></div>';
+  return h+'</section>';}
 
 // ---------------------------------------------------------------- Start
 function start(){
@@ -2157,7 +2272,8 @@ function lgCodeErr(err,c){var r=realErr(err,'code'),t=lgSent();L.info='';
   if(/passt nicht/.test(r)&&(L.expired||(t&&Date.now()-t>LG_MAX))){lgExpiredMsg();L.lastCode=c||'';}else{L.err=r;L.lastCode=c||'';}
   drawLogin();}
 function realMsg(t){app.innerHTML='<div class="login"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2><p class="muted">'+e(t)+'</p></div></div>';}
-function realLogout(){var done=function(){try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('apl-')===0)localStorage.removeItem(k);});}catch(x){}MEMU=null;location.reload();};try{SB.auth.signOut({scope:'local'}).then(done,done);}catch(x){done();}}   // Prüfung 01.11.: alles von der App auf diesem Handy löschen, andere Geräte bleiben angemeldet
+function realLogout(){wpAbmelden(realLogout2);}   // Stufe 3: zuerst dieses Gerät für Mitteilungen abmelden (höchstens 4 Sek.)
+function realLogout2(){var done=function(){try{Object.keys(localStorage).forEach(function(k){if(k.indexOf('apl-')===0)localStorage.removeItem(k);});}catch(x){}MEMU=null;location.reload();};try{SB.auth.signOut({scope:'local'}).then(done,done);}catch(x){done();}}   // Prüfung 01.11.: alles von der App auf diesem Handy löschen, andere Geräte bleiben angemeldet
 function realBlocked(mail,why){app.innerHTML='<div class="login"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px">'+(why==='nodata'?'<b>Deine Fahrerdaten fehlen noch</b><p class="note" style="margin:0"><b>'+e(mail)+'</b> ist freigeschaltet, aber wir finden deine Fahrerdaten noch nicht. Bitte melde dich an der Theke – danach tippe auf «Nochmals prüfen».</p>':'<b>Diese E-Mail kennen wir noch nicht</b><p class="note" style="margin:0"><b>'+e(mail)+'</b> ist bei uns noch nicht für die App freigeschaltet. Hast du in der Lounge vielleicht eine andere E-Mail angegeben? Dann versuche es damit. Sonst melde dich an der Theke – sobald wir dich freigeschaltet haben, tippe auf «Nochmals prüfen».</p>')+'<button class="btn pri full" id="bAgain">Nochmals prüfen</button><button class="btn full" id="bOut">Andere E-Mail versuchen</button></div></div>';var b=$('#bOut');if(b)b.onclick=realLogout;var a=$('#bAgain');if(a)a.onclick=function(){location.reload();};}
 function realAfter(s){var mail=String((s&&s.user&&s.user.email)||'').toLowerCase();L.mail=mail;SBK.mail=mail;realMsg('Deine Daten werden geladen …');
   SB.from('freigabe').select('fahrer,name,rolle').then(function(r){if(r.error)throw r.error;var rows=r.data||[];if(!rows.length){realBlocked(mail);return;}
