@@ -104,6 +104,9 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}
 .tb .nm{max-width:0;width:100%;overflow:hidden;text-overflow:ellipsis}
 .tb .nm small{display:block;font-size:11.5px;color:var(--dim);font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
 .tb .t{font-weight:700}
+/* Roger 03.11.2026: Strich unter jeder Stufe in ihrer Farbe + Abstand zur nächsten Stufe */
+.tb tr.lvb td{border-top:2px solid var(--lb)}
+.tb td.lvc{white-space:nowrap}.tb .lvg{display:block;font-size:10.5px;font-weight:600;color:#fff;margin-top:3px;letter-spacing:0;line-height:1.2;font-variant-numeric:tabular-nums}.tb .lvg b{display:block;font-weight:700}
 .tb tr.gapr td{background:var(--bg2);color:var(--dim);text-align:center;font-size:12px;padding:5px}
 .tb th,.tb td{padding-left:8px;padding-right:8px}
 .tb th:first-child,.tb td:first-child{padding-left:12px}.tb th:last-child,.tb td:last-child{padding-right:12px}
@@ -120,6 +123,7 @@ a.li{color:inherit;text-decoration:none}
 .lic.Carbon::before{background:repeating-linear-gradient(45deg,#3A3F48 0 6px,#2A2E35 6px 12px)}
 .lic > *{position:relative;z-index:1}
 .lic .kl{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700}
+@media (max-width:380px){.lic .kl{letter-spacing:.1em}}@media (max-width:340px){.lic .kl{font-size:9.5px;letter-spacing:.05em}}   /* Prüfung 03.11.2026: «A PLUS LIZENZ · SAISON 2026» auf kleinen Handys ganz sichtbar */
 .lic .nm{font-family:var(--disp);font-weight:700;font-size:25px;line-height:1.05;margin-top:2px;text-transform:uppercase;letter-spacing:.02em;max-width:72%}
 .lic .lv{font-family:var(--disp);font-weight:700;font-size:40px;line-height:.95;margin-top:10px;letter-spacing:.02em}
 .lic .meta{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:13px;color:var(--muted)}
@@ -241,6 +245,75 @@ button.tc{width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}b
 .trmini button.r{background:none;border:0;padding:0;color:inherit;font:inherit;text-align:left;width:100%;cursor:pointer}
 .trsec button.ok{color:inherit;font:inherit;text-align:left;cursor:pointer}
 .trinfo{max-height:64vh;overflow:auto;margin:0 -4px;padding:0 4px}
+/* Dauerbrenner: aktuelle Serie (Roger 02.11.2026) */
+.trsb{margin-top:12px;border-radius:12px;padding:11px 12px;border:1px solid rgba(255,190,50,.5);background:linear-gradient(135deg,rgba(255,190,50,.12),rgba(255,190,50,.02))}
+.trsb.brk{border-color:rgba(255,77,77,.55);background:linear-gradient(135deg,rgba(255,77,77,.14),rgba(255,77,77,.02))}
+.trsbh{display:flex;justify-content:space-between;align-items:baseline;gap:8px}.trsbh small{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#fff}
+.trsbh b{font-family:var(--disp);font-size:28px;line-height:1;color:#fff;white-space:nowrap}.trsbh b span{font-size:16px}
+.trsbd{display:flex;gap:3px;margin-top:8px}.trsbd i{flex:1;height:8px;border-radius:4px;background:rgba(255,255,255,.13)}.trsbd i.on{background:linear-gradient(90deg,#FFBE32,#ffd76b)}
+.trsb p{margin:8px 0 0;font-size:13.5px;color:#fff;line-height:1.45}.trsb p b{color:#fff}.trsb.brk .trsbx{color:#FF8A8A}
+.trsl{margin-top:10px;font-size:13.5px;color:#fff;line-height:1.45}
+/* Roger 02./03.11.2026: Lizenzkarte im Profil (mit Ausweis-Teil), Lizenz-Award, Hall of Fame */
+.lic.lcp{min-height:0;padding-bottom:0}
+.lic.lcp .lid{position:relative;z-index:1;display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;margin:13px -16px 0;padding:11px 16px 13px;background:#0a1324;border-top:1px solid rgba(255,255,255,.16)}
+.lic.lcp .lid div{min-width:0}.lic.lcp .lid .w2{grid-column:1/-1}
+.lic.lcp .lid small{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:#00B2E7}
+.lic.lcp .lid b{display:block;font-size:14px;color:#fff;font-weight:700;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lic.lcp .lid b.club{color:#3FD47A}.lic.lcp .meta{color:#fff}
+.awph{position:relative;flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;border-radius:16px;
+  border:1.5px dashed var(--sc,rgba(255,255,255,.35));background:radial-gradient(80% 70% at 50% 35%,var(--sg,rgba(255,255,255,.08)),transparent 75%),rgba(255,255,255,.03)}
+.awph b{font-family:var(--disp);font-weight:700;font-style:italic;line-height:1;color:#fff}
+.awph i{font-style:normal;font-family:var(--disp);font-weight:700;text-transform:uppercase;letter-spacing:.1em;line-height:1}
+.awph small{font-size:10.5px;font-weight:700;color:#fff;letter-spacing:.02em;line-height:1.2}
+.awph.open{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.03)}
+.awimg{display:block;object-fit:contain}
+.awc{position:relative;overflow:hidden;background:radial-gradient(80% 90% at 22% 40%,var(--sg,rgba(127,220,255,.12)),transparent 70%),linear-gradient(135deg,#112443,#0a1529)}
+.awc-row{display:flex;align-items:center;gap:14px}
+.awc-tx{min-width:0;display:flex;flex-direction:column;gap:3px}
+.awc-tx small{font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:#fff}
+.awc-tx > b{font-family:var(--disp);font-weight:700;font-size:32px;line-height:.95;letter-spacing:.05em;text-transform:uppercase;color:#fff}
+.awc-tx p{margin:4px 0 0;font-size:12.5px;color:#fff;line-height:1.35}.awc-tx p b{color:#fff}
+.awst{align-self:flex-start;display:inline-flex;align-items:center;margin-top:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:700;background:rgba(255,190,50,.14);border:1px solid rgba(255,190,50,.55);color:#FFBE32}
+.awst.ok{background:rgba(63,212,122,.15);border-color:rgba(63,212,122,.5);color:#3FD47A}
+.awnx{margin-top:12px}.awnx small{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#fff;margin-bottom:6px}
+.awnx div{display:flex;gap:8px}.awnx span{flex:1;height:32px;border:1.5px dashed rgba(255,255,255,.32);border-radius:9px;display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-style:italic;font-size:16px;color:#fff;background:rgba(255,255,255,.03)}
+.hofb{position:relative;display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-top:12px;padding:13px 16px;border:0;border-radius:12px;cursor:pointer;overflow:hidden;
+  background:linear-gradient(180deg,#fff0b8 0%,#f5c542 40%,#c8901a 64%,#f2c94c 100%);box-shadow:0 0 0 1px rgba(255,214,106,.7),0 8px 24px rgba(245,197,66,.28),inset 0 1px 0 rgba(255,255,255,.8);
+  font-family:var(--disp);font-weight:700;font-size:18px;letter-spacing:.18em;color:#120c00;text-transform:uppercase}
+.hofb svg{width:26px;height:26px;flex:0 0 auto}
+.hofb small{font-family:var(--body);font-size:12px;letter-spacing:0;text-transform:none;font-weight:700;background:rgba(18,12,0,.14);border-radius:999px;padding:2px 9px}
+@media (max-width:360px){.hofb{font-size:16px;letter-spacing:.1em;gap:8px;padding:12px 10px}.hofb svg{width:22px;height:22px}}
+.hofb::after{content:"";position:absolute;top:0;bottom:0;left:-40%;width:30%;transform:skewX(-20deg);background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);pointer-events:none}
+.hof{position:fixed;inset:0;z-index:200;overflow-x:hidden;overflow-y:auto;color:#fff;-webkit-overflow-scrolling:touch;
+  background:radial-gradient(120% 50% at 50% 0%,rgba(255,214,106,.10),transparent 60%),repeating-linear-gradient(90deg,rgba(255,255,255,.028) 0 1px,transparent 1px 64px),linear-gradient(180deg,#0c1628 0%,#060a13 70%,#04070d 100%)}
+.hof-in{max-width:480px;margin:0 auto;overflow:hidden;padding:calc(18px + env(safe-area-inset-top,0px)) 16px calc(40px + env(safe-area-inset-bottom,0px))}
+.hof-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.hof-top h2{margin:0;font-family:var(--disp);font-weight:700;font-style:italic;font-size:36px;letter-spacing:.04em;line-height:1;color:#fff}
+.hof-top p{margin:6px 0 0;font-size:13.5px;color:#fff}
+.hofx{flex:0 0 auto;width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.06);color:#fff;font-size:22px;line-height:1;cursor:pointer}
+.hof-rail{height:3px;margin:16px -16px 0;background:linear-gradient(90deg,transparent,rgba(255,214,106,.55),transparent)}
+.spot{position:relative;display:flex;flex-direction:column;align-items:center;padding-top:26px}
+.spot::before{content:"";position:absolute;left:50%;top:0;width:150%;height:100%;transform:translateX(-50%);pointer-events:none;
+  background:radial-gradient(45% 70% at 50% 0%,rgba(255,250,235,.20),rgba(255,250,235,.05) 55%,transparent 75%);clip-path:polygon(38% 0,62% 0,100% 100%,0 100%)}
+.spot > *{position:relative}
+.plq{margin-top:12px;min-width:72%;text-align:center;border-radius:6px;padding:7px 12px 8px;color:#0b0f14;
+  background:linear-gradient(180deg,#f7f9fb,#c9cfd6 48%,#e9edf1 52%,#aab1ba);box-shadow:0 0 0 1px rgba(0,0,0,.5),inset 0 1px 0 #fff,0 6px 14px rgba(0,0,0,.5)}
+.plq b{display:block;font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:#0b0f14}
+.plq span{display:block;font-size:12px;font-weight:700;margin-top:1px;color:#0b0f14}
+.spot.sm .plq{min-width:88%;padding:5px 8px 6px}.spot.sm .plq b{font-size:13.5px;letter-spacing:.08em}.spot.sm .plq span{font-size:11px}
+.hof-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-top:22px}
+.hof-next{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:6px;padding:16px 10px;border-radius:14px;border:1.5px dashed rgba(255,255,255,.3);margin-top:26px;min-height:150px}
+.hof-next > b{font-family:var(--disp);font-weight:700;font-style:italic;font-size:32px;color:#fff}
+.hof-next span{font-size:12.5px;color:#fff;line-height:1.35}.hof-next span b{display:block;font-size:13px}
+.hof-ft{margin-top:24px;font-size:12.5px;color:#fff;line-height:1.45;text-align:center;border-top:1px solid rgba(255,255,255,.14);padding-top:12px}
+.awpic{display:block;flex:0 0 auto;padding:0;border:0;background:none;cursor:zoom-in;line-height:0;filter:drop-shadow(0 10px 18px rgba(0,0,0,.55))}
+.awz{position:fixed;inset:0;z-index:300;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:calc(64px + env(safe-area-inset-top,0px)) 16px calc(24px + env(safe-area-inset-bottom,0px));
+  background:radial-gradient(60% 50% at 50% 45%,rgba(255,255,255,.10),transparent 70%),rgba(3,6,12,.98);animation:awzIn .22s ease-out}
+.awz img{display:block;max-height:78vh;max-width:92vw;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 18px 40px rgba(0,0,0,.7));animation:awzImg .28s cubic-bezier(.2,.8,.3,1)}
+.awzx{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:14px;width:44px;height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;font-size:26px;line-height:1;cursor:pointer}
+.awzc{font-family:var(--disp);font-weight:700;font-size:16px;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+@keyframes awzIn{from{opacity:0}}@keyframes awzImg{from{transform:scale(.6);opacity:0}}
+@media (prefers-reduced-motion:reduce){.awz,.awz img{animation:none}}
 .trinfo .tcn em{font-style:normal;font-family:var(--disp);font-size:16px;letter-spacing:.1em;text-transform:uppercase}
 .trtiers{display:flex;flex-direction:column;gap:6px;margin-top:12px}
 .trtiers>div{display:flex;gap:10px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:7px 10px}
@@ -487,7 +560,9 @@ var PTS={Diamant:750,Carbon:700,Gold:650,Silber:600,Bronze:550,Leder:500};
 var THR=[[735,'Diamant'],[679,'Carbon'],[624,'Gold'],[570,'Silber'],[517,'Bronze'],[470,'Leder']];
 var LCOL={Diamant:'#5BC8E8',Carbon:'#A0A4AE',Gold:'#F5C542',Silber:'#C9CED6',Bronze:'#CD7F32',Leder:'#9A6A3A'};
 var WD=['So','Mo','Di','Mi','Do','Fr','Sa'],WDL=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],MO=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-var SHOP='https://shop.e-guma.ch/simracing/de/gutscheine',WEB='https://www.simracing-events.ch',YT='https://www.youtube.com/@aplussimracinglounge';
+var LOUNGE='A Plus SimRacing Lounge';   // Roger 02.11.2026: Absender der Lounge im Chat
+var SHOP='https://shop.e-guma.ch/simracing/de/gutscheine',PASS='https://shop.e-guma.ch/simracing/de/tickets/after-work-abos-1581070',   // Roger 03.11.2026: «Pässe im Shop» direkt zu den AfterWork-Abos
+WEB='https://www.simracing-events.ch',YT='https://www.youtube.com/@aplussimracinglounge';
 var TODAY=nowIso(); // Prüfung 01.11.2026: echtes heutiges Datum (vorher fest 30.10.2026) – sonst zählen vergangene Abende nach neuen Daten noch als offen
 var D=null,U=null,ME=null,ANON=false,st={tab:'home',stack:[],sub:{},q:{},flt:{}};
 // ---- Echte App (01.11.2026): auf aplus-simracing.github.io / app.simracing-events.ch Anmeldung mit Code per E-Mail (Supabase, Zürich).
@@ -652,7 +727,7 @@ function notifs(){var x=ls('notif-'+U);if(!x){x=notifSeed(U);x.forEach(function(
 function unread(){return notifs().some(function(n){return !n.read;});}
 function markRead(id){var x=ls('notif-'+U)||[];x.forEach(function(n){if(!id||n.id===id)n.read=true;});ls('notif-'+U,x);var a=ls('admin-push')||[];a.forEach(function(n){if(!id||n.id===id)n.read=true;});ls('admin-push',a);var pr=ls('pushread-'+(U||'gast'))||{};lpush().forEach(function(n){if(!id||n.id===id)pr[n.id]=1;});ls('pushread-'+(U||'gast'),pr);}
 var pushT=null;
-function showPush(n){var P=$('#push');P.innerHTML='<button class="pb" id="pbB"><img src="logo.png" alt=""><div class="grow"><div class="row"><span class="pt grow ell">APlus Lounge</span><span class="pa">jetzt</span></div><div class="pt" style="margin-top:2px">'+e(n.title)+'</div><div class="px">'+e(n.text)+'</div></div></button>';
+function showPush(n){var P=$('#push');P.innerHTML='<button class="pb" id="pbB"><img src="logo.png" alt=""><div class="grow"><div class="row"><span class="pt grow ell">A Plus SimRacing Lounge</span><span class="pa">jetzt</span></div><div class="pt" style="margin-top:2px">'+e(n.title)+'</div><div class="px">'+e(n.text)+'</div></div></button>';
   requestAnimationFrame(function(){P.classList.add('show');});clearTimeout(pushT);pushT=setTimeout(function(){P.classList.remove('show');},6500);
   $('#pbB').onclick=function(){P.classList.remove('show');if(n.id)markRead(n.id);if(pushOeffnen(n))return;if(n.go)go(n.go,true);};}
 // Prüfung 3x (C4): «Antippen öffnet» aus dem TimeTool – Webseite im Browser, Mitteilung nur mit Bild → Bild zeigen (sonst die Seite aus n.go)
@@ -669,7 +744,7 @@ var SIDE=['notif','news','events','ev','admin','info','me','settings'];
 function isDetail(p){var a=String(p||'').split('/');return SIDE.indexOf(a[0])>=0||(a[0]==='aw'&&a[1]==='abend')||(a[0]==='times'&&(a[1]==='board'||a[1]==='strecke'||a[1]==='auto'))||(a[0]==='club'&&(a[1]==='tag'||a[1]==='chat'))||(a[0]==='chat'&&!!a[1]);}
 function setTab(p){var t=p.split('/')[0];if(SIDE.indexOf(t)>=0)st.tab=st.lastTab||'home';else{st.tab=t;st.lastTab=t;}}
 var HP=0; // eigene Verlaufs-Einträge, damit die Zurück-Geste am Handy innerhalb der App bleibt
-function go(path,push){var cur=st.path||'home';if(cur===path){render();return;}
+function go(path,push){try{awzClose();hofClose();}catch(x){}var cur=st.path||'home';if(cur===path){render();return;}
   if(isDetail(path)){if(push!==false){st.stack.push({p:cur,y:window.scrollY||0});try{history.pushState({apl:1},'');HP++;}catch(x){}}}
   else st.stack=[];
   if(/^events\/./.test(path))st.flt.ev=path.split('/')[1];   // Prüfung 31.10.2026: Link «Alle AfterWorks» setzt den Filter jedes Mal
@@ -681,6 +756,7 @@ window.addEventListener('popstate',function(){if(SKIP){SKIP=0;return;}
   if(LGH&&($('#fMail')||$('#fCode')||$('.login.who'))){LGH=0;var dd=$('#dlg');if(dd&&!dd.hidden){dd.hidden=true;if(L.step!=='mail')lgGuard();return;}   // Prüfung 01.11.2026: Zurück-Geste bleibt in der Anmeldung
     if(L.step==='code'){LGS++;LGV++;L.busySend=false;L.busyVerify=false;L.step='mail';L.err='';L.info='';L.expired=false;if(REAL)lgSave();drawLogin();return;}
     if(L.step==='who')lgGuard();return;}
+  if(awzClose()||hofClose()){try{history.pushState({apl:1},'');}catch(x){}return;}   // Award gross / Hall of Fame zuerst schliessen
   var d=$('#dlg');if(d&&!d.hidden){d.hidden=true;try{history.pushState({apl:1},'');}catch(x){}return;}if(HP>0)HP--;back();});   // Prüfung 01.11.2026: offenes Fenster zuerst schliessen
 function goBack(){if(HP>0&&st.stack.length){try{history.back();return;}catch(x){}}back();}
 function tabGo(t){if(HP>0){SKIP=1;try{history.go(-HP);}catch(x){SKIP=0;}HP=0;}st.stack=[];if(t==='aw')st.sub.aw='abende';go(t,false);}
@@ -872,16 +948,16 @@ function vHome(){
 }
 function licCard(a,link){
   var p=ME,off=p.lic,h='';
-  if(!a){return '<div class="lic" style="--lc:#2E4267"><div class="kl">APlus Lizenz · Saison 2026</div><div class="nm">'+e(p.n)+'</div><div class="lv">Noch keine</div><div class="meta"><span>Fahre dein erstes AfterWork – ab dann zählt jeder Dienstag für deine Lizenz.</span></div>'+(off?'<div class="goal">Leaderboard-Badge: '+badge(off)+'</div>':'')+(link?'<div class="goal"><button class="lnk" data-go="aw/regeln">So funktioniert die Lizenz</button></div>':'')+'</div>';}
+  if(!a){return '<div class="lic" style="--lc:#2E4267"><div class="kl">A Plus Lizenz · Saison 2026</div><div class="nm">'+e(p.n)+'</div><div class="lv">Noch keine</div><div class="meta"><span>Fahre dein erstes AfterWork – ab dann zählt jeder Dienstag für deine Lizenz.</span></div>'+(off?'<div class="goal">Leaderboard-Badge: '+badge(off)+'</div>':'')+(link?'<div class="goal"><button class="lnk" data-go="aw/regeln">So funktioniert die Lizenz</button></div>':'')+'</div>';}
   if(!a.status&&a.n>0){var f4=Math.max(1,4-a.n),tl=a.lic||licOf(a.avg);   // Roger 30.10.2026: offizielle Lizenzkarte erst ab 4 AfterWorks (wie auf dem Leaderboard)
-    return '<div class="lic" style="--lc:#2E4267"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="kl">APlus Lizenz · Saison 2026</div><div class="nm">'+e(p.n)+'</div><div class="lv" style="font-size:30px;color:#fff">Noch '+f4+' AfterWork'+(f4===1?'':'s')+'</div>'
+    return '<div class="lic" style="--lc:#2E4267"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="kl">A Plus Lizenz · Saison 2026</div><div class="nm">'+e(p.n)+'</div><div class="lv" style="font-size:30px;color:#fff">Noch '+f4+' AfterWork'+(f4===1?'':'s')+'</div>'
       +'<div class="meta">'+(a.avg!=null?'<span>Ø <b class="num">'+a.avg+'</b> Punkte</span>':'')+'<span><b>'+a.n+'</b> AfterWork'+(a.n===1?'':'s')+'</span></div>'
       +'<div class="goal">Ab <b>4 AfterWorks</b> bekommst du deine offizielle Lizenzkarte – mit deiner Stufe, wie auf dem Leaderboard.'+(tl?' Nach deinem jetzigen Schnitt wäre das <b>'+e(tl)+'</b>.':'')+'</div></div>'
       +'<div class="zcard">'+seasonNight(a)+'</div>';}
   var l=a.lic||'',col=LCOL[l]||'#2E4267',SCOL={Diamant:'#bdf1ff',Carbon:'#c9ced6',Gold:'#f5c542',Silber:'#e2e6ea',Bronze:'#e09a5a',Leder:'#d9a874'};
   var LKD='2';   // Roger 30.10.2026: Kartendesign fix Serie 2 «Rennstreifen» (Serie 1 «Material» nur noch als Reserve im Code)
-  h+=l?(LKD==='1'?'<div class="lic mt t-'+e(l)+' '+e(l)+'"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="shade"></div>'+(l==='Diamant'?'<div class="fac"></div>':'')+(l==='Leder'?'<div class="stitch"></div>':'')+'<div class="kl">APlus Lizenz · Saison 2026'+(a.status?'':' · vorläufig')+'</div><div class="nm">'+e(p.n)+'</div><div class="lv">'+e(l)+'</div>':'<div class="lic rs '+e(l)+'" style="--sc:'+SCOL[l]+'"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="band t-'+e(l)+'"></div><div class="st1"></div><div class="st2"></div><div class="kl">APlus Lizenz · Saison 2026'+(a.status?'':' · vorläufig')+'</div><div class="nm">'+e(p.n)+'</div><div class="lv f-'+e(l)+'">'+e(l)+'</div>')
-    :'<div class="lic" style="--lc:'+col+'"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="kl">APlus Lizenz · Saison 2026'+(a.status?'':' · vorläufig')+'</div><div class="nm">'+e(p.n)+'</div><div class="lv" style="color:#fff">–</div>';
+  h+=l?(LKD==='1'?'<div class="lic mt t-'+e(l)+' '+e(l)+'"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="shade"></div>'+(l==='Diamant'?'<div class="fac"></div>':'')+(l==='Leder'?'<div class="stitch"></div>':'')+'<div class="kl">A Plus Lizenz · Saison 2026'+(a.status?'':' · vorläufig')+'</div><div class="nm">'+e(p.n)+'</div><div class="lv">'+e(l)+'</div>':'<div class="lic rs '+e(l)+'" style="--sc:'+SCOL[l]+'"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="band t-'+e(l)+'"></div><div class="st1"></div><div class="st2"></div><div class="kl">A Plus Lizenz · Saison 2026'+(a.status?'':' · vorläufig')+'</div><div class="nm">'+e(p.n)+'</div><div class="lv f-'+e(l)+'">'+e(l)+'</div>')
+    :'<div class="lic" style="--lc:'+col+'"'+(link?' role="button" tabindex="0" data-go="aw"':'')+'><div class="kl">A Plus Lizenz · Saison 2026'+(a.status?'':' · vorläufig')+'</div><div class="nm">'+e(p.n)+'</div><div class="lv" style="color:#fff">–</div>';
   h+='<div class="meta">'+(a.avg!=null?'<span>Ø <b class="num">'+a.avg+'</b> Punkte</span>':'<span>noch kein Ø</span>')+'<span><b>'+a.n+'</b> AfterWork'+(a.n===1?'':'s')+'</span>'+(a.y.nw?'<span>'+a.y.nw+'× nicht gewertet</span>':'')+(off&&off!==l?'<span>Leaderboard-Badge: <b>'+e(off)+'</b></span>':'')+'</div>';
   if(l)h+='</div><div class="zcard">';   // Karte = Entwurf 2; Ziel und Award darunter in eigenem Kästchen (Roger 30.10.2026)
   if(a.goal&&a.avg!=null){var g=a.goal,ab=g.evenings===1?'1 Abend':g.evenings+' Abenden',gt=(THR.filter(function(x){return x[1]===g.lic;})[0]||[0])[0];
@@ -974,7 +1050,7 @@ function vAW(sub){
       +'<div><b>2. Dein Jahresschnitt entscheidet.</b><p class="note" style="margin:4px 0 0">Gezählt wird der Durchschnitt aller Abende mit Punkten, auf ganze Punkte gerundet. Die Saison ist das Kalenderjahr.</p></div>'
       +'<div><b>3. Status und Award.</b><p class="note" style="margin:4px 0 0">Ab 4 AfterWorks ist deine Lizenz offiziell. Ab 10 AfterWorks bekommst du den Lizenz-Award an der Season Night (16.01.2027).</p></div>'
       +'<div class="ls"><b>LAST SHOT</b><span class="note" style="color:#fff">Nach mind. 2 Slots und höchstens 0.500 s hinter der nächsten Stufe: 1 Extra-Slot für CHF 10 statt 29 – einmal pro Abend. Die App meldet sich, sobald du im Fenster bist.</span></div>'
-      +'<div><b>Preise</b><p class="note" style="margin:4px 0 0">Slot (ca. 25 Min.: Hotlapping + 3-Runden-Rennen) CHF 29 · Einstiegsabo CHF 189 (1 Monat) · AfterWork Pass CHF 1\'190/Jahr · Share Pass CHF 1\'690/Jahr.</p><a class="btn" style="margin-top:8px" href="'+SHOP+'" target="_blank" rel="noopener">Pässe im Shop '+IC.ext+'</a></div></div>';
+      +'<div><b>Preise</b><p class="note" style="margin:4px 0 0">Slot (ca. 25 Min.: Hotlapping + 3-Runden-Rennen) CHF 29 · Einstiegsabo CHF 189 (1 Monat) · AfterWork Pass CHF 1\'190/Jahr · Share Pass CHF 1\'690/Jahr.</p><a class="btn" style="margin-top:8px" href="'+PASS+'" target="_blank" rel="noopener">Pässe im Shop '+IC.ext+'</a></div></div>';
   }
   return h;
 }
@@ -986,10 +1062,13 @@ function vEvening(d){
   if(!U)return h+needLogin('Die Rangliste des Abends');
   var mine=rows.filter(function(r){return r.k===U;})[0];
   if(mine&&mine.ls)h+='<div class="ls"><b>LAST SHOT</b><span class="note" style="color:#fff">Du warst <b>'+(mine.g/1000).toFixed(3)+' s</b> hinter '+e(mine.nx)+' – Extra-Slot für CHF 10.</span></div>';
-  h+='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Zeit</th><th>Stufe</th><th class="r">P.</th></tr></thead><tbody>'+rows.map(function(r,i){return '<tr class="'+(r.k===U?'me':'')+(i<3?' p'+(i+1):'')+'"><td class="rk num">'+(r.b?i+1:'–')+'</td><td class="nm">'+e(r.n)+(function(){var y=yr(r.k),li=y&&y.c>=4&&y.l?'<span title="Lizenz 2026" style="color:'+LCOL[y.l]+'">◆ '+e(y.l)+'</span>':'';return li||r.ls?'<small>'+(r.ls?'<span class="tag red" title="Last Shot" style="font-size:10px;padding:0 5px">LS</span>'+(li?' ':''):'')+li+'</small>':'';})()+'</td><td class="r num t">'+fmt(r.b)+'</td><td>'+badge(r.l)+'</td><td class="r num">'+(r.nw?'<s title="nicht gewertet">'+r.p+'</s>':r.p)+'</td></tr>';}).join('')+'</tbody></table></div>'
-    +'<p class="note">Schnellste gültige Runde pro Fahrer. ◆ = Lizenz im Jahresstand 2026 (ab 4 AfterWorks). LS = war im Last-Shot-Fenster.</p>';
+  h+='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Zeit</th><th>Stufe</th><th class="r">P.</th></tr></thead><tbody>'+rows.map(function(r,i){var lb=i&&rows[i-1].l&&rows[i-1].l!==(r.l||'');return '<tr class="'+(r.k===U?'me':'')+(i<3?' p'+(i+1):'')+(lb?' lvb':'')+'"'+(lb?' style="--lb:'+LCOL[rows[i-1].l]+'"':'')+'><td class="rk num">'+(r.b?i+1:'–')+'</td><td class="nm">'+e(r.n)+(function(){var y=yr(r.k),li=y&&y.c>=4&&y.l?'<span title="Lizenz 2026" style="color:'+LCOL[y.l]+'">◆ '+e(y.l)+'</span>':'';return li||r.ls?'<small>'+(r.ls?'<span class="tag red" title="Last Shot" style="font-size:10px;padding:0 5px">LS</span>'+(li?' ':''):'')+li+'</small>':'';})()+'</td><td class="r num t">'+fmt(r.b)+'</td><td class="lvc">'+badge(r.l)+lvGap(r,ev.refs)+'</td><td class="r num">'+(r.nw?'<s title="nicht gewertet">'+r.p+'</s>':r.p)+'</td></tr>';}).join('')+'</tbody></table></div>'
+    +'<p class="note">Schnellste gültige Runde pro Fahrer. ◆ = Lizenz im Jahresstand 2026 (ab 4 AfterWorks). LS = war im Last-Shot-Fenster.'+(rows.some(function(r){return r.l;})?' Farbiger Strich = Grenze zwischen den Stufen.':'')+(ev.refs&&ev.refs.Diamant?' Kleine Zahl unter der Stufe = so viel fehlte zur nächsten Stufe.':'')+'</p>';
   return h;
 }
+// Roger 03.11.2026: unter dem Stufen-Abzeichen, wie viel zur nächsten Stufe gefehlt hat (Diamant = keine)
+function lvGap(r,refs){if(!refs||!r.b)return '';var i=r.l?LV.indexOf(r.l):LV.length,nx=i>0?LV[i-1]:null,t=nx&&refs[nx];if(!t||r.b<=t)return '';
+  return '<small class="lvg"><b>−'+((r.b-t)/1000).toFixed(3)+'</b>bis '+nx+'</small>';}
 
 // ---------------------------------------------------------------- Bestzeiten
 function vTimes(sub){
@@ -1247,13 +1326,13 @@ function trAll(){if(TRS)return TRS;var E={},LI={Silber:1,Gold:2,Carbon:3,Diamant
   (D.aw.year||[]).forEach(function(r){YR[r.k]=r;});
   D.aw.evenings.forEach(function(ev){var arr=ev.rows.filter(function(r){return r.b>0;}).sort(function(a,b){return a.b-b.b;}),dia=ev.refs&&ev.refs.Diamant;
     ev.rows.forEach(function(r){var i=arr.indexOf(r),x=E[r.k]=E[r.k]||[];x.push({ev:ev,d:ev.d,pos:i+1,of:arr.length,b:r.b,l:r.l,margin:i===0&&arr[1]?arr[1].b-r.b:null,beat:!!(dia&&r.b>0&&r.b<dia)});});});
-  TREV=E;var days=D.aw.evenings.map(function(e){return e.d;}),CE={},kc=kcAll(),AI=allById();
+  TREV=E;var days=D.aw.evenings.filter(function(e){return e.rows&&e.rows.length&&e.d<=TODAY;}).map(function(e){return e.d;}),CE={},kc=kcAll(),AI=allById();
   var CP={};(D.club.entries||[]).forEach(function(en){var n=(D.club.days||[]).filter(function(d){return d.pts&&d.pts[en.id];}).length,pd=0;(D.club.days||[]).forEach(function(d){(d.races||[]).forEach(function(r){(r.res||[]).slice(0,3).forEach(function(x){if(x.e===en.id)pd++;});});});entKeys(en).forEach(function(k){CE[k]=Math.max(CE[k]||0,n);CP[k]=Math.max(CP[k]||0,pd);});});
   TRS={};Object.keys(D.people).forEach(function(k){var p=D.people[k],s=p.st||[],me=E[k]||[],y=YR[k]||{},K=kc[k]||{};
-    var cur=0,best=0;days.forEach(function(d){if(me.some(function(m){return m.d===d;})){cur++;if(cur>best)best=cur;}else cur=0;});
+    var cur=0,best=0,cs=null,bs=null,be=null,last=null;days.forEach(function(d){if(me.some(function(m){return m.d===d;})){if(!cur)cs=d;cur++;last=d;if(cur>=best){best=cur;bs=cs;be=d;}}else if(d!==TODAY)cur=0;});   // Prüfung 03.11.2026: heutiger Abend unterbricht erst, wenn er vorbei ist; bei gleich langen Serien zählt die neuere   // Roger 02.11.2026: auch aktuelle Serie (seit wann) und längste Serie (von–bis)
     var ym=0,night=0,cb=0;(p.pids||[]).forEach(function(id){var a=AI[id];if(a){ym|=a[5];night+=a[6];cb=Math.max(cb,a[7]);}});
     TRS[k]={laps:s[0]||0,km:s[6]||0,aw:(function(){var c={},b=0;me.forEach(function(m){var y=m.d.slice(0,4);c[y]=(c[y]||0)+1;if(c[y]>b)b=c[y];});return b;})(),   // beste Saison zählt (Roger 31.10.2026)
-      streak:best,years:ymStreak(ym),tracks:s[4]||0,cars:s[5]||0,
+      streak:best,streakNow:cur,streakInfo:{bs:bs,be:be,cs:cur?cs:null,last:last},years:ymStreak(ym),tracks:s[4]||0,cars:s[5]||0,
       kombi:K.kombi||0,p1:K.p1||0,p3:K.p3||0,p5:K.p5||0,
       awWin:me.filter(function(m){return m.pos===1;}).length,awPod:me.filter(function(m){return m.pos>0&&m.pos<=3;}).length,dia:me.filter(function(m){return m.l==='Diamant';}).length,
       lic:Math.max((y.c>=4&&LI[y.l])||0,(p.licBest||0)),club:Math.max(CE[k]||0,p.clubBest||0),clubpod:CP[k]||0,   // beste Saison zählt; licBest/clubBest = frühere Saisons (kommt mit der echten App aus dem TimeTool)
@@ -1283,14 +1362,15 @@ function trOf(k){var s=trAll()[k];if(!s)return null;var E=trEarned(k),ch=false,y
     for(var j=1;j<=L;j++)if(!ek[j]){ek[j]=yr;ch=true;}
     var keep=0;for(var q=1;q<=4;q++)if(ek[q])keep=q;L=Math.max(L,keep);
     for(var i=0;i<L;i++)got[i]++;var nx=L<4?t[4][L]:null;
-    return {g:t[0],n:t[1],ic:t[2],key:t[3],v:v,L:L,nx:nx,prog:nx?Math.min(1,v/nx):1,d:t[5],thr:t[4],sc:t[6],info:t[7],yrs:ek};});
+    var now=t[3]==='streak'?(s.streakNow||0):v;   // Roger 02.11.2026: Dauerbrenner zählt ab der aktuellen Serie weiter
+    return {g:t[0],n:t[1],ic:t[2],key:t[3],v:v,now:now,si:t[3]==='streak'?s.streakInfo:null,L:L,nx:nx,prog:nx?Math.min(1,now/nx):1,d:t[5],thr:t[4],sc:t[6],info:t[7],yrs:ek};});
   if(ch&&k===U)ls('troph-earned-'+k,E);
   var sec=TRSEC.map(function(x){return {n:x[0],ic:x[1],d:x[3],c:s[x[2]]||0};});
   var legend=rows.every(function(r){return r.L===4;});
   return {k:k,s:s,rows:rows,got:got,sec:sec,legend:legend,sum:got[0]+got[1]+got[2]+got[3]+(legend?1:0),total:TRDEF.length*4+1,bonus:sec.filter(function(x){return x.c>0;}).length};}
 var LICW=['keine','Silber-Lizenz','Gold-Lizenz','Carbon-Lizenz','Diamant-Lizenz'];
 function trNum(r,v){if(r.key==='lic')return LICW[v]||'keine';return r.key==='years'&&v%1?pz(v,1):n0(v);}
-function trProg(r){return r.key==='lic'?'beste: '+LICW[r.v]+' · nächste: '+LICW[r.nx]:trNum(r,r.v)+' / '+trNum(r,r.nx);}
+function trProg(r){if(r.key==='streak')return 'aktuell '+r.now+' / '+r.nx+(r.v>r.now?' · längste '+r.v:'');return r.key==='lic'?'beste: '+LICW[r.v]+' · nächste: '+LICW[r.nx]:trNum(r,r.v)+' / '+trNum(r,r.nx);}
 // Medaille: Metall mit Rand, Prägung und Glanz
 var MGC={0:['#4a5568','#2b3444','#1c2431','#141a24','#7f8ea6'],1:['#ffe3c4','#e2995a','#a35a22','#5c2f0d','#3d1d06'],2:['#ffffff','#e3e7ec','#a3abb6','#5f6772','#2c323a'],3:['#fff7d1','#ffd75e','#d39a17','#7d5507','#4a3102'],4:['#f4feff','#bff2ff','#62c9e8','#2b84aa','#0b3a52']};
 function medal(ic,L,sz){var c=MGC[L]||MGC[0],id='mg'+L;
@@ -1352,11 +1432,23 @@ function trDetail(key,k){trAll();var me=TREV[k]||[];
   if(key==='p1')return recLines(k);
   return '';}
 function listBox(h,n){return h?'<div class="list trlist" style="margin-top:10px">'+h+'</div>':'';}
+// Dauerbrenner: aktuelle Serie mit Balken, seit wann bzw. wann unterbrochen, längste Serie (Roger 02.11.2026)
+function trStreakBox(r){var si=r.si||{},n=r.now||0,nx=r.nx,ev=D.aw.evenings.filter(function(x){return x.rows&&x.rows.length&&x.d<=TODAY;}),done={},heute=(TREV[U]||[]).some(function(m){return m.d===TODAY;});ev.forEach(function(x){if(x.d<TODAY||heute)done[x.d]=1;});
+  var miss=si.last?ev.filter(function(x){return x.d>si.last&&x.d!==TODAY;}):[],nxt=CAL.filter(function(c){return c[3]==='AfterWork'&&c[0]>=TODAY&&!done[c[0]];})[0];   // Prüfung 03.11.2026: heutiger Abend zählt erst als verpasst, wenn er vorbei ist
+  var ml=function(x){return dmy(x.d)+(x.label?' ('+e(x.label)+')':'');};
+  var h='<div class="trsb'+(n?'':' brk')+'"><div class="trsbh"><small>Aktuelle Serie</small><b class="num">'+n+(nx?' <span>von '+nx+'</span>':'')+'</b></div>';
+  if(nx)h+='<div class="trsbd" role="img" aria-label="'+n+' von '+nx+'">'+Array.apply(null,Array(nx)).map(function(z,i){return '<i class="'+(i<n?'on':'')+'"></i>';}).join('')+'</div>';
+  if(n)h+='<p>Läuft seit <b>'+dmy(si.cs)+'</b> – '+n+' AfterWork'+(n===1?'':'s')+' hintereinander.'+(nx?' Noch <b class="num">'+(nx-n)+'</b> bis '+TRT[r.L]+'.':'')+'</p>';
+  else if(miss.length)h+='<p><b class="trsbx">Unterbrochen</b> am '+ml(miss[0])+'.'+(miss.length>1?' Seither verpasst: '+(miss.length<=3?miss.slice(1).map(ml).join(', '):(miss.length-1)+' AfterWorks')+'.':'')+' Zuletzt dabei: '+dmy(si.last)+'.</p><p>Deine neue Serie startet am nächsten AfterWork'+(nxt?' ('+dmy(nxt[0])+')':'')+(nx?' – für '+TRT[r.L]+' brauchst du <b class="num">'+nx+'</b> hintereinander':'')+'.</p>';
+  else h+='<p>Deine Serie startet mit deinem nächsten AfterWork'+(nxt?' ('+dmy(nxt[0])+')':'')+'.</p>';
+  h+='</div>';
+  if(r.v)h+='<div class="trsl">Deine längste Serie: <b class="num">'+r.v+'</b> AfterWork'+(r.v===1?'':'s')+' hintereinander'+(si.bs?' ('+dmy(si.bs)+(si.be!==si.bs?' – '+dmy(si.be):'')+')':'')+(n&&si.be===si.last?' – das ist deine aktuelle Serie':'')+'.</div>';
+  return h;}
 function trInfo(key){var T=trOf(U);if(!T)return;var r=T.rows.filter(function(x){return x.key===key;})[0];if(!r)return;
   var tiers='<div class="trtiers">'+r.thr.map(function(t,i){var ok=r.L>i,rr=trRareMe(trRare(r.key,t),r.key,t,r.v,ok);return '<div class="'+(ok?'ok':'')+'">'+medal(r.ic,ok?i+1:0,30)+'<span class="grow"><b class="c'+(i+1)+'">'+TRT[i]+'</b><small class="num">'+(r.key==='lic'?trNum(r,t)+' in einer Saison':trNum(r,t)+' '+e(r.d.split(' (')[0]))+'</small></span><span class="trr num">'+(ok?'✓ '+(r.yrs&&r.yrs[i+1]?'<span class="tryr">'+r.yrs[i+1]+'</span> · ':''):'')+trRareTxt(rr)+'</span></div>';}).join('')+'</div>';
   var det=trDetail(key,U);
-  dialog(r.n,'<div class="trinfo"><div class="row" style="gap:12px;align-items:center">'+medal(r.ic,r.L,64)+'<div><div class="tcn">'+(r.L?'<em class="c'+r.L+'" style="margin:0">'+TRT[r.L-1]+'</em>':'<span class="note">noch keine Stufe</span>')+'</div><div class="note">'+e(r.sc)+' · dein Stand: <b style="color:#fff" class="num">'+trNum(r,r.v)+'</b></div>'+(r.nx?'<div class="note">'+(r.key==='lic'?'Nächste Stufe: <b style="color:#fff">'+LICW[r.nx]+'</b> = '+TRT[r.L]:'Noch <b style="color:#fff" class="num">'+trNum(r,r.nx-r.v)+'</b> bis '+TRT[r.L])+'</div>':'')+'</div></div>'
-   +'<p class="note" style="margin:10px 0 0;color:#DDE6F3">'+e(r.info)+'</p>'+tiers+'<p class="note" style="margin:6px 0 0">Einmal erreicht, bleibt eine Stufe für immer (Jahr beim ✓). Prozent = Anteil aller '+n0(trBase())+' Fahrer, die diese Stufe haben.</p>'
+  dialog(r.n,'<div class="trinfo"><div class="row" style="gap:12px;align-items:center">'+medal(r.ic,r.L,64)+'<div><div class="tcn">'+(r.L?'<em class="c'+r.L+'" style="margin:0">'+TRT[r.L-1]+'</em>':'<span class="note">noch keine Stufe</span>')+'</div><div class="note">'+e(r.sc)+(r.key==='streak'?'':' · dein Stand: <b style="color:#fff" class="num">'+trNum(r,r.v)+'</b>')+'</div>'+(r.nx&&r.key!=='streak'?'<div class="note">'+(r.key==='lic'?'Nächste Stufe: <b style="color:#fff">'+LICW[r.nx]+'</b> = '+TRT[r.L]:'Noch <b style="color:#fff" class="num">'+trNum(r,r.nx-r.v)+'</b> bis '+TRT[r.L])+'</div>':'')+'</div></div>'
+   +(r.key==='streak'?trStreakBox(r):'')+'<p class="note" style="margin:10px 0 0;color:#DDE6F3">'+e(r.info)+'</p>'+tiers+'<p class="note" style="margin:6px 0 0">Einmal erreicht, bleibt eine Stufe für immer (Jahr beim ✓). Prozent = Anteil aller '+n0(trBase())+' Fahrer, die diese Stufe haben.</p>'
    +(det?'<div class="sh" style="margin-top:12px"><h2 style="font-size:15px">'+(key==='p1'?'Deine Lounge-Rekorde':key==='aw'?'Deine AfterWorks '+TRSEAS:'Wo du es geschafft hast')+'</h2></div>'+listBox(det):'')+'</div>',[{t:'Schliessen'}]);trDlgBind();}
 function trSecInfo(ic){var T=trOf(U);var x=T&&T.sec.filter(function(y){return y.ic===ic;})[0];if(!x)return;var det=trDetail(ic,U);
   dialog(x.n,'<div class="trinfo"><div class="row" style="gap:12px;align-items:center">'+medal(x.ic,3,64)+'<div><div class="tcn"><em class="c3" style="margin:0">Geheime Trophäe</em></div><div class="note">'+e(x.d)+(x.c>1?' · '+x.c+'×':'')+'</div><div class="note">Haben nur '+trRareTxt(trRare(ic,1))+' aller Fahrer.</div></div></div>'+(det?'<div class="sh" style="margin-top:12px"><h2 style="font-size:15px">Wo du es geschafft hast</h2></div>'+listBox(det):'')+'</div>',[{t:'Schliessen'}]);trDlgBind();}
@@ -1366,7 +1458,7 @@ function bindTroph(){app.querySelectorAll('[data-tri]').forEach(function(b){b.on
   app.querySelectorAll('[data-erf]').forEach(function(b){b.onclick=function(){var k=b.getAttribute('data-erf'),t={awWin:'Deine AfterWork-Siege',awPod:'Deine AfterWork-Podestplätze',p1:'Deine Lounge-Rekorde'}[k];var h=trDetail(k,U);dialog(t,h?'<div class="trinfo">'+listBox(h)+'</div>':'<p class="note">Noch keine.</p>',[{t:'Schliessen'}]);trDlgBind();};});}
 // Schaufenster ohne Anmeldung (Roger 31.10.2026): nur Vorschau mit Beispiel-Fahrer + öffentliche Termine, keine echten Namen/Zeiten
 function vShowcase(){
-  var lic='<div class="lic rs Gold" style="--sc:#f5c542"><div class="band t-Gold"></div><div class="st1"></div><div class="st2"></div><div class="kl">APlus Lizenz · Saison 2026</div><div class="nm">Max Muster</div><div class="lv f-Gold">Gold</div><div class="meta"><span>Ø <b class="num">641</b> Punkte</span><span><b>12</b> AfterWorks</span></div></div>';
+  var lic='<div class="lic rs Gold" style="--sc:#f5c542"><div class="band t-Gold"></div><div class="st1"></div><div class="st2"></div><div class="kl">A Plus Lizenz · Saison 2026</div><div class="nm">Max Muster</div><div class="lv f-Gold">Gold</div><div class="meta"><span>Ø <b class="num">641</b> Punkte</span><span><b>12</b> AfterWorks</span></div></div>';
   var med='<div class="shw-med">'+[['awWin',4],['laps',3],['dia',2],['km',1]].map(function(m){return medal(m[0],m[1],52);}).join('')+'</div>';
   var rk='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Zeit</th><th>Stufe</th></tr></thead><tbody>'
     +[['Lea Beispiel','1:41.208','Diamant'],['Max Muster','1:41.877','Carbon'],['Tim Probe','1:42.530','Gold']].map(function(r,i){return '<tr class="p'+(i+1)+(i===1?' me':'')+'"><td class="rk num">'+(i+1)+'</td><td class="nm">'+r[0]+'</td><td class="r num t">'+r[1]+'</td><td>'+badge(r[2])+'</td></tr>';}).join('')+'</tbody></table></div>';
@@ -1385,8 +1477,8 @@ function vShowcase(){
 function vMe(){
   if(!U)return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">Gast-Modus</b><p class="note" style="margin:0">Du schaust dich ohne Anmeldung um. Melde dich an, um deine Zeiten, deine Lizenz und deine Mitteilungen zu sehen.</p><button class="btn pri" data-act="login">Anmelden</button></div>'+testCard();
   var p=ME,s=p.st,a=awState(U),fav=p.fav!=null?D.combos[p.fav]:null,set=ls('set-'+U)||{aw:true,ls:true,ev:true,news:true,chat:true,club:true};
-  var h='<div class="card row" style="gap:14px"><span class="av" style="width:56px;height:56px;font-size:22px">'+e(ini(p.n))+'</span><div class="grow"><b style="font-family:var(--disp);font-size:22px;display:block">'+e(p.n)+'</b><div class="row" style="gap:6px;flex-wrap:wrap;margin-top:4px">'+(p.pass?'<span class="tag blue">'+e(p.pass)+'</span>':'')+(p.club?'<span class="tag green">Club</span>':'')+(a&&a.lic?badge(a.lic):'')+(p.teams.length?'<span class="tag">'+e(p.teams[0])+'</span>':'')+'</div><div class="note" style="margin-top:4px">Fahrer seit '+tsY(s[2])+(L.mail||(ls('user')||{}).mail?' · '+e(L.mail||(ls('user')||{}).mail):'')+'</div></div></div>';
-  h+=viewSw();   // Roger 01.11.2026: Schalter Fahrer | Betreiber im Profil (nur Betreiber)
+  var h=licCardMe();   // Roger 02.11.2026: Lizenzkarte mit Club, Team, Fahrer seit, E-Mail statt Profil-Kopf
+  h+=viewSw()+meAw();   // Roger 03.11.2026: Lizenz-Award + Hall of Fame   // Roger 01.11.2026: Schalter Fahrer | Betreiber im Profil (nur Betreiber)
   h+='<div class="kpis"><div class="kpi"><b class="num">'+n0(s[0])+'</b><span>Runden total</span></div><div class="kpi"><b class="num">'+(s[0]?Math.round(s[1]/s[0]*100):0)+' %</b><span>gültig</span></div><div class="kpi"><b class="num">'+n0(s[6])+'</b><span>km gefahren</span></div><div class="kpi"><b class="num">'+s[4]+'</b><span>Strecken</span></div><div class="kpi"><b class="num">'+s[5]+'</b><span>Autos</span></div><div class="kpi"><b class="num">'+n0(s[7])+'</b><span>Runden 2026</span></div></div>';
   if(s[6]>500)h+=weltreise(s[6]);
   if(fav)h+='<button class="card li" style="border-radius:var(--r);border:1px solid var(--line)" data-go="times/board/'+p.fav+'"><span class="grow"><span class="s" style="display:block;text-transform:uppercase;letter-spacing:.08em;font-weight:700">Lieblings-Kombi</span><span class="t ell" style="display:block">'+e(fav.t)+'</span><span class="s ell" style="display:block">'+e(fav.c)+'</span></span>'+IC.chev+'</button>';
@@ -1396,6 +1488,71 @@ function vMe(){
   h+='<button class="btn full" data-act="logout">Abmelden</button><p class="note" style="text-align:center">A Plus SimRacing Lounge · '+(REAL?'':'Testversion 0.1 · ')+'Daten-Stand '+e(D.meta.stand)+'</p>';   // Prüfung 4: in der echten App ohne «Testversion»
   return h;
 }
+// ---------------------------------------------------------------- Lizenzkarte im Profil, Lizenz-Award, Hall of Fame (Roger 02./03.11.2026, Idee von Nici)
+var LZSC={Diamant:'#bdf1ff',Carbon:'#c9ced6',Gold:'#f5c542',Silber:'#e2e6ea',Bronze:'#e09a5a',Leder:'#d9a874'};
+var LZSG={Diamant:'rgba(127,220,255,.22)',Carbon:'rgba(170,179,192,.2)',Gold:'rgba(255,200,61,.22)',Silber:'rgba(223,230,238,.2)',Bronze:'rgba(224,138,69,.22)',Leder:'rgba(216,165,96,.2)'};
+var LZ_SN={2026:'2027-01-16'};   // Season Night je Saison (Übergabe der Lizenz-Awards)
+// Award-Bilder (Roger 03.11.2026): pro Jahr und Stufe; fehlt ein Bild, erscheint ein Platzhalter «Award-Bild folgt»
+var AWIMG={2026:{Diamant:'awards/2026/diamant.webp',Carbon:'awards/2026/carbon.webp',Gold:'awards/2026/gold.webp',Silber:'awards/2026/silber.webp',Bronze:'awards/2026/bronze.webp',Leder:'awards/2026/leder.webp'}};
+var LAUR='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 27c-4-3-6-7-6-12 0-3 1-6 3-8"/><path d="M22 27c4-3 6-7 6-12 0-3-1-6-3-8"/><path d="M5 12c2 0 3 1 3.5 3M4.5 17c2 0 3.5 1 4 3M6.5 22c2-.3 3.5.5 4.5 2M7.5 7.5c1.8.5 2.5 2 2.5 3.5"/><path d="M27 12c-2 0-3 1-3.5 3M27.5 17c-2 0-3.5 1-4 3M25.5 22c-2-.3-3.5.5-4.5 2M24.5 7.5c-1.8.5-2.5 2-2.5 3.5"/><path d="M16 9l1.6 3.3 3.6.5-2.6 2.5.6 3.6-3.2-1.7-3.2 1.7.6-3.6-2.6-2.5 3.6-.5z" fill="currentColor"/></svg>';
+function lzSeason(){return +(D.meta&&D.meta.season)||+TODAY.slice(0,4);}
+function lzRank(){var y=yr(U),i=y?((D.aw&&D.aw.year)||[]).indexOf(y):-1;return i>=0?i+1:null;}   // Prüfung 03.11.2026: gleicher Platz wie auf der Seite «Jahresstand»
+// Status eines Awards (Roger 03.11.2026): «gesichert · auf Kurs» bis 31.12., dann «Zielflagge» bis zur Season Night, dann «überreicht»
+function awSt(y){if(TODAY<=y+'-12-31')return 'kurs';var sn=LZ_SN[y]||((y+1)+'-01-31');return TODAY>=sn?'ok':'zf';}   // ohne Datum: Season Night spätestens Ende Januar
+// Alle Awards des Fahrers, neuester zuerst. Frühere Jahre kommen später vom TimeTool (ME.awards = [[Jahr, Stufe], …]); die laufende Saison rechnet die App selbst (ab 10 AfterWorks).
+function awList(){var o=[],seen={},S=lzSeason();
+  (Array.isArray(ME&&ME.awards)?ME.awards:[]).forEach(function(x){var y=+(x&&x[0]),l=String((x&&x[1])||'');if(y&&LV.indexOf(l)>=0&&!seen[y]){seen[y]=1;o.push({y:y,l:l,st:awSt(y)});}});
+  if(!seen[S]){var a=awState(U);if(a&&a.award&&LV.indexOf(a.lic)>=0)o.push({y:S,l:a.lic,st:awSt(S),cur:1});}
+  o.sort(function(a,b){return b.y-a.y;});return o;}
+// Bild des Awards (antippen = gross) oder Platzhalter
+function awPic(l,y,h){var src=l&&AWIMG[y]&&AWIMG[y][l],w=Math.round(h*.52);
+  if(src)return '<button class="awpic" type="button" data-awz="'+y+'|'+e(l)+'" aria-label="Lizenz-Award '+y+' '+e(l)+' gross anzeigen"><img class="awimg" src="'+src+'" alt="Lizenz-Award '+y+' '+e(l)+'" width="'+w+'" height="'+h+'" loading="lazy"></button>';
+  return '<div class="awph'+(l?'':' open')+'" style="width:'+w+'px;height:'+h+'px'+(l?';--sc:'+LZSC[l]+';--sg:'+LZSG[l]:'')+'"><b style="font-size:'+Math.round(h*.13)+'px">'+y+'</b>'+(l?'<i class="f-'+e(l)+'" style="font-size:'+Math.round(h*.075)+'px">'+e(l)+'</i><small>Award-Bild folgt</small>':'<small>noch offen</small>')+'</div>';}
+function awFehlt(a,S){var fe=a?Math.max(0,10-a.n):10,left=a?a.left:leftTuesdays();if(fe<=0)return 'Für den Award brauchst du eine Stufe: fahre an einem AfterWork mindestens die Leder-Zeit.';if(S===lzSeason()&&fe>left)return 'Für den Award '+S+' reicht es diese Saison nicht mehr – ab 1.1.'+(S+1)+' zählt jeder Dienstag für deinen Award '+(S+1)+'.';return null;}
+function awStTxt(x){return x.st==='kurs'?'Award gesichert · auf '+x.l+'-Kurs bis 31.12.'+x.y:x.st==='zf'?'Zielflagge · Übergabe an der Season Night'+(LZ_SN[x.y]?' '+dmy(LZ_SN[x.y]):''):'Überreicht an der Season Night'+(LZ_SN[x.y]?' '+dmy(LZ_SN[x.y]):'');}
+// Profil oben: Lizenzkarte mit Ausweis-Teil (ersetzt den alten Profil-Kopf)
+function licCardMe(){var p=ME,s=p.st||[],a=awState(U),l=a&&a.status&&a.lic?a.lic:'',mail=L.mail||(ls('user')||{}).mail||'',S=lzSeason(),tm=p.teams||[];
+  var h=l?'<div class="lic rs lcp '+e(l)+'" style="--sc:'+LZSC[l]+'"><div class="band t-'+e(l)+'"></div><div class="st1"></div><div class="st2"></div><div class="kl">A Plus Lizenz · Saison '+S+'</div><div class="nm">'+e(p.n)+'</div><div class="lv f-'+e(l)+'">'+e(l)+'</div>'
+    :'<div class="lic lcp" style="--lc:#2E4267"><div class="kl">A Plus Lizenz · Saison '+S+'</div><div class="nm">'+e(p.n)+'</div><div class="lv" style="font-size:28px;color:#fff">'+(a&&a.n&&a.n<4?'Noch '+(4-a.n)+' AfterWork'+(4-a.n===1?'':'s'):'Noch keine Stufe')+'</div>';
+  if(a)h+='<div class="meta">'+(a.avg!=null?'<span>Ø <b class="num">'+a.avg+'</b> Punkte</span>':'')+'<span><b>'+a.n+'</b> AfterWork'+(a.n===1?'':'s')+'</span></div>';
+  var f=[];if(p.club)f.push(['Club','<b class="club">✓ Mitglied</b>']);if(tm.length)f.push(['Team','<b>'+e(tm[0])+'</b>']);if(p.pass)f.push(['Pass','<b>'+e(p.pass)+'</b>']);
+  if(s[2])f.push(['Fahrer seit','<b class="num">'+tsY(s[2])+'</b>']);
+  return h+'<div class="lid">'+f.map(function(x){return '<div><small>'+x[0]+'</small>'+x[1]+'</div>';}).join('')+(mail?'<div class="w2"><small>E-Mail</small><b>'+e(mail)+'</b></div>':'')+'</div></div>';}
+// Profil: Kasten «Lizenz-Award» – nur der letzte Award, darunter klein die nächsten Jahre, Knopf «Hall of Fame»
+function meAw(){var Lst=awList(),x=Lst[0],S=lzSeason(),a=awState(U),body,base;
+  if(x){base=x.y;
+    var st=x.st==='kurs'?'<span class="awst">Award gesichert</span><p>Auf <b>'+e(x.l)+'-Kurs</b> – die Stufe zählt am 31.12.'+x.y+'.</p>':x.st==='zf'?'<span class="awst">Zielflagge: '+e(x.l)+'</span><p>Übergabe an der Season Night'+(LZ_SN[x.y]?' am '+dmy(LZ_SN[x.y]):'')+'.</p>':'<span class="awst ok">Überreicht</span><p>an der Season Night'+(LZ_SN[x.y]?' '+dmy(LZ_SN[x.y]):'')+'.</p>';
+    body='<div class="awc-row">'+awPic(x.l,x.y,170)+'<div class="awc-tx"><small>Lizenz-Award '+x.y+'</small><b class="f-'+e(x.l)+'">'+e(x.l)+'</b>'+st+'</div></div>';}
+  else{base=S;var fe=a?Math.max(0,10-a.n):10;
+    body='<div class="awc-row">'+awPic('',S,150)+'<div class="awc-tx"><small>Lizenz-Award '+S+'</small><b>Noch offen</b><p>'+(awFehlt(a,S)||(a&&a.n?'Noch <b>'+fe+'</b> AfterWork'+(fe===1?'':'s')+' bis zu deinem Lizenz-Award '+S+'.':'Mit <b>10 AfterWorks</b> im Jahr holst du dir deinen Lizenz-Award.'))+'</p></div></div>';}
+  var n=Lst.length;
+  return '<section class="sec"><div class="sh"><h2>Lizenz-Award</h2></div><div class="card awc" style="'+(x?'--sg:'+LZSG[x.l]:'')+'">'+body
+    +'<div class="awnx"><small>Nächste Plätze in der Hall of Fame</small><div>'+[1,2,3].map(function(i){return '<span>'+(base+i)+'</span>';}).join('')+'</div></div>'
+    +'<button class="hofb" type="button">'+LAUR+'Hall of Fame<small>'+n+' Award'+(n===1?'':'s')+'</small></button></div></section>';}
+// Hall of Fame (eigenes Fenster)
+function hofHtml(){var Lst=awList(),a=awState(U),rk=lzRank(),S=lzSeason(),h='<div class="hof" role="dialog" aria-modal="true" aria-label="Hall of Fame"><div class="hof-in"><div class="hof-top"><div><h2>HALL OF FAME</h2><p>'+e(ME.n)+' · Lizenz-Awards</p></div><button class="hofx" type="button" aria-label="Schliessen">×</button></div><div class="hof-rail"></div>';
+  if(Lst.length){var t=Lst[0];
+    h+='<div class="spot">'+awPic(t.l,t.y,330)+'<div class="plq"><b>Saison '+t.y+' · '+e(t.l)+'</b>'+(t.cur&&a?'<span>Ø '+a.avg+' · '+a.n+' AfterWorks'+(rk?' · '+rk+'. im Jahresstand':'')+'</span>':'')+'<span>'+awStTxt(t)+'</span></div></div>';}
+  var rest=Lst.slice(1);
+  if(rest.length)h+='<div class="hof-grid">'+rest.map(function(x){return '<div class="spot sm">'+awPic(x.l,x.y,200)+'<div class="plq"><b>'+x.y+' · '+e(x.l)+'</b><span>'+(x.st==='ok'?'Season Night '+(LZ_SN[x.y]?dmy(LZ_SN[x.y]):''):awStTxt(x))+'</span></div></div>';}).join('')+'</div>';
+  var nx=Lst.length?Lst[0].y+1:S,fe=a?Math.max(0,10-a.n):10;
+  h+='<div class="hof-next"><b>'+nx+'</b><span><b>Dein nächster Platz in der Hall of Fame</b>'+(nx===S&&awFehlt(a,S)?awFehlt(a,S):nx===S&&a&&a.n?'Noch '+fe+' AfterWork'+(fe===1?'':'s')+' – dann kommt hier dein Lizenz-Award '+S+' hin.':'Mit 10 AfterWorks zwischen 1.1. und 31.12.'+nx+' kommt hier dein nächster Lizenz-Award hin.')+'</span></div>';
+  h+='<div class="hof-ft">Den Lizenz-Award bekommen alle mit mindestens <b>10 AfterWorks</b> in einem Jahr (1.1.–31.12.) – in ihrer Stufe vom 31.12., überreicht an der Season Night.</div></div></div>';
+  return h;}
+function ovLock(){document.documentElement.style.overflow=document.getElementById('hofBox')||document.getElementById('awzBox')?'hidden':'';}
+function hofOpen(){hofClose();var d=document.createElement('div');d.id='hofBox';d.innerHTML=hofHtml();document.body.appendChild(d);ovLock();var x=d.querySelector('.hofx');if(x)try{x.focus();}catch(z){}}
+function hofClose(){var d=document.getElementById('hofBox');if(!d)return false;d.remove();ovLock();return true;}
+// Award antippen = gross anzeigen, Kreuz oben rechts oder daneben tippen = schliessen (Roger 03.11.2026)
+function awzOpen(y,l){var src=AWIMG[y]&&AWIMG[y][l];if(!src)return;awzClose();var d=document.createElement('div');d.id='awzBox';
+  d.innerHTML='<div class="awz" role="dialog" aria-modal="true" aria-label="Lizenz-Award '+y+' '+e(l)+'"><button class="awzx" type="button" aria-label="Schliessen">×</button><img src="'+src+'" alt="Lizenz-Award '+y+' '+e(l)+'"><div class="awzc">Lizenz-Award '+y+' · '+e(l)+'</div></div>';
+  document.body.appendChild(d);ovLock();}
+function awzClose(){var d=document.getElementById('awzBox');if(!d)return false;d.remove();ovLock();return true;}
+document.addEventListener('click',function(ev){var t=ev.target;if(!t||!t.closest)return;
+  var z=t.closest('[data-awz]');if(z){ev.preventDefault();var q=z.getAttribute('data-awz').split('|');awzOpen(+q[0],q[1]);return;}
+  if(t.closest('.awz')){if(!t.closest('img')||t.closest('.awzx'))awzClose();return;}
+  if(t.closest('.hofb')){ev.preventDefault();hofOpen();return;}
+  if(t.closest('.hofx'))hofClose();});
+document.addEventListener('keydown',function(ev){if(ev.key==='Escape'){if(!awzClose())hofClose();}});
 function viewSw(){if(!U||!CHAT.adminReal)return '';var drv=!!ls('asdriver');
   return '<section class="sec"><div class="sh"><h2>Ansicht</h2></div><div class="seg vsw" role="radiogroup" aria-label="Ansicht wählen">'
     +'<button type="button" role="radio" aria-checked="'+drv+'" class="'+(drv?'on drv':'')+'" data-act="view" data-v="fahrer">Fahrer</button>'
@@ -1493,7 +1650,7 @@ function bindAdmin(){var f=$('#fPush2');if(!f)return;var P=st.push;
     var ch=P.to==='ch'?(P.ch||((CH.filter(function(x){return x.vis!=='all'&&!x.arch;})[0]||{}).id)):'';
     var to={t:P.to};if(P.to==='ch')to.ch=ch;if(P.to==='keys')to.keys=P.keys.slice();
     var cnt=pushCount(P);sendPush({title:P.title.trim(),text:P.text.trim(),to:to});
-    if(P.news)chatPost('news',{t:P.title.trim()+(P.text.trim()?'\n'+P.text.trim():''),a:'APlus Lounge',k:'',team:true});
+    if(P.news)chatPost('news',{t:P.title.trim()+(P.text.trim()?'\n'+P.text.trim():''),a:LOUNGE,k:'',team:true});
     st.push={to:P.to,ch:P.ch,keys:[],title:'',text:'',news:false};render();
     dialog('Push gesendet','<p class="note">Geht an '+e(cnt)+'.'+(P.news?' Die Info steht jetzt auch im News-Kanal.':'')+(CHAT.mode==='sb'?' Sie steht als Mitteilung in der App und kommt aufs Handy (bei allen, die die Mitteilungen eingeschaltet haben).':REAL?' Noch nicht mit der Lounge verbunden: die Mitteilung bleibt vorerst auf diesem Handy.':' Wer die App offen hat, sieht sie sofort; in der echten App kommt sie auch bei geschlossener App aufs Handy.')+'</p>',[{t:'OK',cls:'pri'}]);};
   app.querySelectorAll('[data-ched]').forEach(function(b){b.onclick=function(){chEdit(b.getAttribute('data-ched'));};});}
@@ -1649,7 +1806,7 @@ function onMsgs(ch,s){
   CHAT.msgs[ch].forEach(function(x){CHAT.seen[x.id]=1;});
   CHAT.first[ch]=true;chatRefresh();
 }
-function localLoad(){var s=ls('chat-v1');if(!s||!s.m){s={m:[],rx:{},rt:{}};var t0=Date.now()-2*3600e3;LSEED.forEach(function(x,i){s.m.push({id:'s'+i,ch:x[0],t:x[1],a:'APlus Lounge',k:'',team:true,kind:'msg',ts:t0+i*60e3});});ls('chat-v1',s);}(s.m||[]).forEach(function(m){if(/^s\d+$/.test(m.id||'')&&typeof m.t==='string')m.t=m.t.replace('«Wichtig»','«Infos zum Kanal»');});CHAT.local=s;fromLocal();
+function localLoad(){var s=ls('chat-v1');if(!s||!s.m){s={m:[],rx:{},rt:{}};var t0=Date.now()-2*3600e3;LSEED.forEach(function(x,i){s.m.push({id:'s'+i,ch:x[0],t:x[1],a:LOUNGE,k:'',team:true,kind:'msg',ts:t0+i*60e3});});ls('chat-v1',s);}(s.m||[]).forEach(function(m){if(/^s\d+$/.test(m.id||'')&&typeof m.t==='string')m.t=m.t.replace('«Wichtig»','«Infos zum Kanal»');});CHAT.local=s;fromLocal();
   s.m.forEach(function(m){CHAT.seen[m.id]=1;});(s.push||[]).forEach(function(p){CHAT.seen['p'+p.id]=1;});}
 function fromLocal(){var s=CHAT.local;CFG=s.cfg||{};rebuildCH();CHAT.push=s.push||[];if(!s.pins){s.pins=PSEED.map(function(x,i){return Object.assign({id:'ps'+i,o:i+1,ts:0},x);});ls('chat-v1',s);}CHAT.pins=s.pins;CH.forEach(function(c){CHAT.msgs[c.id]=s.m.filter(function(m){return m.ch===c.id;}).sort(function(a,b){return a.ts-b.ts;});});
   var sx=s.rx||{},st2=s.rt||{};CHAT.rx=rxMap(Object.keys(sx).map(function(id){return sx[id];}));CHAT.rt=rtMap(Object.keys(st2).map(function(id){return st2[id];}));}
@@ -1659,7 +1816,7 @@ window.addEventListener('storage',function(ev){if(CHAT.mode!=='local'||ev.key!==
 function notifyMsg(ch,m){var c=chOf(ch);if(!c||isMine(m)||!U||!canSee(c))return;
   if((st.path||'')===chPath(ch)&&document.visibilityState!=='hidden')return;
   if(setting().push[ch]===false)return;
-  showPush({id:'c'+(m.id||Date.now()),title:isRT(m)?'Neue Race Time 🏁':(m.team?'APlus Lounge':m.a)+' · '+c.name,text:isRT(m)?rtLabel(m.rt)+(m.rt.sims?' · '+m.rt.sims+' Sims frei':'')+' – tippe auf «Ich komme».':((m.img||m.lz)&&!m.t?'📷 Bild':m.t),go:chPath(ch)});}
+  showPush({id:'c'+(m.id||Date.now()),title:isRT(m)?'Neue Race Time 🏁':(m.team?LOUNGE:m.a)+' · '+c.name,text:isRT(m)?rtLabel(m.rt)+(m.rt.sims?' · '+m.rt.sims+' Sims frei':'')+' – tippe auf «Ich komme».':((m.img||m.lz)&&!m.t?'📷 Bild':m.t),go:chPath(ch)});}
 function dbErr(err,ch){var c=chOf(ch);dialog('Nicht gesendet',(err&&err.code==='invalid_argument'&&c&&c.ro)?'<p class="note">In «'+e(c.name)+'» schreibt nur die Lounge.</p>':(err&&(err.code==='quota_exceeded'||err.code==='invalid_argument'))?'<p class="note">Die Nachricht oder das Bild ist zu gross. Versuche ein kleineres Bild.</p>':'<p class="note">Die Nachricht konnte nicht gesendet werden. Prüfe die Verbindung und versuche es nochmals.</p>',[{t:'OK',cls:'pri'}]);}
 function chatPost(ch,obj){obj.ts=Date.now();obj.dv=DEV;if(!obj.kind)obj.kind='msg';if(CHAT.mode==='sb')return sbPost(ch,obj);/* Stufe 2 */
   if(CHAT.mode==='db')return CHAT.db.collection('chat/'+ch+'/m').add(obj).then(function(){return true;},function(err){dbErr(err,ch);return false;});
@@ -1780,7 +1937,7 @@ function sbPushObj(r){var to={t:{alle:'all',aw:'aw',club:'club',kanal:'ch',fahre
   return {id:r.id,title:String(r.titel||''),text:String(r.text||''),to:to,typ:String(r.typ||'info'),link:sk(r.link_art)?r.link_art:'',url:r.link_art==='url'&&okUrl(r.link_url)?String(r.link_url):'',tag:okDay(String(r.link_tag||'').slice(0,10))?String(r.link_tag).slice(0,10):'',img:sk(r.datei)?r.datei:'',
     ts:Date.parse(r.erstellt)||0,dv:(r.fahrer&&r.fahrer===U)?DEV:''};}   // eigene Push (in der App gesendet) = eigenes Kürzel; Prüfung 3x: Art, «Antippen öffnet» und Bild kommen mit
 function sbMsg(r){var m={id:r.id,ch:r.kanal,kind:r.art==='rt'?'rt':'msg',team:!!r.lounge,k:r.lounge?'':String(r.fahrer||''),dv:(r.lounge&&r.fahrer&&r.fahrer===U)?DEV:'',ts:Date.parse(r.erstellt)||Date.now(),t:String(r.text||'')};   // eigener Lounge-Post = mit eigenem Kürzel geschrieben (keine Geräte-Kennung mehr)
-  m.a=r.lounge?'APlus Lounge':((person(r.fahrer)||{}).n||String(r.name||'Fahrer'));   // Name aus den Fahrerdaten, nicht vom Handy des Absenders
+  m.a=r.lounge?LOUNGE:((person(r.fahrer)||{}).n||String(r.name||'Fahrer'));   // Name aus den Fahrerdaten, nicht vom Handy des Absenders
   if(r.titel&&r.art!=='rt')m.t=String(r.titel)+(m.t?'\n'+m.t:'');
   if(r.antwort&&typeof r.antwort==='object')m.re=r.antwort;
   if(r.art==='rt')m.rt={d:String(r.rt_tag||'').slice(0,10),f:r.rt_von,t:r.rt_bis,sims:+r.rt_sims||0,note:String(r.rt_notiz||''),end:!!r.rt_beendet};
@@ -1892,7 +2049,7 @@ function msgsH(c){
     var me=isMine(m),cont=prev&&prev.k===m.k&&!!prev.team===!!m.team&&m.ts-prev.ts<5*60e3,col=m.team?'#FFBE32':ncol(m.k),y=m.k?yr(m.k):null,ld=y&&y.l?LCOL[y.l]:'';
     var rx=CHAT.rx[m.id]||{},rxh=EMO.filter(function(x){return (rx[x[0]]||[]).length;}).map(function(x){var ks=rx[x[0]];return '<button class="rxc'+(ks.indexOf(U)>=0?' mine':'')+'" data-rx="'+e(m.id)+'|'+x[0]+'">'+x[1]+' '+ks.length+'</button>';}).join('');
     h+='<div class="msg'+(me?' me':'')+(cont?' cont':'')+(m.team?' team':'')+'">'+(me?'':(m.team?'<img class="av mav" src="icon-192.png" alt="" style="padding:0;object-fit:cover">':'<span class="av mav" style="color:'+col+'">'+e(ini(m.a))+'</span>'))
-      +'<div class="col"><div class="bub" data-mid="'+e(m.id)+'">'+(!me&&!cont?'<div class="who" style="color:'+col+'">'+e(m.team?'APlus Lounge':m.a)+(m.team?' <span class="lteam">LOUNGE</span>':'')+(ld?'<span class="ld" style="background:'+ld+'" title="'+e(y.l)+'"></span>':'')+'</div>':'')
+      +'<div class="col"><div class="bub" data-mid="'+e(m.id)+'">'+(!me&&!cont?'<div class="who" style="color:'+col+'">'+e(m.team?LOUNGE:m.a)+(m.team?' <span class="lteam">LOUNGE</span>':'')+(ld?'<span class="ld" style="background:'+ld+'" title="'+e(y.l)+'"></span>':'')+'</div>':'')
       +reH(m,ix)+((m.imgOk||okImg(m.img))?'<img class="cimg" data-img="'+e(m.id)+'" src="'+m.img+'" alt="Bild">':(m.lz?sbImgWait(m):''))+(m.t?'<span class="tx">'+linkify(m.t)+'</span>':'')+ytCard(m.t)+'<span class="tm">'+hm(m.ts)+'</span></div>'+(rxh?'<div class="rxs">'+rxh+'</div>':'')+'</div></div>';
     prev=m;});
   if(CHAT.mode==='sb'&&SBK.sendet[c.id])h+='<div class="msg me" id="msgSend"><div class="col"><div class="bub" style="opacity:.55"><span class="tx">'+e(SBK.sendet[c.id])+'</span><span class="tm">wird gesendet …</span></div></div></div>';   // Prüfung 4 (N3)
@@ -1901,12 +2058,12 @@ function msgsH(c){
 function reOf(m){var r=m&&m.re;if(!r||typeof r!=='object'||typeof r.id!=='string'||!r.id)return null;
   return {id:r.id.slice(0,80),a:String(r.a||'').slice(0,60),k:String(r.k||'').slice(0,40),team:!!r.team,t:String(r.t||'').slice(0,160),weg:r.weg===true};}
 function reSnap(m){var t=String(m.t||'').replace(/\s+/g,' ').trim();if(t.length>160)t=t.slice(0,157)+'…';
-  return {id:String(m.id),a:m.team?'APlus Lounge':String(m.a||'').slice(0,60),k:m.team?'':String(m.k||'').slice(0,40),team:!!m.team,t:t||((m.imgOk||okImg(m.img)||m.lz)?'📷 Bild':'…')};}
+  return {id:String(m.id),a:m.team?LOUNGE:String(m.a||'').slice(0,60),k:m.team?'':String(m.k||'').slice(0,40),team:!!m.team,t:t||((m.imgOk||okImg(m.img)||m.lz)?'📷 Bild':'…')};}
 function reCol(r){return r.team?'#FFBE32':ncol(r.k);}
-function reName(r){return !r.team&&!!U&&r.k===U?'Du':(r.team?'APlus Lounge':((CHAT.mode==='sb'&&r.k&&(person(r.k)||{}).n)||r.a||'Fahrer'));}
+function reName(r){return !r.team&&!!U&&r.k===U?'Du':(r.team?LOUNGE:((CHAT.mode==='sb'&&r.k&&(person(r.k)||{}).n)||r.a||'Fahrer'));}
 function reH(m,ix){var r=reOf(m);if(!r)return '';var o=null,weg;
   if(CHAT.mode==='sb')weg=r.weg||!r.t;   // Prüfung 4 (VERIF3 H1): nur das Zitat der Zentrale (aus der echten Nachricht gebaut) – nie, was ein Handy geschickt hat
-  else{o=ix&&ix[r.id];if(o)r=reSnap(o);else{r.team=false;r.k='';if(r.a==='APlus Lounge')r.a='Lounge';}weg=!o&&(r.weg||!r.t);}
+  else{o=ix&&ix[r.id];if(o)r=reSnap(o);else{r.team=false;r.k='';if(r.a==='APlus Lounge'||r.a===LOUNGE)r.a='Lounge';}weg=!o&&(r.weg||!r.t);}   // alter Lounge-Name in gespeicherten Antworten wird weiter erkannt
   var col=reCol(r);   // Prüfung 3x: gelöschte Nachricht → «Nachricht gelöscht» (die Zentrale leert auch das Zitat)
   return '<div class="rq" data-rq="'+e(r.id)+'" style="border-left-color:'+col+'"><b style="color:'+col+'">'+e(reName(r))+'</b><span>'+(weg?'<i>Nachricht gelöscht</i>':e(r.t))+'</span></div>';}
 function startReply(ch,m){st.reply={ch:ch,re:reSnap(m)};cmpRefresh(ch,true);}
@@ -1940,13 +2097,13 @@ function bindRTForm(root,done){var f=root.querySelector('#fRT');if(!f)return;f.o
   if(rt.t<=rt.f){dialog('Zeit prüfen','<p class="note">«bis» muss später sein als «von».</p>',[{t:'OK',cls:'pri'}]);return;}
   var jz=new Date(),hm0=String(jz.getHours()).padStart(2,'0')+':'+String(jz.getMinutes()).padStart(2,'0');
   if(rt.d<nowIso()||(rt.d===nowIso()&&rt.t<=hm0)){dialog('Zeit prüfen','<p class="note">Diese Zeit ist schon vorbei. Bitte einen Tag ab heute wählen.</p>',[{t:'OK',cls:'pri'}]);return;}   // Prüfung 4 (VERIF3 N8)
-  chatPost('club',{kind:'rt',rt:rt,a:'APlus Lounge',k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung'+(CHAT.mode==='sb'?' in der App und aufs Handy (wer die Mitteilungen eingeschaltet hat)':'')+'. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
+  chatPost('club',{kind:'rt',rt:rt,a:LOUNGE,k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung'+(CHAT.mode==='sb'?' in der App und aufs Handy (wer die Mitteilungen eingeschaltet hat)':'')+'. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
 function sheet(html,binder){var d=$('#dlg');if($('#fMail')||$('#fCode')||$('.login.who'))lgGuard();d.innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';d.hidden=false;d.onclick=function(ev){if(ev.target===d)d.hidden=true;};if(binder)binder(d);}
 function msgActions(ch,id){var m=CHAT.msgs[ch].filter(function(x){return x.id===id;})[0];if(!m||!U)return;var rx=CHAT.rx[id]||{},mine=isMine(m),cw=canWrite(chOf(ch));
   var eb=function(x){return '<button type="button" data-se="'+x[0]+'" class="'+((rx[x[0]]||[]).indexOf(U)>=0?'mine':'')+'" aria-label="Reaktion '+x[1]+'">'+x[1]+'</button>';};
   var more=EMO.slice(EMO_NQ).some(function(x){return (rx[x[0]]||[]).indexOf(U)>=0;});
   var grid=EMO_G.map(function(g){return '<div class="emo-gh">'+g[0]+'</div><div class="emo-g">'+g[1].split(' ').map(function(c){return eb([emoK(c),c]);}).join('')+'</div>';}).join('');
-  sheet('<div class="note" style="margin:0">'+e(m.team?'APlus Lounge':m.a)+' · '+hm(m.ts)+'</div><div class="sheet-rx">'+EMO.slice(0,EMO_NQ).map(eb).join('')+'<button type="button" class="more'+(more?' on':'')+'" data-emore="1" aria-label="Mehr Emojis" aria-expanded="'+more+'">+</button></div>'
+  sheet('<div class="note" style="margin:0">'+e(m.team?LOUNGE:m.a)+' · '+hm(m.ts)+'</div><div class="sheet-rx">'+EMO.slice(0,EMO_NQ).map(eb).join('')+'<button type="button" class="more'+(more?' on':'')+'" data-emore="1" aria-label="Mehr Emojis" aria-expanded="'+more+'">+</button></div>'
     +'<div class="emo-all"'+(more?'':' hidden')+'>'+grid+'</div>'
     +'<div class="list">'+(cw?'<button class="li" data-sa="re"><span class="grow t">↩ Antworten</span></button>':'')+(!mine?'<button class="li" data-sa="rep"><span class="grow t">Nachricht melden</span></button>':'')+((mine||CHAT.admin)?'<button class="li" data-sa="del"><span class="grow t" style="color:var(--red)">Nachricht löschen</span></button>':'')+'<button class="li" data-sa="x"><span class="grow t">Schliessen</span></button></div>',
     function(d){d.querySelectorAll('[data-se]').forEach(function(b){b.onclick=function(){d.hidden=true;rxToggle(id,b.getAttribute('data-se'));};});
@@ -1968,7 +2125,7 @@ function bindComposer(c){var tb=$('#cmpTalk');if(tb)tb.onclick=function(){go('ch
   var fit=function(){t.style.height='44px';t.style.height=Math.min(132,t.scrollHeight)+'px';};fit();
   t.oninput=function(){st.draft[c.id]=t.value;s.disabled=!t.value.trim()||!!(CHAT.mode==='sb'&&SBK.sendet[c.id]);fit();};
   var send=function(){var v=t.value.replace(/\s+$/,'');if(!v.trim())return;if(CHAT.mode==='sb'&&SBK.sendet[c.id])return;t.value='';st.draft[c.id]='';s.disabled=true;fit();
-    var o=c.ro?{t:v.slice(0,1000),a:'APlus Lounge',k:'',team:true}:{t:v.slice(0,1000),a:ME.n,k:U},hadRe=takeReply(c,o);
+    var o=c.ro?{t:v.slice(0,1000),a:LOUNGE,k:'',team:true}:{t:v.slice(0,1000),a:ME.n,k:U},hadRe=takeReply(c,o);
     if(CHAT.mode==='sb'){SBK.sendet[c.id]=v.slice(0,1000);chatRefresh();}   // Prüfung 4 (VERIF3 N3): «wird gesendet …», Senden gesperrt bis zur Antwort
     chatPost(c.id,o).then(function(ok){if(CHAT.mode==='sb'){delete SBK.sendet[c.id];chatRefresh();if(curChId()===c.id&&ok!==false)cmpRefresh(c.id,false);}if(ok!==false)return;var t2=$('#cmpT');if(t2&&t2.value)return;st.draft[c.id]=v;if(o.re&&!st.reply)st.reply={ch:c.id,re:o.re};if(curChId()===c.id)cmpRefresh(c.id,false,v);});/* Prüfung 3x: der Text kommt wieder ins Feld (nicht vom leeren Feld überschrieben) */if(hadRe)cmpRefresh(c.id,true);else t.focus();setTimeout(function(){window.scrollTo(0,document.documentElement.scrollHeight);},60);};
   s.onclick=send;t.onkeydown=function(ev){if(ev.key==='Enter'&&!ev.shiftKey&&!('ontouchstart' in window)){ev.preventDefault();send();}else if(ev.key==='Escape'&&st.reply&&st.reply.ch===c.id){st.reply=null;cmpRefresh(c.id,true);}};
@@ -2037,7 +2194,7 @@ function imgPick(c,f){if(!/^image\//.test(f.type||'')){alertD('Kein Bild','Bitte
       if(!okImg(u)){alertD('Bild zu gross','Das Bild konnte nicht verkleinert werden. Versuche ein anderes.');return;}
       sheet('<h3>Bild senden</h3><img src="'+u+'" alt="Vorschau" style="width:100%;max-height:46vh;object-fit:contain;border-radius:12px;background:#000"><input class="inp" id="imC" maxlength="300" placeholder="Text dazu (optional)"><div class="row" style="gap:8px;justify-content:flex-end"><button class="btn" id="imN">Abbrechen</button><button class="btn pri" id="imS">Senden</button></div>',
         function(d){d.querySelector('#imN').onclick=function(){d.hidden=true;};d.querySelector('#imS').onclick=function(){var t=d.querySelector('#imC').value.trim().slice(0,300);d.hidden=true;
-          var o=c.ro?{t:t,img:u,a:'APlus Lounge',k:'',team:true}:{t:t,img:u,a:ME.n,k:U},hadRe=takeReply(c,o);chatPost(c.id,o).then(function(ok){if(ok===false){if(o.re&&!st.reply)st.reply={ch:c.id,re:o.re};cmpRefresh(c.id,false);return;}if(hadRe)cmpRefresh(c.id,false);setTimeout(function(){window.scrollTo(0,document.documentElement.scrollHeight);},80);});};});};
+          var o=c.ro?{t:t,img:u,a:LOUNGE,k:'',team:true}:{t:t,img:u,a:ME.n,k:U},hadRe=takeReply(c,o);chatPost(c.id,o).then(function(ok){if(ok===false){if(o.re&&!st.reply)st.reply={ch:c.id,re:o.re};cmpRefresh(c.id,false);return;}if(hadRe)cmpRefresh(c.id,false);setTimeout(function(){window.scrollTo(0,document.documentElement.scrollHeight);},80);});};});};
     im.onerror=function(){alertD('Bild nicht lesbar','Dieses Bild kann die App nicht öffnen. Versuche ein anderes (JPG oder PNG).');};im.src=fr.result;};fr.readAsDataURL(f);}
 
 // Einstellungen (Roger 30.10.2026): alles ist eingeschaltet; pro Kanal «Mitteilung» und «Rote Zahl»; beides aus = stumm
@@ -2217,7 +2374,7 @@ function wpNachricht(ev){var m=(ev&&ev.data)||{};if(m.typ==='apl-go')wpGo(m.u);e
 // Prüfung REV5 (b): App offen und vorne → sw.js zeigt keine Mitteilung, sondern meldet sie hierher. Die App holt das Neue sofort ab (der Hinweis oben
 // kommt dann wie bisher – nie doppelt, auch wenn die Live-Verbindung gerade hängt); der Test-Push aus dem TimeTool hat keine Daten → direkt als Hinweis.
 function wpVorne(d){if(!U)return;
-  if(d.typ==='test'){showPush({id:'wpt'+Date.now(),title:String(d.t||'APlus Lounge').slice(0,80),text:String(d.b||'').slice(0,300),go:'notif'});return;}
+  if(d.typ==='test'){showPush({id:'wpt'+Date.now(),title:String(d.t||LOUNGE).slice(0,80),text:String(d.b||'').slice(0,300),go:'notif'});return;}
   try{sbSoon(d.typ==='chat'?'km_nachricht':'km_mitteilung');}catch(x){}
   setTimeout(function(){wpBadge(-1);},3000);}
 function wpGo(u){u=String(u||'');var m;if(!U)return;

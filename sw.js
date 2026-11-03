@@ -33,11 +33,11 @@ function istApp(c) {   // ein Fenster mit der App (nicht irgendeine andere Seite
 
 self.addEventListener('push', function (e) {
   var d = {};
-  try { d = e.data ? e.data.json() : {}; } catch (x) { d = { t: 'APlus Lounge', b: e.data ? String(e.data.text()).slice(0, 300) : '' }; }
+  try { d = e.data ? e.data.json() : {}; } catch (x) { d = { t: 'A Plus SimRacing Lounge', b: e.data ? String(e.data.text()).slice(0, 300) : '' }; }
   e.waitUntil(zeigen(d && typeof d === 'object' ? d : {}));
 });
 function zeigen(d) {
-  var titel = String(d.t || 'APlus Lounge').slice(0, 80), text = String(d.b || '').slice(0, 600), tag = /^[\w:-]{1,64}$/.test(d.tag || '') ? d.tag : '';
+  var titel = String(d.t || 'A Plus SimRacing Lounge').slice(0, 80), text = String(d.b || '').slice(0, 600), tag = /^[\w:-]{1,64}$/.test(d.tag || '') ? d.tag : '';
   var n = Math.max(1, Math.min(999, +d.n || 1)), u = ROUTE.test(d.u || '') ? d.u : 'notif', w = /^https:\/\/[^\s"'<>]+$/.test(d.w || '') ? d.w : '';
   return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (cl) {
     // App gerade offen und vorne: sie zeigt die Mitteilung selbst (ausser auf Apple-Geräten – dort muss jede Push sichtbar sein)
