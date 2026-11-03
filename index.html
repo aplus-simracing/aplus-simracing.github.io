@@ -1055,7 +1055,7 @@ function vAW(sub){
   return h;
 }
 function vEvening(d){
-  var ev=D.aw.evenings.filter(function(x){return x.d===d;})[0];if(!ev)return '<div class="empty">Abend nicht gefunden.</div>';
+  var ev=awAllEv().filter(function(x){return x.d===d;})[0];if(!ev)return '<div class="empty">Abend nicht gefunden.</div>';
   var rows=ev.rows.filter(function(r){return r.b>0||r.p;}).sort(function(a,b){return (a.b||9e9)-(b.b||9e9);});
   var h='<div class="card" style="display:flex;flex-direction:column;gap:8px"><b style="font-family:var(--disp);font-size:21px">'+e(ev.label||ev.track||'AfterWork')+'</b><div class="note">'+e(ev.track)+(ev.n?' · '+ev.n+' Fahrer':'')+(ev.slots?' · '+ev.slots+' Slots':'')+'</div>'+(ev.refs&&ev.refs.Diamant?refGrid(ev.refs):'<div class="note">'+(ev.status==='abgeschlossen'?'Zielzeiten nicht erfasst (aus der Excel-Liste übernommen).':'Zielzeiten folgen am Nachmittag.')+'</div>')+'</div>';
   if(!rows.length)return h+'<div class="empty">Noch keine Runden an diesem Abend.</div>';
@@ -1294,6 +1294,8 @@ var TRI={   // eigene Symbole (24er-Raster, Linien), auf die Medaille «geprägt
  secret:'<path d="M9.4 9a2.6 2.6 0 1 1 3.8 2.3c-.7.4-1.2 1-1.2 1.8v.8"/><circle cx="12" cy="17.2" r=".9" fill="currentColor" stroke="none"/>'
 };
 var TRSEAS=+TODAY.slice(0,4);   // laufende AfterWork-Saison
+// Roger 03.11.2026: Trophäen und Dauerbrenner zählen alle Abende seit 2026 – frühere Saisons schickt das TimeTool ab dem Jahreswechsel als D.aw.past
+function awAllEv(){return (Array.isArray(D.aw.past)?D.aw.past:[]).concat(D.aw.evenings);}
 function awSeasonTotal(){return D.aw.evenings.filter(function(e){return e.d.slice(0,4)===String(TRSEAS);}).length+leftTuesdays();}
 // [Gruppe, Name, Symbol, Wert, Stufen B/S/G/P, Kurztext, Gültigkeit, Erklärung]
 function trDefs(){var aws=awSeasonTotal(),cl=CLUBCAL.filter(function(c){return /^Clubrennen/.test(c[3]);}).length;return [
@@ -1324,9 +1326,9 @@ var ALLI=null;function allById(){if(ALLI)return ALLI;ALLI={};(D.all||[]).forEach
 var TRS=null,TREV=null;
 function trAll(){if(TRS)return TRS;var E={},LI={Silber:1,Gold:2,Carbon:3,Diamant:4},YR={};TRDEF=trDefs();
   (D.aw.year||[]).forEach(function(r){YR[r.k]=r;});
-  D.aw.evenings.forEach(function(ev){var arr=ev.rows.filter(function(r){return r.b>0;}).sort(function(a,b){return a.b-b.b;}),dia=ev.refs&&ev.refs.Diamant;
+  awAllEv().forEach(function(ev){var arr=ev.rows.filter(function(r){return r.b>0;}).sort(function(a,b){return a.b-b.b;}),dia=ev.refs&&ev.refs.Diamant;
     ev.rows.forEach(function(r){var i=arr.indexOf(r),x=E[r.k]=E[r.k]||[];x.push({ev:ev,d:ev.d,pos:i+1,of:arr.length,b:r.b,l:r.l,margin:i===0&&arr[1]?arr[1].b-r.b:null,beat:!!(dia&&r.b>0&&r.b<dia)});});});
-  TREV=E;var days=D.aw.evenings.filter(function(e){return e.rows&&e.rows.length&&e.d<=TODAY;}).map(function(e){return e.d;}),CE={},kc=kcAll(),AI=allById();
+  TREV=E;var days=awAllEv().filter(function(e){return e.rows&&e.rows.length&&e.d<=TODAY;}).map(function(e){return e.d;}),CE={},kc=kcAll(),AI=allById();
   var CP={};(D.club.entries||[]).forEach(function(en){var n=(D.club.days||[]).filter(function(d){return d.pts&&d.pts[en.id];}).length,pd=0;(D.club.days||[]).forEach(function(d){(d.races||[]).forEach(function(r){(r.res||[]).slice(0,3).forEach(function(x){if(x.e===en.id)pd++;});});});entKeys(en).forEach(function(k){CE[k]=Math.max(CE[k]||0,n);CP[k]=Math.max(CP[k]||0,pd);});});
   TRS={};Object.keys(D.people).forEach(function(k){var p=D.people[k],s=p.st||[],me=E[k]||[],y=YR[k]||{},K=kc[k]||{};
     var cur=0,best=0,cs=null,bs=null,be=null,last=null;days.forEach(function(d){if(me.some(function(m){return m.d===d;})){if(!cur)cs=d;cur++;last=d;if(cur>=best){best=cur;bs=cs;be=d;}}else if(d!==TODAY)cur=0;});   // Prüfung 03.11.2026: heutiger Abend unterbricht erst, wenn er vorbei ist; bei gleich langen Serien zählt die neuere   // Roger 02.11.2026: auch aktuelle Serie (seit wann) und längste Serie (von–bis)
@@ -1433,7 +1435,7 @@ function trDetail(key,k){trAll();var me=TREV[k]||[];
   return '';}
 function listBox(h,n){return h?'<div class="list trlist" style="margin-top:10px">'+h+'</div>':'';}
 // Dauerbrenner: aktuelle Serie mit Balken, seit wann bzw. wann unterbrochen, längste Serie (Roger 02.11.2026)
-function trStreakBox(r){var si=r.si||{},n=r.now||0,nx=r.nx,ev=D.aw.evenings.filter(function(x){return x.rows&&x.rows.length&&x.d<=TODAY;}),done={},heute=(TREV[U]||[]).some(function(m){return m.d===TODAY;});ev.forEach(function(x){if(x.d<TODAY||heute)done[x.d]=1;});
+function trStreakBox(r){var si=r.si||{},n=r.now||0,nx=r.nx,ev=awAllEv().filter(function(x){return x.rows&&x.rows.length&&x.d<=TODAY;}),done={},heute=(TREV[U]||[]).some(function(m){return m.d===TODAY;});ev.forEach(function(x){if(x.d<TODAY||heute)done[x.d]=1;});
   var miss=si.last?ev.filter(function(x){return x.d>si.last&&x.d!==TODAY;}):[],nxt=CAL.filter(function(c){return c[3]==='AfterWork'&&c[0]>=TODAY&&!done[c[0]];})[0];   // Prüfung 03.11.2026: heutiger Abend zählt erst als verpasst, wenn er vorbei ist
   var ml=function(x){return dmy(x.d)+(x.label?' ('+e(x.label)+')':'');};
   var h='<div class="trsb'+(n?'':' brk')+'"><div class="trsbh"><small>Aktuelle Serie</small><b class="num">'+n+(nx?' <span>von '+nx+'</span>':'')+'</b></div>';
@@ -1797,7 +1799,7 @@ function pushErlaubt(p){var S=setting(),t=(p&&p.to)||{};if(p.typ==='awErinnerung
   if(p.typ==='raceTime')return S.push.club!==false;if(t.t==='ch'&&t.ch)return S.push[t.ch]!==false;return S.gen;}
 // Prüfung 3x (C4): «Antippen öffnet» (im TimeTool gewählt) – AfterWork-Erinnerung öffnet den Abend mit «Ich komme»
 function pushZiel(p){var a=p&&p.link,d=p&&p.tag;if(a==='termine')return 'events';if(a==='bestzeiten')return 'times';if(a==='club')return 'club';
-  if(a==='aw'){if(okDay(d)){if(d>=nowIso()){var ev=EVENTS.filter(function(x){return x.aw&&x.date===d;})[0];if(ev)return 'ev/'+ev.id;}else if(D&&D.aw&&(D.aw.evenings||[]).some(function(v){return v.d===d;}))return 'aw/abend/'+d;}return 'aw';}
+  if(a==='aw'){if(okDay(d)){if(d>=nowIso()){var ev=EVENTS.filter(function(x){return x.aw&&x.date===d;})[0];if(ev)return 'ev/'+ev.id;}else if(D&&D.aw&&awAllEv().some(function(v){return v.d===d;}))return 'aw/abend/'+d;}return 'aw';}
   return 'notif';}
 function lpush(){var r=ls('pushread-'+(U||'gast'))||{};return (CHAT.push||[]).filter(pushFor).map(function(p){return {id:'p'+p.id,ts:dayKey(p.ts),t:+p.ts||0,kind:'Lounge',title:p.title,text:p.text,go:pushZiel(p),url:p.url||'',img:p.img||'',read:!!r['p'+p.id]||p.dv===DEV};});}
 function onMsgs(ch,s){
@@ -2411,7 +2413,7 @@ function start(){
   st.path=st.path||'home';chatInit();render();
 }
 buildEvents();
-function prepData(j){if(j.names){j.combos.forEach(function(c){c.top=c.top.map(function(r){var N=j.names[r[0]];return [N[0],r[1],r[2],r[3],r[4],r[5],N[1]];});});}buildIdx(j);D=j;(D.aw.year||[]).forEach(function(r){r.nw=0;});(D.aw.evenings||[]).forEach(function(v){(v.rows||[]).forEach(function(r){r.nw='';});});   // Roger 31.10.2026: «nicht gewertet» nur im TimeTool, in der App nirgends sichtbar
+function prepData(j){if(j.names){j.combos.forEach(function(c){c.top=c.top.map(function(r){var N=j.names[r[0]];return [N[0],r[1],r[2],r[3],r[4],r[5],N[1]];});});}buildIdx(j);D=j;(D.aw.year||[]).forEach(function(r){r.nw=0;});(D.aw.evenings||[]).concat(Array.isArray(D.aw.past)?D.aw.past:[]).forEach(function(v){(v.rows||[]).forEach(function(r){r.nw='';});});   // Roger 31.10.2026: «nicht gewertet» nur im TimeTool, in der App nirgends sichtbar
 ANON=!!(j.meta&&j.meta.anon);}
 function loadErr(err,title,txt){app.innerHTML='<div class="login"><div class="hero"><img src="logo.png" alt=""><h2>A Plus SimRacing Lounge</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><b>'+e(title||'Die Daten konnten nicht geladen werden.')+'</b><p class="note" style="margin:0">'+e(txt||'Prüfe deine Internetverbindung und tippe auf «Nochmals versuchen».')+(err&&err.message?' ('+e(String(err.message).slice(0,80))+')':'')+'</p><button class="btn pri" id="bReload">Nochmals versuchen</button>'+(REAL&&SB?'<button class="btn" id="bLout">Abmelden</button>':'')+'</div></div>';var r=$('#bReload');if(r)r.onclick=function(){location.reload();};var lo=$('#bLout');if(lo)lo.onclick=realLogout;}
 function realErr(err,what){var m=String((err&&(err.message||err.msg||err.error_description))||err||''),st=+(err&&err.status)||0,code=String((err&&err.code)||''),nm=String((err&&err.name)||''),sec=/(\d+)\s*sec/i.exec(m);
