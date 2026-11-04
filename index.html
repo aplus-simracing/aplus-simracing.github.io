@@ -107,6 +107,7 @@ table.tb{width:100%;border-collapse:collapse;font-size:14px}
 /* Roger 03.11.2026: Strich unter jeder Stufe in ihrer Farbe + Abstand zur nächsten Stufe */
 .tb tr.lvb td{border-top:2px solid var(--lb)}
 .tb td.lvc{white-space:nowrap}.tb .lvg{display:block;font-size:10.5px;font-weight:600;color:#fff;margin-top:3px;letter-spacing:0;line-height:1.2;font-variant-numeric:tabular-nums}.tb .lvg b{display:block;font-weight:700}
+.tb .gp{display:block;font-size:12.5px;font-weight:600;color:#C9D3E3;margin-top:2px;letter-spacing:0}
 .tb tr.gapr td{background:var(--bg2);color:var(--dim);text-align:center;font-size:12px;padding:5px}
 .tb th,.tb td{padding-left:8px;padding-right:8px}
 .tb th:first-child,.tb td:first-child{padding-left:12px}.tb th:last-child,.tb td:last-child{padding-right:12px}
@@ -681,7 +682,12 @@ function buildEvents(){var t=nowIso();
   // Clubprogramm Saison 2026/27 (Roger 30.10.2026) – öffentlich für alle sichtbar; Vergangenes fällt automatisch weg
   CLUBCAL.forEach(function(c){EVENTS.push({id:'club-'+c[0]+'-'+nk(c[3]),date:c[0],kind:'Club',title:c[3],what:c[4]||'Club-Programm 2026/27',time:c[1]||'Zeit folgt',place:c[5]||'APlus SimRacing Lounge, Hinwil',text:(c[6]?c[6]+' ':'')+'Anlass des A Plus SimRacing Club – für Club-Mitglieder.'});});
   var keep=EVENTS.filter(function(x){return !x.date||x.date>=t;});EVENTS.length=0;keep.sort(function(a,b){return (a.date||'9999').localeCompare(b.date||'9999');}).forEach(function(x){EVENTS.push(x);});}
-function nextAW(){for(var i=0;i<EVENTS.length;i++)if(EVENTS[i].aw)return EVENTS[i];return null;}
+function nextAW(){for(var i=0;i<EVENTS.length;i++)if(EVENTS[i].aw&&!evVorbei(EVENTS[i]))return EVENTS[i];return null;}
+// Roger 03.11.2026: Termin von heute ist vorbei, sobald das AfterWork im TimeTool abgeschlossen ist – spätestens 15 Min. nach dem Ende (z.B. 22:15)
+function evVorbei(x){if(!x||!x.date)return false;var t=nowIso();if(x.date<t)return true;if(x.date>t)return false;
+  if(x.aw&&D&&D.aw&&(D.aw.evenings||[]).some(function(v){return v.d===t&&v.status==='abgeschlossen';}))return true;
+  var m=/\d{1,2}:\d{2}\s*–\s*(?:ca\.\s*)?(\d{1,2}):(\d{2})/.exec(String(x.time||''));if(!m)return false;
+  var n=new Date();return n.getHours()*60+n.getMinutes()>=(+m[1])*60+(+m[2])+15;}
 var NEWS=[
  {id:'n1',date:'2026-10-25',tag:'Lizenz',title:'Deine Lizenz – jetzt live nach jedem AfterWork',text:'Ab sofort rechnet das TimeTool deine Lizenz direkt nach jedem AfterWork aus. In der App siehst du deinen Stand, deine Punkte pro Abend und was dir zur nächsten Stufe fehlt.'},
  {id:'n3',date:'2026-10-20',tag:'AfterWork',title:'Brands Hatch: 17 Fahrer, Egli knapp an Diamant',text:'Mit dem Toyota Yaris auf Brands Hatch fehlten Patrick Egli nur 0.036 s auf die Diamant-Zeit – ein klassischer Last Shot.'},
@@ -1044,8 +1050,11 @@ function vAW(sub){
         +'<div class="row" style="gap:10px"><span class="kpi" style="flex:1"><b class="num">'+myRow.c+'</b><span>AfterWork'+(myRow.c===1?'':'s')+'</span></span><span class="kpi" style="flex:1"><b class="num">'+(myRow.avg==null?'–':myRow.avg)+'</b><span>Ø Punkte</span></span><span class="kpi" style="flex:1"><b class="num">'+(myRow.tot||0)+'</b><span>Punkte total</span></span></div>'
         +'<p class="note" style="margin:0">'+(need>0?'Noch '+need+' AfterWork'+(need===1?'':'s')+' bis zum offiziellen Status.':myRow.c<10?'Status erreicht. Noch '+(10-myRow.c)+' bis zum Lizenz-Award 🏆.':'Lizenz-Award erreicht 🏆 – wir sehen uns an der Season Night.')+'</p>'
         +(rows.indexOf(myRow)>=0?'<button class="lnk" data-act="jump" style="align-self:flex-start">↓ In der Tabelle zeigen</button>':'')+'</div>';}
-    h+='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th>Stufe</th><th class="r">Ø</th></tr></thead><tbody>'+rows.map(function(r,i){return '<tr class="'+(r.k===U?'me':'')+(i<3?' p'+(i+1):'')+'" '+(r.k===U?'id="meRow"':'')+'><td class="rk num">'+(i+1)+'</td><td class="nm">'+e(r.n)+'<small>'+r.c+' AfterWork'+(r.c===1?'':'s')+(r.c>=10?' · 🏆 Award':'')+(r.nw?' · '+r.nw+'× n. gew.':'')+'</small></td><td>'+badge(r.l)+'</td><td class="r num t">'+(r.avg==null?'–':r.avg)+'</td></tr>';}).join('')+'</tbody></table></div>'
-      +'<p class="note">Ø = Durchschnitt der Abende mit Punkten. Status ab 4 Teilnahmen, Lizenz-Award (🏆) ab 10. Gerechnet vom TimeTool, Stand '+e(D.meta.stand)+'.</p>';
+    var jq=st.q.jahr||'',jn=nk(jq),hits=rows.map(function(r,i){return [r,i];}).filter(function(x){return !jn||nk(x[0].n).indexOf(jn)>=0;});   // Wunsch Patrick Baumann 03.11.2026: sich oder Freunde suchen statt scrollen; Platz bleibt der echte
+    h+='<div class="srch">'+IC.search+'<input id="iBoard" data-q="jahr" placeholder="Fahrer suchen, z.B. Baumann …" value="'+e(jq)+'" autocomplete="off" enterkeyhint="search"></div>';
+    if(jn&&!hits.length)h+='<div class="empty">Kein Fahrer gefunden.</div>';
+    if(hits.length)h+='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th>Stufe</th><th class="r">Ø</th></tr></thead><tbody>'+hits.map(function(x){var r=x[0],i=x[1];return '<tr class="'+(r.k===U?'me':'')+(i<3?' p'+(i+1):'')+'" '+(r.k===U?'id="meRow"':'')+'><td class="rk num">'+(i+1)+'</td><td class="nm">'+e(r.n)+'<small>'+r.c+' AfterWork'+(r.c===1?'':'s')+(r.c>=10?' · 🏆 Award':'')+(r.nw?' · '+r.nw+'× n. gew.':'')+'</small></td><td>'+badge(r.l)+'</td><td class="r num t">'+(r.avg==null?'–':r.avg)+'</td></tr>';}).join('')+'</tbody></table></div>';
+    h+='<p class="note">Ø = Durchschnitt der Abende mit Punkten. Status ab 4 Teilnahmen, Lizenz-Award (🏆) ab 10. Gerechnet vom TimeTool, Stand '+e(D.meta.stand)+'.</p>';
   }
   if(sub==='abende'){
     var evs=D.aw.evenings.filter(function(ev){return ev.n||ev.status==='abgeschlossen';}).reverse(),mine=U?myEv(U).map(function(x){return x.ev.d;}):[];
@@ -1054,9 +1063,9 @@ function vAW(sub){
       h+='<div class="sh"><h2>Dein letztes AfterWork</h2><span class="note">'+wd(lm.ev.d)+' '+dmy(lm.ev.d)+'</span></div><button class="card lastaw" data-go="aw/abend/'+lm.ev.d+'" style="display:flex;flex-direction:column;gap:10px;text-align:left;width:100%;color:inherit;font:inherit;cursor:pointer;border-color:rgba(56,199,242,.45)">'
         +'<span class="row" style="justify-content:space-between;gap:10px;align-items:flex-start"><span style="min-width:0"><b style="font-family:var(--disp);font-size:20px;display:block">'+e(lm.ev.label||lm.ev.track)+'</b><span class="note">'+lm.of+' Fahrer'+(lm.ev.slots?' · '+lm.ev.slots+' Slots':'')+'</span></span><span style="text-align:right;flex:0 0 auto">'+badge(lm.r.l)+'<span class="s num" style="display:block;margin-top:4px">'+(lm.r.nw?'<s>'+lm.r.p+'</s>':(lm.r.p||0)+' P.')+'</span></span></span>'
         +'<span class="row" style="gap:10px"><span class="kpi" style="flex:1"><b class="num">'+(lm.pos?lm.pos+'.':'–')+'</b><span>Platz von '+lm.of+'</span></span><span class="kpi" style="flex:1"><b class="num">'+(lm.r.b?fmt(lm.r.b):'–')+'</b><span>Deine Zeit</span></span><span class="kpi" style="flex:1"><b class="num">'+(lm.r.sl||'–')+'</b><span>Slots</span></span></span>'
-        +'<span class="note" style="display:block">'+top3.map(function(r,i){return (i+1)+'. '+e(r.n)+' '+fmt(r.b);}).join(' · ')+'</span>'
+        +'<span class="note" style="display:block">'+top3.map(function(r,i){return (i+1)+'. '+e(r.n)+' '+(i?(r.b>top3[0].b?gapT(r.b-top3[0].b):'+0.000'):fmt(r.b));}).join(' · ')+'</span>'   // Roger 04.11.2026: Platz 2 und 3 mit Abstand auf Platz 1
         +'<span style="color:var(--blue2);font-weight:700">Ganze Rangliste ›</span></button>';}
-    var up=EVENTS.filter(function(x){return x.aw;});if(up.length)h+='<div class="sh"><h2>Kommende AfterWorks</h2>'+(up.length>3?'<a href="#" data-go="events/aw">Alle '+up.length+'</a>':'')+'</div><div class="list">'+up.slice(0,3).map(eventLi).join('')+'</div><div class="sh"><h2>Gefahren 2026</h2></div>';
+    var up=EVENTS.filter(function(x){return x.aw&&!evVorbei(x);});if(up.length)h+='<div class="sh"><h2>Kommende AfterWorks</h2>'+(up.length>3?'<a href="#" data-go="events/aw">Alle '+up.length+'</a>':'')+'</div><div class="list">'+up.slice(0,3).map(eventLi).join('')+'</div><div class="sh"><h2>Gefahren 2026</h2></div>';
     h+='<div class="list">'+evs.map(function(ev){var open=ev.status!=='abgeschlossen'&&!ev.n;return '<button class="li" data-go="aw/abend/'+ev.d+'"><div class="date" style="width:52px;flex:0 0 auto"><span>'+wd(ev.d)+'</span><b>'+pd(ev.d).getUTCDate()+'</b><span>'+MO[pd(ev.d).getUTCMonth()]+'</span></div><span class="grow"><span class="t ell" style="display:block">'+e(ev.label||ev.track||'Strecke folgt')+'</span><span class="s">'+(open?'kommt':ev.n+' Fahrer')+(mine.indexOf(ev.d)>=0?' · <span style="color:var(--blue2)">du warst dabei</span>':'')+'</span></span>'+IC.chev+'</button>';}).join('')+'</div>';
   }
   if(sub==='regeln'){
@@ -1079,8 +1088,10 @@ function vEvening(d){
   if(!U)return h+needLogin('Die Rangliste des Abends');
   var mine=rows.filter(function(r){return r.k===U;})[0];
   if(mine&&mine.ls)h+='<div class="ls"><b>LAST SHOT</b><span class="note" style="color:#fff">Du warst <b>'+(mine.g/1000).toFixed(3)+' s</b> hinter '+e(mine.nx)+' – Extra-Slot für CHF 10.</span></div>';
-  h+='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Zeit</th><th>Stufe</th><th class="r">P.</th></tr></thead><tbody>'+rows.map(function(r,i){var lb=i&&rows[i-1].l&&rows[i-1].l!==(r.l||'');return '<tr class="'+(r.k===U?'me':'')+(i<3?' p'+(i+1):'')+(lb?' lvb':'')+'"'+(lb?' style="--lb:'+LCOL[rows[i-1].l]+'"':'')+'><td class="rk num">'+(r.b?i+1:'–')+'</td><td class="nm">'+e(r.n)+(function(){var y=yr(r.k),li=y&&y.c>=4&&y.l?'<span title="Lizenz 2026" style="color:'+LCOL[y.l]+'">◆ '+e(y.l)+'</span>':'';return li||r.ls?'<small>'+(r.ls?'<span class="tag red" title="Last Shot" style="font-size:10px;padding:0 5px">LS</span>'+(li?' ':''):'')+li+'</small>':'';})()+'</td><td class="r num t">'+fmt(r.b)+'</td><td class="lvc">'+badge(r.l)+lvGap(r,ev.refs)+'</td><td class="r num">'+(r.nw?'<s title="nicht gewertet">'+r.p+'</s>':r.p)+'</td></tr>';}).join('')+'</tbody></table></div>'
-    +'<p class="note">Schnellste gültige Runde pro Fahrer. ◆ = Lizenz im Jahresstand 2026 (ab 4 AfterWorks). LS = war im Last-Shot-Fenster.'+(rows.some(function(r){return r.l;})?' Farbiger Strich = Grenze zwischen den Stufen.':'')+(ev.refs&&ev.refs.Diamant?' Kleine Zahl unter der Stufe = so viel fehlte zur nächsten Stufe.':'')+'</p>';
+  // Roger 04.11.2026: statt Punkte (ergeben sich aus der Stufe) der Abstand auf Platz 1 – wie in einer richtigen Rangliste (klein unter der Zeit, damit die Namen auf dem Handy Platz haben)
+  var b1=rows[0].b||0;
+  h+='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Zeit</th><th>Stufe</th></tr></thead><tbody>'+rows.map(function(r,i){var lb=i&&rows[i-1].l&&rows[i-1].l!==(r.l||'');return '<tr class="'+(r.k===U?'me':'')+(i<3?' p'+(i+1):'')+(lb?' lvb':'')+'"'+(lb?' style="--lb:'+LCOL[rows[i-1].l]+'"':'')+'><td class="rk num">'+(r.b?i+1:'–')+'</td><td class="nm">'+e(r.n)+(function(){var y=yr(r.k),li=y&&y.c>=4&&y.l?'<span title="Lizenz 2026" style="color:'+LCOL[y.l]+'">◆ '+e(y.l)+'</span>':'';return li||r.ls?'<small>'+(r.ls?'<span class="tag red" title="Last Shot" style="font-size:10px;padding:0 5px">LS</span>'+(li?' ':''):'')+li+'</small>':'';})()+'</td><td class="r num t">'+fmt(r.b)+(r.b&&b1&&i?'<small class="gp">'+(r.b>b1?gapT(r.b-b1):'+0.000')+'</small>':'')+'</td><td class="lvc">'+badge(r.l)+lvGap(r,ev.refs)+'</td></tr>';}).join('')+'</tbody></table></div>'
+    +'<p class="note">Schnellste gültige Runde pro Fahrer. Kleine Zahl unter der Zeit = Abstand auf Platz 1. ◆ = Lizenz im Jahresstand 2026 (ab 4 AfterWorks). LS = war im Last-Shot-Fenster.'+(rows.some(function(r){return r.l;})?' Farbiger Strich = Grenze zwischen den Stufen.':'')+(ev.refs&&ev.refs.Diamant?' Kleine Zahl unter der Stufe = so viel fehlte zur nächsten Stufe.':'')+'</p>';
   return h;
 }
 // Roger 03.11.2026: unter dem Stufen-Abzeichen, wie viel zur nächsten Stufe gefehlt hat (Diamant = keine)
@@ -1479,8 +1490,8 @@ function bindTroph(){app.querySelectorAll('[data-tri]').forEach(function(b){b.on
 function vShowcase(){
   var lic='<div class="lic rs Gold" style="--sc:#f5c542"><div class="band t-Gold"></div><div class="st1"></div><div class="st2"></div><div class="kl">A Plus Lizenz · Saison 2026</div><div class="nm">Max Muster</div><div class="lv f-Gold">Gold</div><div class="meta"><span>Ø <b class="num">641</b> Punkte</span><span><b>12</b> AfterWorks</span></div></div>';
   var med='<div class="shw-med">'+[['awWin',4],['laps',3],['dia',2],['km',1]].map(function(m){return medal(m[0],m[1],52);}).join('')+'</div>';
-  var rk='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Zeit</th><th>Stufe</th></tr></thead><tbody>'
-    +[['Lea Beispiel','1:41.208','Diamant'],['Max Muster','1:41.877','Carbon'],['Tim Probe','1:42.530','Gold']].map(function(r,i){return '<tr class="p'+(i+1)+(i===1?' me':'')+'"><td class="rk num">'+(i+1)+'</td><td class="nm">'+r[0]+'</td><td class="r num t">'+r[1]+'</td><td>'+badge(r[2])+'</td></tr>';}).join('')+'</tbody></table></div>';
+  var rk='<div class="tw"><table class="tb"><thead><tr><th>#</th><th>Fahrer</th><th class="r">Zeit</th><th>Stufe</th></tr></thead><tbody>'   // Roger 04.11.2026: Abstand auf Platz 1
+    +[['Lea Beispiel','1:41.208','Diamant','–'],['Max Muster','1:41.877','Carbon','+0.669'],['Tim Probe','1:42.530','Gold','+1.322']].map(function(r,i){return '<tr class="p'+(i+1)+(i===1?' me':'')+'"><td class="rk num">'+(i+1)+'</td><td class="nm">'+r[0]+'</td><td class="r num t">'+r[1]+(i?'<small class="gp">'+r[3]+'</small>':'')+'</td><td>'+badge(r[2])+'</td></tr>';}).join('')+'</tbody></table></div>';
   function box(t,txt,inner){return '<section class="sec"><div class="sh"><h2>'+t+'</h2><span class="tag">Beispiel</span></div>'+inner+'<p class="note" style="margin:2px 2px 0">'+txt+'</p></section>';}
   var h='<div class="shw-hero"><img src="logo.png" alt="A Plus SimRacing Lounge"><h2>Deine Zeiten. Deine Lizenz. Deine Lounge.</h2><p>Die App für Fahrerinnen und Fahrer der A Plus SimRacing Lounge in Hinwil.</p><button class="btn pri full" data-act="login">Anmelden</button></div>';
   h+='<div class="sh"><h2>Das erwartet dich</h2></div>';
@@ -1593,7 +1604,7 @@ function notifImg(id){var k='d:'+id,u=SBK.files[k];if(okBig(u))return '<img src=
 function vNews(){return '<div class="list">'+allNews().map(newsLi).join('')+'</div>';}
 function vNewsOne(id){var n=allNews().filter(function(x){return x.id===id;})[0];if(!n)return '<div class="empty">News nicht gefunden.</div>';
   return '<article class="card" style="display:flex;flex-direction:column;gap:10px"><div class="row" style="gap:6px"><span class="tag blue">'+e(n.tag)+'</span><span class="note">'+dmy(n.date)+'</span></div><h2 style="margin:0;font-family:var(--disp);font-size:24px;line-height:1.1;text-wrap:balance">'+e(n.title)+'</h2><p style="margin:0;line-height:1.55">'+e(n.text)+'</p></article>';}
-function evVisible(x){return true;}   // Roger 30.10.2026: alle Termine der Lounge sind öffentlich – auch Club-Termine (nur der Club-Bereich selbst ist geschlossen)
+function evVisible(x){return !evVorbei(x);}   // Roger 30.10.2026: alle Termine der Lounge sind öffentlich – auch Club-Termine (nur der Club-Bereich selbst ist geschlossen)
 function vEvents(f){f=st.flt.ev||'alle';var L=EVENTS.filter(evVisible).filter(function(x){return f==='alle'||(f==='aw'?x.aw:f==='r100'?x.kind==='Race100':f==='nos'?x.kind==='4h NOS':f==='club'?x.kind==='Club':!x.aw&&x.kind!=='Race100'&&x.kind!=='4h NOS'&&x.kind!=='Club');}),mo='',g='';
   var h='<div class="chips">'+[['alle','Alle'],['aw','AfterWork'],['r100','Race100'],['nos','4h NOS'],['club','Club']].concat([['mehr','Weitere']]).map(function(c){return '<button class="chip'+(f===c[0]?' on':'')+'" data-flt="ev:'+c[0]+'">'+c[1]+'</button>';}).join('')+'</div>';
   L.forEach(function(x){var m=x.date?['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'][pd(x.date).getUTCMonth()]+' '+x.date.slice(0,4):'Datum folgt';if(m!==mo){if(mo)g+='</div>';g+='<div class="sh"><h2>'+e(m)+'</h2></div><div class="list">';mo=m;}g+=eventLi(x);});if(mo)g+='</div>';
@@ -1601,8 +1612,9 @@ function vEvents(f){f=st.flt.ev||'alle';var L=EVENTS.filter(evVisible).filter(fu
 function vEventOne(id){var x=EVENTS.filter(function(y){return y.id===id;})[0];if(!x)return '<div class="empty">Termin nicht gefunden.</div>';
   var reg=isReg(x.date);
   return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><div class="row" style="gap:6px"><span class="tag blue">'+e(x.kind)+'</span></div><h2 style="margin:0;font-family:var(--disp);font-size:24px">'+e(x.title)+'</h2>'+(x.what?'<div style="font-weight:700;font-size:16px">'+e(x.what)+'</div>':'')+'<div class="note">'+(x.date?WDL[pd(x.date).getUTCDay()]+', '+dmy(x.date)+' · ':'')+e(x.time)+'<br>'+e(x.place)+'</div><p style="margin:0">'+e(x.text)+'</p>'
-    +(x.aw&&U?(reg?'<button class="btn ok" data-act="unreg" data-d="'+x.date+'">✓ Du bist dabei</button>':'<button class="btn pri" data-act="reg" data-d="'+x.date+'">Ich komme</button>'):'')
-    +(x.url?'<a class="btn" href="'+x.url+'" target="_blank" rel="noopener">Anmeldung und mehr Infos '+IC.ext+'</a>':'')+'</div>';}
+    +(evVorbei(x)?'<p class="note" style="margin:0;color:#fff"><b>'+(x.aw?'Dieses AfterWork ist vorbei.':'Dieser Termin ist vorbei.')+'</b></p>'+(x.aw&&D&&(D.aw.evenings||[]).some(function(v){return v.d===x.date;})?'<button class="btn pri" data-go="aw/abend/'+x.date+'">Rangliste ansehen</button>':'')   // Roger 03.11.2026
+    :(x.aw&&U?(reg?'<button class="btn ok" data-act="unreg" data-d="'+x.date+'">✓ Du bist dabei</button>':'<button class="btn pri" data-act="reg" data-d="'+x.date+'">Ich komme</button>'):'')
+    +(x.url?'<a class="btn" href="'+x.url+'" target="_blank" rel="noopener">Anmeldung und mehr Infos '+IC.ext+'</a>':''))+'</div>';}
 function vInfo(){if(REAL)return '<div class="card" style="display:flex;flex-direction:column;gap:10px"><b style="font-family:var(--disp);font-size:20px">A Plus SimRacing Lounge</b>'   // Prüfung 4: Text für die echte App (die Testversion-Texte waren hier falsch)
   +'<p class="note" style="margin:0"><b style="color:#fff">Aus dem TimeTool:</b> Bestzeiten, Ranglisten, Lizenz-Rechnung, AfterWork-Abende, Jahresstand und Club-Meisterschaft – Stand '+e(D.meta.stand)+(D.meta.bz?' (Bestzeiten und Ranglisten Stand '+e(D.meta.bz)+')':'')+'.</p>'
   +(CHAT.mode==='sb'?'<p class="note" style="margin:0"><b style="color:#fff">Live mit der Lounge:</b> Chat, Mitteilungen, News, «Ich komme» und Race Time. Roger und Nici sehen sie im TimeTool. Mitteilungen aufs Handy schaltest du unter «Einstellungen» ein.</p>'
@@ -2301,7 +2313,7 @@ function act(a,x){
   if(a==='chnew')chEdit('');
   if(a==='asdriver'){ls('asdriver',ls('asdriver')?null:true);applyAdm();st.pinEdit=false;render();}
   if(a==='view'){ls('asdriver',x.getAttribute('data-v')==='fahrer'?true:null);applyAdm();st.pinEdit=false;render();}
-  if(a==='jump'){var r2=$('#meRow');if(r2)r2.scrollIntoView({behavior:'smooth',block:'center'});}
+  if(a==='jump'){if(!$('#meRow')&&st.q.jahr){st.q.jahr='';render();}var r2=$('#meRow');if(r2)r2.scrollIntoView({behavior:'smooth',block:'center'});}   // Suche im Jahresstand verdeckt die eigene Zeile → Suche leeren
   if(a==='readall'){markRead(null);render();}
   if(a==='wpein')wpEin();   // Stufe 3: Mitteilungen aufs Handy
   if(a==='wpaus')wpAus();
