@@ -405,6 +405,7 @@ button.tc{width:100%;text-align:left;color:inherit;font:inherit;cursor:pointer}b
 .inp:focus{border-color:var(--blue);outline:none}
 .code{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
 .code{position:relative}.code .cbx{display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--disp);font-size:26px;font-weight:700;padding:10px 0;min-height:52px}.code .cbx.on{border-color:var(--blue)}.code .code-in{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;outline:none;background:transparent;color:transparent;-webkit-text-fill-color:transparent;caret-color:transparent;font-size:16px;letter-spacing:0;opacity:1;z-index:2}.code .code-in::selection{background:transparent}.code .code-in:-webkit-autofill,.code .code-in:autofill{-webkit-box-shadow:0 0 0 1000px transparent inset;transition:background-color 99999s ease-out 0s;-webkit-text-fill-color:transparent}.login .note,.login .muted{color:#fff}.login .err{color:#fff;background:rgba(255,77,77,.16);border:1px solid #FF4D4D;border-radius:12px;padding:10px 12px;font-weight:600}.login .info{color:#fff;background:rgba(0,178,231,.14);border:1px solid #00B2E7;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45}.login .lnk{font-size:14.5px;padding:6px 0;align-self:center;cursor:pointer}.login .lnk.wait{color:#fff;font-weight:500;cursor:default}.login .fld label,.login .li .s,.login .chk{color:#fff}.login .btn:disabled{opacity:.8}.login input:-webkit-autofill{-webkit-text-fill-color:#fff;-webkit-box-shadow:0 0 0 1000px var(--bg2) inset;caret-color:#fff}.login .help{font-size:13px;color:#fff;line-height:1.4}.login .note b,.login .info b,.login .err b{overflow-wrap:anywhere}.login .card{min-width:0}.login .li .t.ell{white-space:normal;overflow:visible;text-overflow:clip}@media (max-height:620px){.login .hero img{width:76px}.login h2{font-size:22px}.login .hero p{display:none}}.login .warn{color:#fff;background:rgba(255,190,50,.14);border:1px solid #FFBE32;border-radius:12px;padding:10px 12px;font-size:13.5px;line-height:1.45;display:flex;flex-direction:column;gap:8px}.login .warn .btn{align-self:flex-start;padding:8px 14px;font-size:13.5px}.pastebtn{background:none;border:0;color:var(--blue2);font-family:var(--body);font-size:15px;padding:4px 0;cursor:pointer;align-self:center}
+.instbar{display:flex;align-items:center;gap:10px;background:rgba(0,178,231,.12);border:1px solid var(--blue);border-radius:14px;padding:8px 8px 8px 12px;color:#fff;font-size:14px;line-height:1.35}.instbar .ic{font-size:20px;flex:0 0 auto}.instbar .tx{flex:1;min-width:0}.instbar .btn{flex:0 0 auto;padding:9px 10px;font-size:14px;white-space:nowrap;min-width:104px}@media (max-width:359px){.instbar .ic{display:none}}.instbar.ok{border-color:var(--green);background:rgba(63,212,122,.14)}.card.instk{display:flex;flex-direction:column;gap:10px;border:1.5px solid var(--blue);background:linear-gradient(180deg,#0c2a44,var(--card))}.card.instk>b{font-family:var(--disp);font-size:20px;color:#fff}.card.instk p{margin:0;font-size:14px;line-height:1.45;color:#fff}.card.instk.ok{border-color:var(--green)}.card.instk .btn{white-space:nowrap}.instsheet{display:flex;flex-direction:column;gap:12px;color:#fff;max-height:calc(85vh - 40px);overflow:auto;overscroll-behavior:contain}.instsheet>[data-inst=zu]{position:sticky;bottom:0;flex:0 0 auto;box-shadow:0 -14px 14px var(--card)}.instsheet p{font-size:14.5px;line-height:1.45}.inststeps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}.inststeps li{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.4;color:#fff}.inststeps .k{flex:0 0 24px;height:24px;border-radius:50%;background:var(--blue);color:#04121C;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;margin-top:1px}.instsym{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;padding:0 5px;border:1px solid var(--blue2);border-radius:6px;font-size:13px;font-weight:800;vertical-align:middle;margin:0 2px;background:#0a2238;color:#fff}#wpStatus{white-space:normal;text-align:right}.instsheet .instklein{margin:0;font-size:13px;color:#fff;border-top:1px solid var(--line2);padding-top:9px}.instsheet .btn.big{padding:15px;font-size:17px}
 .err{color:var(--red);font-size:13.5px;font-weight:600}
 .testhint{border:1px dashed rgba(255,190,50,.55);color:#FFD884;background:rgba(255,190,50,.07);border-radius:12px;padding:10px 12px;font-size:13px}
 .pick{max-height:46vh;overflow:auto}
@@ -776,6 +777,7 @@ window.addEventListener('popstate',function(){if(SKIP){SKIP=0;return;}
   if(LGH&&($('#fMail')||$('#fCode')||$('.login.who'))){LGH=0;var dd=$('#dlg');if(dd&&!dd.hidden){dd.hidden=true;if(L.step!=='mail')lgGuard();return;}   // Prüfung 01.11.2026: Zurück-Geste bleibt in der Anmeldung
     if(L.step==='code'){LGS++;LGV++;L.busySend=false;L.busyVerify=false;L.step='mail';L.err='';L.info='';L.expired=false;if(REAL)lgSave();drawLogin();return;}
     if(L.step==='who')lgGuard();return;}
+  if(INSTH){INSTH=0;var di=$('#dlg');if(di&&!di.hidden&&di.querySelector('.instsheet')){di.hidden=true;return;}}   // Installier-Hilfe (Roger 09.11.2026): Zurück schliesst nur das Blatt
   if(awzClose()||hofClose()){try{history.pushState({apl:1},'');}catch(x){}return;}   // Award gross / Hall of Fame zuerst schliessen
   var d=$('#dlg');if(d&&!d.hidden){d.hidden=true;try{history.pushState({apl:1},'');}catch(x){}return;}if(HP>0)HP--;back();});   // Prüfung 01.11.2026: offenes Fenster zuerst schliessen
 function goBack(){if(HP>0&&st.stack.length){try{history.back();return;}catch(x){}}back();}
@@ -817,14 +819,103 @@ function lgTick(){var fc=$('#fCode');if(!fc){clearInterval(LGT);LGT=null;return;
   if(t&&Date.now()-t>LG_MAX&&!L.expired&&!L.busyVerify&&!L.busySend){var ci=$('#cIn'),v=ci?ci.value:'';lgExpiredMsg();L.lastCode=v;drawLogin();return;}
   var b=$('#bResend');if(!b||L.busySend)return;var left=t?Math.min(60,Math.ceil((LG_WAIT-(Date.now()-t))/1000)):0;
   if(left>0){b.disabled=true;b.classList.add('wait');b.textContent='Kein Code erhalten? Nochmals senden geht in '+left+' Sekunden';}else{b.disabled=false;b.classList.remove('wait');b.textContent='Kein Code erhalten? Code nochmals senden';}}
-function lgIOSBrowser(){var ua=navigator.userAgent||'',ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
-  var sa=navigator.standalone===true||(window.matchMedia&&matchMedia('(display-mode: standalone)').matches);return ios&&!sa;}
 function lgInApp(){return /FBAN|FBAV|FB_IAB|Instagram|LinkedInApp|Snapchat|TikTok|Line\/|GSA\/|; wv\)/.test(navigator.userAgent||'');}
+// ---------------------------------------------------------------- Hilfe zum Installieren (Roger 09.11.2026)
+// Viele legen die App nur als Lesezeichen auf den Startbildschirm und bleiben im Browser. Die App erkennt Handy + Browser und zeigt
+// nur die passenden Schritte: vor dem Anmelden ein kleiner Hinweis (überspringbar), nach dem Anmelden oben auf der Startseite (mit «Später»).
+// Android/Chrome: ein Knopf (Fenster «Installieren?» vom Handy). Samsung-Browser + andere: «In Chrome öffnen». iPhone: Schritte (Apple erlaubt keinen Knopf).
+// Ist die App installiert (eigenes Fenster), erscheint nichts. Am PC erscheint nichts.
+var INST={evt:null,ok:false,zu:0,okzu:false},INST_ZU=3*864e5,INSTH=0;   // «Später» = 3 Tage Ruhe (zu: falls der Browser nichts speichern darf) · INSTH: eigener Verlaufs-Eintrag fürs Blatt
+function instStandalone(){try{if(navigator.standalone===true)return true;return ['standalone','fullscreen','minimal-ui'].some(function(m){return matchMedia('(display-mode: '+m+')').matches;});}catch(x){return false;}}
+function instArt(){var u=navigator.userAgent||'',ios=/iPhone|iPad|iPod/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1);
+  if(instStandalone())return '';
+  if(ios){if(lgInApp()||!/Safari\//.test(u))return 'ios-inapp';if(/CriOS|FxiOS|EdgiOS|OPiOS|OPT\/|YaBrowser|DuckDuckGo|Brave/.test(u))return 'ios-andere';var m=u.match(/Version\/(\d+)/);return (m&&+m[1]>=26)?'ios26':'ios';}
+  if(/Android/.test(u)){if(lgInApp())return 'and-inapp';if(/SamsungBrowser/.test(u))return 'samsung';if(/Firefox|OPR\/|EdgA|YaBrowser|MiuiBrowser|HuaweiBrowser|HeyTapBrowser|UCBrowser|Vivaldi/.test(u))return 'and-andere';return 'chrome';}
+  return '';}
+function instIpad(){var u=navigator.userAgent||'';return /iPad/.test(u)||(/Macintosh/.test(u)&&navigator.maxTouchPoints>1);}
+function instChromeUrl(){return 'intent://'+location.host+location.pathname+'#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url='+encodeURIComponent(location.origin+location.pathname)+';end';}   // öffnet die App in Chrome (fehlt Chrome: bleibt hier)
+function instSpaeter(){var t=+(ls('inst-spaeter')||INST.zu||0),d=Date.now()-t;return t>0&&d>=0&&d<INST_ZU;}
+function instDirekt(){return !!INST.evt&&instArt()!=='samsung';}   // Samsung: Installieren im Samsung-Browser klappt oft nicht (Berichte 2026) → dort immer zuerst Chrome
+// klein, vor dem Anmelden (nur Schritt «E-Mail»)
+function instBar(){var a=REAL?instArt():'';if(!a||(/inapp/.test(a)&&lgInApp()))return '';   // fremde App (Instagram …): dort steht schon «Bitte im Browser öffnen»
+  if(INST.ok)return '<div class="instbar ok" role="status"><span class="ic">✅</span><span class="tx"><b>Installiert!</b> Öffne die App jetzt über das neue Symbol «APlus Lounge» und melde dich dort an.</span></div>';
+  var di=instDirekt();
+  return '<div class="instbar" role="note"><span class="ic">📲</span><span class="tx">Du bist im Browser. <b>Installiere zuerst die App.</b></span>'
+    +'<button type="button" class="btn pri" data-inst="'+(di?'jetzt':'hilfe')+'">'+(di?'Installieren':'So geht\'s')+'</button></div>';}
+// nach dem Anmelden, oben auf der Startseite
+function instKarte(){var a=REAL&&U&&!LGM?instArt():'';if(!a)return '';
+  if(INST.ok)return INST.okzu?'':'<div class="card instk ok" role="status"><b>✅ Installiert!</b><p>Öffne die App jetzt über das neue Symbol «APlus Lounge» auf dem Startbildschirm.</p><button type="button" class="btn" data-inst="okzu">OK</button></div>';
+  if(instSpaeter())return '';
+  var di=instDirekt();
+  return '<div class="card instk" role="note"><b><span aria-hidden="true">📲</span> App richtig installieren</b><p>Du nutzt die App noch im Browser. Als App bekommst du ein eigenes Symbol, den ganzen Bildschirm und Mitteilungen aufs Handy.</p>'
+    +'<div class="row"><button type="button" class="btn pri grow" data-inst="'+(di?'jetzt':'hilfe')+'">'+(di?'📲 Installieren':'So geht\'s')+'</button><button type="button" class="btn" data-inst="spaeter">Später</button></div></div>';}
+function instSchritte(l){return '<ol class="inststeps">'+l.map(function(x,i){return '<li><span class="k">'+(i+1)+'</span><span>'+x+'</span></li>';}).join('')+'</ol>';}
+function instSym(x){return '<span class="instsym">'+x+'</span>';}
+// das Blatt mit der Anleitung für genau dieses Handy
+function instHilfe(){var a=instArt();if(!a)return;var neu=U?' und dich dort <b>nochmals anmelden</b> (neuer Code per E-Mail)':' und dich dort anmelden';
+  var h='<div class="instsheet"><h3>📲 App installieren</h3><p class="note" style="margin:0;color:#fff">So bekommst du die App mit eigenem Symbol «APlus Lounge», auf dem ganzen Bildschirm und mit Mitteilungen aufs Handy.</p>';
+  var chromeKnopf='<a class="btn pri full" href="'+e(instChromeUrl())+'" data-inst="chrome">In Chrome öffnen</a>';
+  var direkt=instDirekt()?'<button type="button" class="btn pri full big" data-inst="jetzt">📲 App installieren</button>':'';
+  var inChrome='<p class="note instklein">Steht im Menü <b>«In Chrome öffnen»</b>? Zuerst das antippen.</p>';
+  if(a==='ios26'||a==='ios'){
+    var s1=a==='ios26'?(instIpad()?'Oben rechts auf das Teilen-Symbol '+instSym('⬆︎')+' tippen (Viereck mit Pfeil nach oben).':'Unten rechts neben der Adresszeile auf '+instSym('•••')+' tippen, dann auf <b>«Teilen»</b>. (Siehst du direkt das Teilen-Symbol '+instSym('⬆︎')+' – Viereck mit Pfeil? Dann dieses antippen.)')
+      :(instIpad()?'Oben rechts auf das Teilen-Symbol '+instSym('⬆︎')+' tippen (Viereck mit Pfeil nach oben).':'Unten in der Mitte auf das Teilen-Symbol '+instSym('⬆︎')+' tippen (Viereck mit Pfeil nach oben).');
+    h+=instSchritte([s1,'Weiter unten in der Liste <b>«Zum Home-Bildschirm»</b> wählen.',
+      a==='ios26'?'<b>«Als Web-App öffnen»</b> eingeschaltet lassen und <b>«Hinzufügen»</b> tippen.':'Oben rechts auf <b>«Hinzufügen»</b> tippen.',
+      'Die App über das <b>neue Symbol</b> öffnen'+neu+'.']);
+  }else if(a==='ios-andere'){
+    h+='<p style="margin:0">Am einfachsten geht es in <b>Safari</b>:</p>'+instSchritte(['Auf <b>«Link kopieren»</b> tippen.','<b>Safari</b> öffnen, den Link oben in die Adresszeile einfügen und öffnen.','Dort erscheint diese Hilfe wieder – mit den Schritten für Safari.'])
+      +'<button type="button" class="btn pri full" data-inst="kopieren">Link kopieren</button><p class="note instklein">In Chrome geht es oft auch: Teilen-Symbol '+instSym('⬆︎')+' in der Adresszeile → <b>«Zum Home-Bildschirm»</b>.</p>';
+  }else if(a==='ios-inapp'){
+    h+='<p style="margin:0">Du hast den Link in einer anderen App geöffnet (z.B. Instagram oder Mail). Installieren geht nur in <b>Safari</b>:</p>'+instSchritte(['Auf <b>«Link kopieren»</b> tippen.','<b>Safari</b> öffnen und den Link oben einfügen.','Dort erscheint diese Hilfe wieder.'])
+      +'<button type="button" class="btn pri full" data-inst="kopieren">Link kopieren</button>';
+  }else if(a==='chrome'){
+    h+=direkt?direkt+'<p style="margin:0">Das Handy fragt dann «Installieren?» – bestätigen. Danach die App über das <b>neue Symbol</b> öffnen.</p>'
+      +'<p class="note instklein">Kein Fenster erschienen? Auf '+instSym('⋮')+' tippen und <b>«App installieren»</b> wählen.</p>'
+      :instSchritte(['Auf '+instSym('⋮')+' tippen (oben rechts – ist die Adresszeile unten: unten rechts).','<b>«App installieren»</b> oder <b>«Installieren und Verknüpfung erstellen»</b> wählen (älteres Chrome: «Zum Startbildschirm hinzufügen»), dann <b>«Installieren»</b>.','Die App über das <b>neue Symbol</b> öffnen.'])
+      +inChrome+'<p class="note instklein">Siehst du nirgends «Installieren»? Dann ist die App vielleicht schon installiert – schau auf dem Startbildschirm nach dem Symbol «APlus Lounge».</p>';
+  }else if(a==='samsung'){
+    h+='<p style="margin:0">Auf Samsung-Handys geht es am einfachsten mit <b>Chrome</b> (ist auf jedem Samsung schon drauf):</p>'+chromeKnopf
+      +'<p style="margin:0">In Chrome erscheint diese Hilfe wieder, mit dem Knopf <b>«Installieren»</b>'+(U?' (dort meldest du dich einmal neu an)':'')+'.</p>'
+      +'<p class="note instklein">Lieber im Samsung-Browser? Unten rechts auf '+instSym('≡')+' tippen → <b>«Seite hinzufügen zu»</b> → <b>«Startbildschirm»</b>.</p>';
+  }else{   // anderer Android-Browser oder fremde App (Instagram …)
+    h+=(direkt?direkt+'<p class="note instklein" style="text-align:center">oder</p>':'')
+      +'<p style="margin:0">'+(a==='and-inapp'?'Du hast den Link in einer anderen App geöffnet (z.B. Instagram). ':'')+'Am einfachsten geht es mit <b>Chrome</b>:</p>'+chromeKnopf
+      +'<p style="margin:0">In Chrome erscheint diese Hilfe wieder, mit dem Knopf <b>«Installieren»</b>.</p>'
+      +(a==='and-inapp'?'<p class="note instklein">Klappt der Knopf nicht? Oben rechts auf '+instSym('⋮')+' tippen → <b>«Im Browser öffnen»</b>. Oder den Link kopieren und in Chrome einfügen:</p><button type="button" class="btn full" data-inst="kopieren">Link kopieren</button>'
+        :'<p class="note instklein">Oder im Menü deines Browsers <b>«Zum Startbildschirm hinzufügen»</b> bzw. <b>«Installieren»</b> wählen.</p>');
+  }
+  h+='<button type="button" class="btn full" data-inst="zu">Schliessen</button></div>';
+  var d0=$('#dlg'),offen=!!(d0&&!d0.hidden&&d0.querySelector('.instsheet'));
+  sheet(h,function(d){d.onclick=function(ev){if(ev.target===d)instZu();};});
+  if(!offen&&!INSTH&&!($('#fMail')||$('#fCode')||$('.login.who'))){try{history.pushState({apl:'inst'},'');INSTH=1;}catch(x){}}}   // Anmeldung hat schon ihren eigenen Schutz (lgGuard)
+function instZu(){var d=$('#dlg');if(d&&d.querySelector('.instsheet'))d.hidden=true;if(INSTH){INSTH=0;SKIP=1;try{history.back();}catch(x){SKIP=0;}}}
+function instJetzt(){var ev=INST.evt;if(!ev||!instDirekt()){instHilfe();return;}INST.evt=null;var d=$('#dlg');
+  if(d&&!d.hidden&&d.querySelector('.instsheet'))d.hidden=true;   // Blatt nur verstecken – sein Verlaufs-Eintrag bleibt (Prüfung 09.11.: sonst bei Fehler Verlauf durcheinander)
+  instNeu();
+  var antwort=function(c){if(c&&c.outcome==='accepted')INST.ok=true;var dd=$('#dlg');if(INSTH&&(!dd||dd.hidden))instZu();instNeu();};   // Eintrag erst nach der Antwort aufräumen
+  try{Promise.resolve(ev.prompt()).then(function(){return ev.userChoice;}).then(antwort,function(){instNeu();instHilfe();});}catch(x){instNeu();instHilfe();}}
+// nur die Hinweise neu zeichnen (Eingaben auf der Seite bleiben stehen)
+function instNeu(){var b=$('.instbar');if(b)b.outerHTML=instBar();var k=$('.instk');if(k)k.outerHTML=instKarte();
+  var d=$('#dlg');if(d&&!d.hidden&&d.querySelector('.instsheet')){if(INST.ok)instZu();else instHilfe();}}
+function instKopieren(btn){var u=location.origin+location.pathname;var fertig=function(){btn.textContent='Link kopiert ✓';};
+  try{navigator.clipboard.writeText(u).then(fertig,function(){btn.textContent=u;});}catch(x){btn.textContent=u;}}
+document.addEventListener('click',function(ev){var t=ev.target&&ev.target.closest?ev.target.closest('[data-inst]'):null;if(!t)return;var k=t.getAttribute('data-inst');
+  if(k==='chrome')return;   // normaler Link (intent://) – das Handy öffnet Chrome
+  ev.preventDefault();
+  if(k==='jetzt')instJetzt();else if(k==='hilfe')instHilfe();else if(k==='kopieren')instKopieren(t);
+  else if(k==='zu')instZu();
+  else if(k==='okzu'){INST.okzu=true;instNeu();}
+  else if(k==='spaeter'){INST.zu=Date.now();ls('inst-spaeter',INST.zu);instNeu();}});
+window.addEventListener('beforeinstallprompt',function(ev){var a=REAL?instArt():'';if(!a||a==='samsung')return;   // am PC und im Samsung-Browser: Browser macht es selbst (eigenes Angebot nicht unterdrücken)
+  try{ev.preventDefault();}catch(x){}INST.evt=ev;instNeu();});
+window.addEventListener('appinstalled',function(){INST.ok=true;INST.evt=null;instNeu();});
+function swFrueh(){try{if(REAL&&'serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').then(null,function(){});}catch(x){}}   // schon vor dem Anmelden: nur so gilt die App als «installierbar»
 function drawLogin(){
   var h='<div class="login'+(L.step==='who'?' who':L.step==='code'?' cstep':'')+'"><div class="flag" aria-hidden="true"></div><div class="hero"><img src="logo.png" alt="APlus SimRacing Events &amp; Lounge"><h2>A Plus SimRacing Lounge</h2><p class="muted">Deine Zeiten. Deine Lizenz. Deine Lounge.</p></div>';
   if(L.step==='mail'){
-    h+=(REAL&&lgInApp()?'<div class="warn" role="note"><b>Bitte im Browser öffnen</b><span>Du hast den Link in einer anderen App geöffnet. Öffne ihn in Safari (iPhone) bzw. Chrome (Android) – nur dort kannst du die App auf den Home-Bildschirm legen.</span><button class="btn" type="button" id="bCopyLink">Link kopieren</button></div>':'')
-      +(REAL&&!lgInApp()&&lgIOSBrowser()?'<div class="info" role="note"><b>Tipp fürs iPhone:</b> Lege die App zuerst auf den Home-Bildschirm (Teilen-Symbol → «Zum Home-Bildschirm») und melde dich dann dort an. Sonst musst du dich zweimal anmelden.</div>':'')
+    h+=(REAL&&lgInApp()?'<div class="warn" role="note"><b>Bitte im Browser öffnen</b><span>Du hast den Link in einer anderen App geöffnet. Öffne ihn in Safari (iPhone) bzw. Chrome (Android) – nur dort kannst du die App auf den Home-Bildschirm legen.</span>'+(instArt()==='and-inapp'?'<a class="btn pri" href="'+e(instChromeUrl())+'" data-inst="chrome">In Chrome öffnen</a>':'')+'<button class="btn" type="button" id="bCopyLink">Link kopieren</button></div>':'')
+      +instBar()   // Roger 09.11.2026: kleiner Hinweis «zuerst installieren» (ersetzt den alten iPhone-Tipp)
       +'<form id="fMail" class="card" style="display:flex;flex-direction:column;gap:12px" novalidate><div class="fld"><label for="iMail">E-Mail-Adresse</label><input class="inp" id="iMail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send" value="'+e(L.mail)+'"><span class="help">Nimm die E-Mail, die du bei uns in der Lounge angegeben hast.</span></div>'
       +'<label class="chk"><input type="checkbox" id="iOk"'+(L.ok?' checked':'')+'><span>Ich akzeptiere die <a data-lg="nr">Nutzungsregeln</a> und habe die <a data-lg="ds">Datenschutzerklärung</a> gelesen.</span></label>'
       +(L.info?'<div class="info" role="status">'+e(L.info)+'</div>':'')+(L.err?'<div class="err" role="alert">'+e(L.err)+'</div>':'')+'<button class="btn pri full" type="submit">Code per E-Mail senden</button>'
@@ -860,7 +951,7 @@ function drawLogin(){
     if(!MAILRX.test(m)){L.err='Gib zuerst die E-Mail-Adresse ein, an die wir den Code geschickt haben.';drawLogin();return;}
     if(!L.ok){L.err='Bitte setze zuerst das Häkchen bei Nutzungsregeln und Datenschutz.';lgSave();drawLogin();return;}
     L.err='';L.expired=false;L.step='code';lgSave();drawLogin();var c=$('#cIn');if(c)c.focus();};
-  var bcl=$('#bCopyLink');if(bcl)bcl.onclick=function(){var u=location.href;try{navigator.clipboard.writeText(u).then(function(){bcl.textContent='Link kopiert ✓';},function(){bcl.textContent=u;});}catch(x){bcl.textContent=u;}};
+  var bcl=$('#bCopyLink');if(bcl)bcl.onclick=function(){var u=location.origin+location.pathname;try{navigator.clipboard.writeText(u).then(function(){bcl.textContent='Link kopiert ✓';},function(){bcl.textContent=u;});}catch(x){bcl.textContent=u;}};
   var bwo=$('#bWhoOut');if(bwo)bwo.onclick=realLogout;
   var bwb=$('#bWhoBack');if(bwb)bwb.onclick=function(){if(lgVorher())start();};   // Lounge-Konto: Wechseln abbrechen
   var f=$('#fMail');if(f){f.onsubmit=function(ev){ev.preventDefault();var m=($('#iMail').value||'').trim().toLowerCase();L.ok=!!($('#iOk')||{}).checked;L.info='';
@@ -946,7 +1037,7 @@ function needLogin(what){return '<div class="card" style="display:flex;flex-dire
 // ---------------------------------------------------------------- Start
 function vHome(){
   var h='';
-  if(U){var a=awState(U);h+=a?licCard(a,true):welcomeCard();var rtn=nextRT();if(rtn&&isMem())h+=rtCard(rtn,true);h+=wpKarte();}   // wpKarte: Stufe 3
+  if(U){var ik=instKarte();h+=ik;var a=awState(U);h+=a?licCard(a,true):welcomeCard();var rtn=nextRT();if(rtn&&isMem())h+=rtCard(rtn,true);if(!ik)h+=wpKarte();}   // wpKarte: Stufe 3 · erst nach dem Installieren (sonst doppelte Mitteilungen Browser + App)
   else h+='<div class="card next" style="display:flex;flex-direction:column;gap:8px"><b style="font-family:var(--disp);font-size:20px">Willkommen in der A Plus SimRacing Lounge</b><p class="note" style="margin:0">Melde dich an und sieh deine Bestzeiten, deine Lizenz und deinen AfterWork-Stand – alles aus dem TimeTool der Lounge.</p><button class="btn pri" data-act="login">Anmelden</button></div>';
   // News – gleich nach der Lizenz (Roger 30.10.2026)
   h+='<section class="sec"><div class="sh"><h2>News</h2><a href="#" data-go="news">Alle</a></div><div class="list">'+allNews().slice(0,3).map(newsLi).join('')+'</div></section>';
@@ -2234,7 +2325,8 @@ function setting(){var s=(U&&ls('set2-'+uk()))||{};return {gen:s.gen!==false,awr
 function settingSave(f){if(!U)return;var s=setting();f(s);ls('set2-'+uk(),s);wpPrefsBald();}   // Stufe 3: Schalter gehen auch an die Mitteilungen aufs Handy
 function vSettings(){if(!U)return needLogin('Die Einstellungen');var S=setting();
   var tg=function(key,on,lab,sub){return '<button class="li" data-st="'+key+'" role="switch" aria-checked="'+(on?'true':'false')+'"><span class="grow"><span class="t" style="display:block">'+lab+'</span>'+(sub?'<span class="s">'+sub+'</span>':'')+'</span><span class="tgl'+(on?' on':'')+'"></span></button>';};
-  var h=wpSektion(S)+'<section class="sec"><div class="sh"><h2>Mitteilungen</h2></div><div class="list">'+tg('gen',S.gen,'Allgemeine Infos der Lounge','Veranstaltungen, Neuigkeiten, Infos – nicht aus einem Chat')+tg('awrem',S.awrem,'AfterWork-Erinnerung','Dienstag am Mittag, mit Strecke und Auto')+tg('awres',S.awres,'AfterWork-Resultat','Rangliste nach dem Abend')+tg('ls',S.ls,'Last Shot','sofort, wenn du im Fenster bist')+'</div><p class="note">'+(CHAT.mode==='sb'?'Die Schalter gelten in der App und für die Mitteilungen aufs Handy.':'Erinnerung, Resultat und Last Shot kommen mit der echten App aufs Handy.')+'</p></section>';
+  var h=(REAL&&instArt()?'<section class="sec"><div class="sh"><h2>App installieren</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><p style="margin:0;color:#fff">Du nutzt die App noch im Browser. Als App bekommst du ein eigenes Symbol, den ganzen Bildschirm und Mitteilungen aufs Handy.</p><button type="button" class="btn pri" data-inst="hilfe">So geht\'s</button></div></section>':'')   // Roger 09.11.2026
+    +wpSektion(S)+'<section class="sec"><div class="sh"><h2>Mitteilungen</h2></div><div class="list">'+tg('gen',S.gen,'Allgemeine Infos der Lounge','Veranstaltungen, Neuigkeiten, Infos – nicht aus einem Chat')+tg('awrem',S.awrem,'AfterWork-Erinnerung','Dienstag am Mittag, mit Strecke und Auto')+tg('awres',S.awres,'AfterWork-Resultat','Rangliste nach dem Abend')+tg('ls',S.ls,'Last Shot','sofort, wenn du im Fenster bist')+'</div><p class="note">'+(CHAT.mode==='sb'?'Die Schalter gelten in der App und für die Mitteilungen aufs Handy.':'Erinnerung, Resultat und Last Shot kommen mit der echten App aufs Handy.')+'</p></section>';
   var chs=CH.filter(function(c){return !c.arch&&(canSee(c)||c.id==='club');});   // Club-Chat immer zeigen, für Nicht-Mitglieder ausgegraut
   h+='<section class="sec"><div class="sh"><h2>Kanäle</h2></div><p class="note" style="margin:0 0 8px">Pro Kanal einstellbar: <b style="color:#fff">Mitteilung</b> = Ton und Hinweis am Handy<br><b style="color:#fff">Rote Zahl</b> = Zähler für neue Nachrichten <span class="ubadge" style="display:inline-grid;vertical-align:middle;background:#ff4d4d;color:#fff">3</span></p><div class="list stbl"><div class="li" style="padding-top:8px;padding-bottom:8px;background:var(--bg2)"><span class="grow note" style="margin:0">Kanal</span><span class="sc sh2">Mitteilung</span><span class="sc sh2">Rote Zahl</span></div>'
     +chs.map(function(c){var lk=c.id==='club'&&!isMem()&&!CHAT.admin,pu=!lk&&S.push[c.id]!==false,ba=!lk&&S.badge[c.id]!==false;   // Roger 31.10.2026: Club-Chat für Nicht-Mitglieder ausgegraut
@@ -2420,12 +2512,12 @@ function wpRefresh(){var p=st.path||'home';if(p==='settings'||p==='home')render(
 function wpKarte(){if(!U||ls('pushkarte-'+uk())||wpZustand()!=='aus'||wpErlaubnis()!=='default')return '';   // Start-Seite, einmal nach dem Anmelden
   return '<div class="card" id="wpKarte" style="display:flex;flex-direction:column;gap:10px;border-color:rgba(0,178,231,.55)"><b style="font-family:var(--disp);font-size:19px">🔔 Mitteilungen einschalten?</b><p class="note" style="margin:0">Dann kommen neue Chat-Nachrichten, Race Time und Infos der Lounge sofort aufs Handy – auch wenn die App zu ist. Ausschalten geht jederzeit unter «Einstellungen».</p><div class="row" style="gap:8px"><button class="btn pri grow" data-act="wpein"'+(WP.busy?' disabled':'')+'>Einschalten</button><button class="btn" data-act="wpkarte">Später</button></div></div>';}
 function wpSektion(S){if(!REAL)return '';var z=wpZustand(),h='<section class="sec" id="wpSek"><div class="sh"><h2>Mitteilungen aufs Handy</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px">';
-  var lab={an:['✓ An','green'],aus:['Aus',''],blockiert:['Blockiert','red'],nicht:['Auf diesem Gerät nicht möglich',''],ios:['Auf diesem Gerät nicht möglich',''],bald:['Kommt bald',''],pruefe:['Wird geprüft …','']}[z];
+  var lab={an:['✓ An','green'],aus:['Aus',''],blockiert:['Blockiert','red'],nicht:['Auf diesem Gerät nicht möglich',''],ios:['Nur als App',''],bald:['Kommt bald',''],pruefe:['Wird geprüft …','']}[z];
   h+='<div class="row" style="justify-content:space-between;gap:10px"><b>Status</b><span class="tag'+(lab[1]?' '+lab[1]:'')+'" id="wpStatus" data-z="'+z+'">'+lab[0]+'</span></div>';
   if(z==='an')h+='<p class="note" style="margin:0">Du bekommst Mitteilungen aufs Handy, auch wenn die App zu ist. Welche, stellst du unten ein.</p><button class="btn" data-act="wpaus"'+(WP.busy?' disabled':'')+'>Mitteilungen ausschalten</button>';
   else if(z==='aus')h+='<p class="note" style="margin:0">Neue Chat-Nachrichten, Race Time und Infos der Lounge kommen sofort aufs Handy – auch wenn die App zu ist. Mit roter Zahl auf dem App-Symbol.</p><button class="btn pri" data-act="wpein"'+(WP.busy?' disabled':'')+'>'+(WP.busy?'Einen Moment …':'Mitteilungen einschalten')+'</button>';
   else if(z==='blockiert')h+='<p class="note" style="margin:0">Du hast die Mitteilungen für diese App abgelehnt. So erlaubst du sie wieder:</p><ol class="note" style="margin:0;padding-left:20px;line-height:1.5">'+(wpIos()?'<li>iPhone: <b style="color:#fff">Einstellungen → Mitteilungen → APlus Lounge</b> → «Mitteilungen erlauben» einschalten.</li>':/Android/.test(navigator.userAgent||'')?'<li>Android: lange auf das App-Symbol tippen → <b style="color:#fff">App-Info → Benachrichtigungen</b> → erlauben (im Browser: Schloss neben der Adresse → Berechtigungen).</li>':'<li>Computer: links neben der Adresse auf das <b style="color:#fff">Schloss</b> klicken → Benachrichtigungen «Zulassen».</li>')+'<li>Dann die App neu öffnen.</li></ol>';
-  else if(z==='ios')h+='<p class="note" style="margin:0"><b style="color:#fff">Zuerst die App zum Home-Bildschirm hinzufügen</b> – auf dem iPhone gehen Mitteilungen nur so:</p><ol class="note" style="margin:0;padding-left:20px;line-height:1.5"><li>Unten in Safari auf <b style="color:#fff">«Teilen»</b> tippen (Viereck mit Pfeil nach oben).</li><li><b style="color:#fff">«Zum Home-Bildschirm»</b> wählen und «Hinzufügen» tippen.</li><li>Die App über das neue Symbol öffnen und hier <b style="color:#fff">«Mitteilungen einschalten»</b> tippen.</li></ol>';
+  else if(z==='ios')h+='<p style="margin:0;color:#fff;font-size:14px;line-height:1.45"><b>Auf dem iPhone gehen Mitteilungen nur in der installierten App.</b> So geht es: oben bei «App installieren». Danach die App über das neue Symbol öffnen und hier «Mitteilungen einschalten» tippen.</p>';   // Roger 09.11.2026: gleiche Hilfe wie «App installieren» (oben)
   else if(z==='nicht')h+='<p class="note" style="margin:0">'+(wpIos()?'Auf diesem iPhone geht das erst ab iOS 16.4 (Einstellungen → Allgemein → Softwareupdate).':'Dieser Browser kann keine Mitteilungen aufs Handy. Tipp: auf Android Chrome verwenden, auf dem iPhone Safari (App auf dem Home-Bildschirm).')+'</p>';
   else if(z==='bald')h+='<p class="note" style="margin:0">Die Lounge richtet die Mitteilungen aufs Handy gerade ein – bitte später nochmals schauen.</p>';
   if(WP.fehler&&z!=='an')h+='<p class="note" style="margin:0;color:#FF9F43">'+e(WP.fehler)+'</p>';
@@ -2477,7 +2569,7 @@ function realAfter(s){var mail=String((s&&s.user&&s.user.email)||'').toLowerCase
       var u=ls('user')||MEMU||{},k=REALKEYS.indexOf(u.k)>=0?u.k:(REALKEYS.length===1?REALKEYS[0]:null);
       if(k){ls('user',{k:k,mail:mail});start();}else{L={step:'who',mail:mail,err:'',q:''};drawLogin();}});
   }).catch(function(err){loadErr(err);});}
-function realBoot(){var t0=Date.now();realMsg('Einen Moment …');(function wait(){
+function realBoot(){var t0=Date.now();swFrueh();realMsg('Einen Moment …');(function wait(){
   if(window.supabase&&window.supabase.createClient){try{SB=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'apl-sb'}});}catch(x){loadErr(x);return;}
     var stored=function(){try{return !!localStorage.getItem('apl-sb');}catch(x){return false;}};
     var offline=function(){loadErr(null,'Keine Verbindung','Du bist angemeldet, aber gerade ohne Internet. Prüfe WLAN oder mobile Daten und tippe auf «Nochmals versuchen».');};

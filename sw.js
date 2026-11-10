@@ -3,7 +3,8 @@
      Nachrichten)»), Ton nach Einstellung (silent), rote Zahl auf dem App-Symbol hochzählen (wo das Handy es kann).
    - Antippen: offene App nach vorne holen und die richtige Seite zeigen – sonst die App öffnen (oder die Webseite des Links).
    - pushsubscriptionchange: merken, damit sich die App beim nächsten Öffnen neu anmeldet.
-   Absichtlich KEIN «fetch»-Teil und kein Zwischenspeicher: die App lädt immer die aktuelle Fassung vom Server. */
+   Absichtlich KEIN Zwischenspeicher: die App lädt immer die aktuelle Fassung vom Server. Seit 09.11.2026 ein kleiner «fetch»-Teil
+   nur für Seitenaufrufe (reicht sie unverändert ans Netz weiter, ohne Internet eine kleine Seite) – damit die App installierbar ist. */
 'use strict';
 var DB = 'apl-push', ST = 'kv';
 function idb() { return new Promise(function (ok, no) { var r = indexedDB.open(DB, 1); r.onupgradeneeded = function () { r.result.createObjectStore(ST); }; r.onsuccess = function () { ok(r.result); }; r.onerror = function () { no(r.error); }; }); }
@@ -15,8 +16,30 @@ function kv(k, v) {   // lesen (v weggelassen) oder schreiben
     });
   });
 }
+// Roger 09.11.2026 (Hilfe zum Installieren): nur Seitenaufrufe der App laufen hier durch – immer frisch vom Server, es wird NICHTS
+// zwischengespeichert. Damit erkennen Chrome und der Samsung-Browser die App als «installierbar» (Knopf «App installieren» statt nur
+// Lesezeichen). Alle anderen Abfragen (Daten, Bilder, Supabase) gehen wie bisher direkt ins Netz. Ohne Internet: kleine Seite.
+var OFFLINE = '<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+  + '<title>A Plus SimRacing Lounge</title><style>body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#070D18;color:#fff;'
+  + 'font-family:-apple-system,system-ui,Segoe UI,Roboto,Arial,sans-serif;padding:24px;box-sizing:border-box;text-align:center}div{max-width:340px;display:flex;flex-direction:column;gap:12px;align-items:center}'
+  + 'img{width:120px}h1{margin:0;font-size:22px}p{margin:0;font-size:15px;line-height:1.45}button{background:#00B2E7;color:#04111f;border:0;border-radius:12px;padding:13px 20px;font-size:16px;font-weight:700}</style></head>'
+  + '<body><div><h1>Keine Verbindung</h1><p>Die App braucht Internet. Prüfe WLAN oder mobile Daten und versuche es nochmals.</p>'
+  + '<button type="button" onclick="location.reload()">Nochmals versuchen</button></div>'
+  // Internet wieder da (oder eine Mitteilung kommt an) → die App von selbst neu laden
+  + '<script>addEventListener("online",function(){location.reload()});try{navigator.serviceWorker.addEventListener("message",function(){location.reload()})}catch(x){}</script></body></html>';
+self.addEventListener('fetch', function (e) {
+  var r = e.request;
+  if (r.mode !== 'navigate' || r.method !== 'GET') return;   // alles andere: Browser macht es selbst (wie bisher)
+  e.respondWith(Promise.resolve(e.preloadResponse).then(function (v) { return v || fetch(r); })   // «Vorladen»: die Seite wird schon geholt, während der Hintergrund-Teil startet
+    .then(null, function () { return fetch(r); })
+    .then(null, function () { return new Response(OFFLINE, { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } }); }));
+});
+
 self.addEventListener('install', function () { self.skipWaiting(); });
-self.addEventListener('activate', function (e) { e.waitUntil(self.clients.claim()); });
+self.addEventListener('activate', function (e) {
+  var vor = self.registration.navigationPreload ? self.registration.navigationPreload.enable().then(null, function () { }) : null;   // App startet so schnell wie ohne fetch-Teil
+  e.waitUntil(Promise.all([self.clients.claim(), vor]));
+});
 
 function zahlPlus(n) {   // rote Zahl: Zähler in IndexedDB (die App setzt ihn beim Öffnen auf die echte Zahl ungelesener Nachrichten)
   if (!(n > 0)) return Promise.resolve();
