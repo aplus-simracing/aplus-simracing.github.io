@@ -473,6 +473,11 @@ textarea.inp{min-height:84px;resize:vertical;font-family:var(--body)}
 .rxs{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
 .rxc{border:1px solid var(--line2);background:var(--card);border-radius:999px;padding:2px 8px;font-size:13px;color:var(--fg)}
 .rxc.mine{border-color:var(--blue);background:rgba(0,178,231,.18)}
+.rxh{font-family:var(--disp);font-size:20px}
+.rxtabs{flex-wrap:nowrap;overflow-x:auto;margin:0}
+.rxlist{max-height:min(52vh,420px);overflow-y:auto}
+.rxli .av{flex:0 0 auto}
+.rxli .rxe{font-size:22px;flex:0 0 auto}
 .lteam{font-size:10px;font-weight:800;letter-spacing:.08em;color:#241800;background:var(--gold);border-radius:4px;padding:1px 5px}
 .cmp{position:fixed;left:0;right:0;bottom:calc(var(--nav) + env(safe-area-inset-bottom,0px));z-index:31;display:flex;justify-content:center;pointer-events:none}
 .cmp-in{pointer-events:auto;width:100%;max-width:480px;display:flex;align-items:flex-end;gap:8px;background:rgba(9,16,29,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);
@@ -2268,7 +2273,7 @@ function msgsH(c){
   a.forEach(function(m){var dk=dayKey(m.ts);if(dk!==lastDay){h+='<div class="day">'+dayLabel(dk)+'</div>';lastDay=dk;prev=null;}
     if(isRT(m)){h+=rtCard(m,false);prev=null;return;}
     var me=isMine(m),cont=prev&&prev.k===m.k&&!!prev.team===!!m.team&&m.ts-prev.ts<5*60e3,col=m.team?'#FFBE32':ncol(m.k),y=m.k?yr(m.k):null,ld=y&&y.l?LCOL[y.l]:'';
-    var rx=CHAT.rx[m.id]||{},rxh=EMO.filter(function(x){return (rx[x[0]]||[]).length;}).map(function(x){var ks=rx[x[0]];return '<button class="rxc'+(ks.indexOf(U)>=0?' mine':'')+'" data-rx="'+e(m.id)+'|'+x[0]+'">'+x[1]+' '+ks.length+'</button>';}).join('');
+    var rx=CHAT.rx[m.id]||{},rxh=EMO.filter(function(x){return (rx[x[0]]||[]).length;}).map(function(x){var ks=rx[x[0]];return '<button class="rxc'+(ks.indexOf(U)>=0?' mine':'')+'" data-rx="'+e(m.id)+'|'+x[0]+'" aria-label="'+x[1]+' '+ks.length+' – wer hat reagiert?">'+x[1]+' '+ks.length+'</button>';}).join('');
     h+='<div class="msg'+(me?' me':'')+(cont?' cont':'')+(m.team?' team':'')+'">'+(me?'':(m.team?'<img class="av mav" src="icon-192.png" alt="" style="padding:0;object-fit:cover">':'<span class="av mav" style="color:'+col+'">'+e(ini(m.a))+'</span>'))
       +'<div class="col"><div class="bub" data-mid="'+e(m.id)+'">'+(!me&&!cont?'<div class="who" style="color:'+col+'">'+e(m.team?LOUNGE:m.a)+(m.team?' <span class="lteam">LOUNGE</span>':'')+(ld?'<span class="ld" style="background:'+ld+'" title="'+e(y.l)+'"></span>':'')+'</div>':'')
       +(c.id==='news'&&m.team&&m.nw?nwChatKopf(m):'')+reH(m,ix)+((m.imgOk||okImg(m.img))?'<img class="cimg" data-img="'+e(m.id)+'" src="'+m.img+'" alt="Bild">':(m.lz?sbImgWait(m):''))+(c.id==='news'&&m.team&&m.nw&&m.nw.tit?'<span class="tx"><b>'+e(m.nw.tit)+'</b>'+(m.nw.tx?'\n'+linkify(m.nw.tx):'')+'</span>':m.t?'<span class="tx">'+linkify(m.t)+'</span>':'')+ytCard(m.t)+(c.id==='news'&&m.team&&m.nw?nwChatFuss(m):'')+'<span class="tm">'+hm(m.ts)+'</span></div>'+(rxh?'<div class="rxs">'+rxh+'</div>':'')+'</div></div>';
@@ -2320,6 +2325,21 @@ function bindRTForm(root,done){var f=root.querySelector('#fRT');if(!f)return;f.o
   if(rt.d<nowIso()||(rt.d===nowIso()&&rt.t<=hm0)){dialog('Zeit prüfen','<p class="note">Diese Zeit ist schon vorbei. Bitte einen Tag ab heute wählen.</p>',[{t:'OK',cls:'pri'}]);return;}   // Prüfung 4 (VERIF3 N8)
   chatPost('club',{kind:'rt',rt:rt,a:LOUNGE,k:'',team:true,t:'Race Time '+rtLabel(rt)}).then(function(ok){if(ok===false)return;if(done)done();else dialog('Race Time ausgeschrieben','<p class="note">Alle Club-Mitglieder bekommen jetzt eine Mitteilung'+(CHAT.mode==='sb'?' in der App und aufs Handy (wer die Mitteilungen eingeschaltet hat)':'')+'. Wer «Ich komme» tippt, erscheint hier und im Club-Chat.</p>',[{t:'Super',cls:'pri'}]);});};}
 function sheet(html,binder){var d=$('#dlg');if($('#fMail')||$('#fCode')||$('.login.who'))lgGuard();d.innerHTML='<div class="box" role="dialog" aria-modal="true">'+html+'</div>';d.hidden=false;d.onclick=function(ev){if(ev.target===d)d.hidden=true;};if(binder)binder(d);}
+// Wer hat reagiert (Roger 16.11.2026, wie WhatsApp): oben «Alle n» und je Emoji, darunter die Namen; die eigene Reaktion zuoberst («Du – antippen zum Entfernen»)
+function rxName(k){var p=person(k),y=p?null:yr(k);return (p&&p.n)||(y&&y.n)||'Fahrer';}
+function rxSheet(mid,sel){var rx=CHAT.rx[mid]||{},em=EMO.filter(function(x){return (rx[x[0]]||[]).length;});
+  if(!em.length){$('#dlg').hidden=true;return;}
+  if(sel&&!(rx[sel]||[]).length)sel='';
+  var all=[];em.forEach(function(x){rx[x[0]].forEach(function(k){all.push({k:k,e:x[0],c:x[1]});});});
+  var mein=function(k){return k===U&&!LGM;};
+  var list=all.filter(function(r){return !sel||r.e===sel;}).sort(function(a,b){return (mein(b.k)?1:0)-(mein(a.k)?1:0)||rxName(a.k).localeCompare(rxName(b.k),'de');});
+  var tabs='<div class="chips rxtabs"><button type="button" class="chip'+(sel?'':' on')+'" data-rxt="">Alle '+all.length+'</button>'+em.map(function(x){return '<button type="button" class="chip'+(sel===x[0]?' on':'')+'" data-rxt="'+x[0]+'">'+x[1]+' '+rx[x[0]].length+'</button>';}).join('')+'</div>';
+  var rows=list.map(function(r){var me=mein(r.k),n=rxName(r.k);return (me?'<button type="button" class="li rxli" data-rxw="'+r.e+'">':'<div class="li rxli">')
+    +'<span class="av" style="color:'+(me?'var(--blue)':ncol(r.k))+'">'+e(ini(n))+'</span><span class="grow" style="min-width:0"><span class="t" style="display:block">'+(me?'Du':e(n))+'</span>'+(me?'<span class="s">Antippen zum Entfernen</span>':'')+'</span><span class="rxe">'+r.c+'</span>'+(me?'</button>':'</div>');}).join('');
+  sheet('<b class="rxh">Reaktionen</b>'+tabs+'<div class="list rxlist">'+rows+'</div><div class="list"><button type="button" class="li" data-rxx="1"><span class="grow t">Schliessen</span></button></div>',function(d){
+    d.querySelectorAll('[data-rxt]').forEach(function(b){b.onclick=function(){rxSheet(mid,b.getAttribute('data-rxt'));};});
+    d.querySelectorAll('[data-rxw]').forEach(function(b){b.onclick=function(){rxToggle(mid,b.getAttribute('data-rxw'));rxSheet(mid,sel);};});
+    d.querySelector('[data-rxx]').onclick=function(){d.hidden=true;};});}
 function msgActions(ch,id){var m=CHAT.msgs[ch].filter(function(x){return x.id===id;})[0];if(!m||!U)return;var rx=CHAT.rx[id]||{},mine=isMine(m),cw=canWrite(chOf(ch));
   var eb=function(x){return '<button type="button" data-se="'+x[0]+'" class="'+((rx[x[0]]||[]).indexOf(U)>=0?'mine':'')+'" aria-label="Reaktion '+x[1]+'">'+x[1]+'</button>';};
   var more=EMO.slice(EMO_NQ).some(function(x){return (rx[x[0]]||[]).indexOf(U)>=0;});
@@ -2340,7 +2360,7 @@ function bindMsgs(){var ch=curChId();bindPins(ch);
   app.querySelectorAll('#msgs .bub [data-go]').forEach(function(x){x.onclick=function(ev){ev.preventDefault();ev.stopPropagation();go(x.getAttribute('data-go'));};});
   app.querySelectorAll('#msgs .bub [data-ctheke]').forEach(function(x){x.onclick=function(ev){ev.preventDefault();ev.stopPropagation();thekeZeigen(x.getAttribute('data-ctheke'));};});   // Theke direkt aus dem Chat (Prüfer 11.11., 2. Runde)   // News-Knopf in der Blase (Prüfer 11.11.)
   app.querySelectorAll('#msgs [data-mid]').forEach(function(b){b.onclick=function(){msgActions(ch,b.getAttribute('data-mid'));};b.oncontextmenu=function(ev){ev.preventDefault();msgActions(ch,b.getAttribute('data-mid'));};});
-  app.querySelectorAll('[data-rx]').forEach(function(b){b.onclick=function(ev){ev.stopPropagation();var q=b.getAttribute('data-rx').split('|');rxToggle(q[0],q[1]);};});
+  app.querySelectorAll('[data-rx]').forEach(function(b){b.onclick=function(ev){ev.stopPropagation();var q=b.getAttribute('data-rx').split('|');rxSheet(q[0],q[1]);};});   // Roger 16.11.2026: wie WhatsApp – Antippen zeigt, wer reagiert hat
   app.querySelectorAll('[data-rtgo]').forEach(function(b){b.onclick=function(ev){ev.stopPropagation();rtToggle(b.getAttribute('data-rtgo'));};});
   app.querySelectorAll('[data-go]').forEach(function(x){if(!x.onclick)x.onclick=function(ev){ev.preventDefault();go(x.getAttribute('data-go'));};});}
 function takeReply(c,o){if(!(st.reply&&st.reply.ch===c.id))return false;o.re=st.reply.re;st.reply=null;return true;}
