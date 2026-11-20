@@ -640,30 +640,61 @@ var IC={
 // ---------------------------------------------------------------- Inhalte (Termine, News) – Beispiele aus echten Infos
 function nextTuesdays(n){var out=[],d=pd(TODAY);while(d.getUTCDay()!==2)d=new Date(d.getTime()+864e5);for(var i=0;i<n;i++){out.push(d.toISOString().slice(0,10));d=new Date(d.getTime()+7*864e5);}return out;}
 var EVENTS=[];
-// Veranstaltungskalender – übernommen von simracing-events.ch/veranstaltungen (Stand 26.10.2026). Später liest das TimeTool ihn selbst.
+// Veranstaltungskalender: kommt seit 20.11.2026 aus dem TimeTool (D.kal = Rennkalender der Homepage + eigene Termine, siehe buildEvents).
+// Diese eingebaute Liste gilt nur ohne TimeTool-Daten (z.B. Vorschau ohne Anmeldung) – Stand Homepage simracing-events.ch/events vom 20.11.2026.
 var CAL=[
  ['2026-10-24','10:00','15:00','One Lap Contest','Prologue · 21 geheime Kombinationen','one-lap-contest/'],
  ['2026-10-27','17:00','22:00','AfterWork','Eastern Creek · Clio Cup 4','veranstaltungen-afterwork-racing/'],
  ['2026-11-03','17:00','22:00','AfterWork','Bahrain · GT3 Cars','veranstaltungen-afterwork-racing/'],
  ['2026-11-04','17:30','21:30','Race100','Bahrain · GT3 Cars','race100/'],
  ['2026-11-10','17:00','22:00','AfterWork','Interlagos · Formel 1','veranstaltungen-afterwork-racing/'],
- ['2026-11-17','17:00','22:00','AfterWork','Red Bull Ring · Dodge Charger','veranstaltungen-afterwork-racing/'],
- ['2026-11-24','17:00','22:00','AfterWork','Imola · Audi RS5 DTM Class1','veranstaltungen-afterwork-racing/'],
- ['2026-12-01','17:00','22:00','AfterWork','Oulton Park · Subaru Levorg BTCC','veranstaltungen-afterwork-racing/'],
- ['2026-12-08','17:00','22:00','AfterWork','Brno · Ford GT40 GTE','veranstaltungen-afterwork-racing/'],
- ['2026-12-15','17:00','22:00','AfterWork','Anneau du Rhin · Lotus Emira GT4','veranstaltungen-afterwork-racing/'],
- ['2026-12-22','17:00','22:00','AfterWork','Watkins Glen · LMP2 Ligier','veranstaltungen-afterwork-racing/'],
- ['2027-01-14','17:00','21:00','4h NOS','Trainingsabend · Nordschleife','4h-nordschleife/'],   // Roger 30.10.2026
- ['2027-01-20','17:00','21:00','4h NOS','Trainingsabend · Nordschleife','4h-nordschleife/'],   // Roger 30.10.2026
- ['2027-01-23','10:00','16:00','4h NOS','Nordschleife · GT3 Cars','4h-nordschleife/'],
- ['2027-02-17','17:30','21:30','Race100','Bathurst · GT3 Cars','race100/'],
- ['2027-03-17','17:30','21:30','Race100','Silverstone · GT3 Cars','race100/'],
- ['2027-04-21','17:30','21:30','Race100','Red Bull Ring · GT3 Cars','race100/'],
- ['2027-05-19','17:30','21:30','Race100','Mugello · GT3 Cars','race100/'],
- ['2027-06-16','17:30','21:30','Race100','Spa · GT3 Cars','race100/'],
- ['2027-09-08','17:30','21:30','Race100','Nürburgring GP · GT3 Cars','race100/'],
- ['2027-10-06','17:30','21:30','Race100','Hockenheimring · GT3 Cars','race100/'],
- ['2027-11-03','17:30','21:30','Race100','Watkins Glen · GT3 Cars','race100/']];
+ ['2026-11-17','17:00','22:00','AfterWork','Red Bull Ring · Dodge Charger','veranstaltungen-afterwork-racing/'],   // vergangene Termine (alter Stand 26.10.2026) – nur für Tests mit früheren Daten
+ ['2026-11-24','17:00','22:00','AfterWork','Imola · Audi RS5 DTM Class1','events/afterwork-racing-2026-11-24/'],
+ ['2026-12-01','17:00','22:00','AfterWork','Olton Park · Subaru Levroc BTCC','events/afterwork-racing-2026-12-01/'],
+ ['2026-12-08','17:00','22:00','AfterWork','Brno · Ford GT40 GTE','events/afterwork-racing-2026-12-08/'],
+ ['2026-12-15','17:00','22:00','AfterWork','Anneau du Rhin · Lotus Emira GT4','events/afterwork-racing-2026-12-15/'],
+ ['2026-12-22','17:00','22:00','AfterWork','Watkins Glen · LMP2 Ligier','events/afterwork-racing-2026-12-22/'],
+ ['2027-01-05','17:00','22:00','AfterWork','','events/afterwork-racing-2027-01-05/'],
+ ['2027-01-12','17:00','22:00','AfterWork','','events/afterwork-racing-2027-01-12/'],
+ ['2027-01-14','17:00','21:00','4h NOS','Trainingsabend · Nordschleife','events/4h-nos-2027-01-23/'],   // Roger 30.10.2026
+ ['2027-01-19','17:00','22:00','AfterWork','','events/afterwork-racing-2027-01-19/'],
+ ['2027-01-20','17:00','21:00','4h NOS','Trainingsabend · Nordschleife','events/4h-nos-2027-01-23/'],   // Roger 30.10.2026
+ ['2027-01-23','10:00','16:00','4h NOS','Nürburgring Nordschleife · GT3-Klasse (Änderungen vorbehalten)','events/4h-nos-2027-01-23/'],
+ ['2027-01-26','17:00','22:00','AfterWork','','events/afterwork-racing-2027-01-26/'],
+ ['2027-02-02','17:00','22:00','AfterWork','','events/afterwork-racing-2027-02-02/'],
+ ['2027-02-09','17:00','22:00','AfterWork','','events/afterwork-racing-2027-02-09/'],
+ ['2027-02-16','17:00','22:00','AfterWork','','events/afterwork-racing-2027-02-16/'],
+ ['2027-02-17','17:30','21:30','Race100','Bathurst · GT3-Klasse','events/race100-bathurst-2027-02-17/'],
+ ['2027-02-23','17:00','22:00','AfterWork','','events/afterwork-racing-2027-02-23/'],
+ ['2027-03-02','17:00','22:00','AfterWork','','events/afterwork-racing-2027-03-02/'],
+ ['2027-03-09','17:00','22:00','AfterWork','','events/afterwork-racing-2027-03-09/'],
+ ['2027-03-16','17:00','22:00','AfterWork','','events/afterwork-racing-2027-03-16/'],
+ ['2027-03-17','17:30','21:30','Race100','Silverstone · GT3-Klasse','events/race100-silverstone-2027-03-17/'],
+ ['2027-03-23','17:00','22:00','AfterWork','','events/afterwork-racing-2027-03-23/'],
+ ['2027-03-30','17:00','22:00','AfterWork','','events/afterwork-racing-2027-03-30/'],
+ ['2027-04-06','17:00','22:00','AfterWork','','events/afterwork-racing-2027-04-06/'],
+ ['2027-04-13','17:00','22:00','AfterWork','','events/afterwork-racing-2027-04-13/'],
+ ['2027-04-20','17:00','22:00','AfterWork','','events/afterwork-racing-2027-04-20/'],
+ ['2027-04-21','17:30','21:30','Race100','Red Bull Ring · GT3-Klasse','events/race100-red-bull-ring-2027-04-21/'],
+ ['2027-04-27','17:00','22:00','AfterWork','','events/afterwork-racing-2027-04-27/'],
+ ['2027-05-04','17:00','22:00','AfterWork','','events/afterwork-racing-2027-05-04/'],
+ ['2027-05-11','17:00','22:00','AfterWork','','events/afterwork-racing-2027-05-11/'],
+ ['2027-05-18','17:00','22:00','AfterWork','','events/afterwork-racing-2027-05-18/'],
+ ['2027-05-19','17:30','21:30','Race100','Mugello · GT3-Klasse','events/race100-mugello-2027-05-19/'],
+ ['2027-05-25','17:00','22:00','AfterWork','','events/afterwork-racing-2027-05-25/'],
+ ['2027-06-01','17:00','22:00','AfterWork','','events/afterwork-racing-2027-06-01/'],
+ ['2027-06-08','17:00','22:00','AfterWork','','events/afterwork-racing-2027-06-08/'],
+ ['2027-06-15','17:00','22:00','AfterWork','','events/afterwork-racing-2027-06-15/'],
+ ['2027-06-16','17:30','21:30','Race100','Spa · GT3-Klasse','events/race100-spa-2027-06-16/'],
+ ['2027-06-22','17:00','22:00','AfterWork','','events/afterwork-racing-2027-06-22/'],
+ ['2027-06-29','17:00','22:00','AfterWork','','events/afterwork-racing-2027-06-29/'],
+ ['2027-07-06','17:00','22:00','AfterWork','','events/afterwork-racing-2027-07-06/'],
+ ['2027-07-13','17:00','22:00','AfterWork','','events/afterwork-racing-2027-07-13/'],
+ ['2027-07-20','17:00','22:00','AfterWork','','events/afterwork-racing-2027-07-20/'],
+ ['2027-07-27','17:00','22:00','AfterWork','','events/afterwork-racing-2027-07-27/'],
+ ['2027-09-08','17:30','21:30','Race100','Nürburgring GP · GT3-Klasse','events/race100-nuerburgring-gp-2027-09-08/'],
+ ['2027-10-06','17:30','21:30','Race100','Hockenheimring · GT3-Klasse','events/race100-hockenheimring-2027-10-06/'],
+ ['2027-11-03','17:30','21:30','Race100','Watkins Glen · GT3-Klasse','events/race100-watkins-glen-2027-11-03/']];
 var CLUBCAL=[   // [Datum, Zeit, -, Titel, Untertitel, Ort, Text]
  ['2026-09-16','17:00–21:00','','Testtag Club','Club-Programm 2026/27'],
  ['2026-10-14','18:00–22:00','','Clubrennen I','Club-Meisterschaft 2026/27','','Erster Renntag der Club-Meisterschaft.'],
@@ -680,13 +711,28 @@ var CLUBCAL=[   // [Datum, Zeit, -, Titel, Untertitel, Ort, Text]
  ['2027-06-02','11:00–16:00','','Clubrennen VI','Club-Meisterschaft 2026/27'],
  ['2027-07-17','13:00–ca. 22:00','','Clubrennen – Final + Jahresgrill','Final der Club-Meisterschaft 2026/27','','Zuerst das Final-Rennen, anschliessend der Jahresgrill 2026/2027.']];
 var KTXT={'AfterWork':'Jeden Dienstag. Ein Slot dauert ca. 25 Minuten: zuerst Hotlapping, danach ein 3-Runden-Rennen. Jede gültige Runde zählt, auch die im Rennen – deine schnellste Runde des Abends ergibt deine Lizenz-Stufe. CHF 29 pro Slot, mit AfterWork- oder Club-Pass so viel du willst. Anmelden ist freiwillig – du kannst auch einfach vorbeikommen.','Race100':'Der strukturierte Renntag mit GT3-Autos.','4h NOS':'Vier Stunden Langstrecke auf der Nordschleife – im Team.','One Lap Contest':'Eine Runde zählt.'};
-function buildEvents(){var t=nowIso();
+// Roger 20.11.2026 («nur die Homepage pflegen»): Termine aus dem TimeTool (D.kal: Rennkalender der Homepage + eigene Termine, wie unter
+// AfterWork → Kalender). Club-Termine nehmen Ort und Zusatztext aus dem Club-Programm (CLUBCAL), wenn das Datum passt.
+var KTXT2={'Camp':'SimRacing-Camp für Jugendliche. Infos für Teilnehmer und Eltern im Kanal «Jugendcamp».'};
+function kalUrl(u){u=String(u||'');return /^https:\/\/[^\s"'<>\\]+$/.test(u)?u:'';}
+function kalEv(x){var k=String(x.k||'Event'),d=/^\d{4}-\d{2}-\d{2}$/.test(x.d||'')?x.d:'',aw=k==='AfterWork',club=k==='Club',cc=club&&d?CLUBCAL.filter(function(c){return c[0]===d;})[0]:null,sn=/season\s*night/i.test(x.t||'');
+  var f=/^\d{2}:\d{2}$/.test(x.f||'')?x.f:'',b=/^\d{2}:\d{2}$/.test(x.b||'')?x.b:'';
+  return {id:aw?'aw-'+d+'-afterwork':(club?'club-':'ev-')+(d||'x')+'-'+nk(x.t),date:d,kind:k,title:aw?'AfterWork Race':String(x.t||''),
+    what:String(x.w||'').replace(/\s+[–—-]\s+/g,' · ')||(aw?'Strecke und Auto folgen':club?'Club-Programm':''),time:f&&b?f+'–'+b:f?'ab '+f:(cc&&cc[1])||'Zeit folgt',place:(cc&&cc[5])||'APlus SimRacing Lounge, Hinwil',
+    text:String(x.x||'')||(club?(cc&&cc[6]?cc[6]+' ':'')+'Anlass des A Plus SimRacing Club – für Club-Mitglieder.':sn?'Übergabe der Lizenz-Awards. Dabei sind alle mit mindestens 10 AfterWorks in der Saison.':KTXT[k]||KTXT2[k]||''),
+    url:kalUrl(x.u),aw:aw};}
+function kalOk(){return !!(D&&Array.isArray(D.kal));}   // Prüfer 20.11.2026: auch leer = die Termine kommen vom TimeTool (dann eben keine)
+function awDates(){return kalOk()?D.kal.filter(function(x){return x.k==='AfterWork'&&/^\d{4}-\d{2}-\d{2}$/.test(x.d||'');}).map(function(x){return x.d;}):CAL.filter(function(x){return x[3]==='AfterWork';}).map(function(x){return x[0];});}
+function buildEvents(){var t=nowIso();EVENTS.length=0;
+  if(kalOk()){var seen={};D.kal.forEach(function(x){if(!x||!x.t)return;var ev=kalEv(x),id=ev.id,n=1;while(seen[id])id=ev.id+'-'+(++n);seen[id]=1;ev.id=id;EVENTS.push(ev);});}   // Prüfer 20.11.2026: «Firmencup 1» / «Firmencup 2» am selben Tag bleiben beide
+  else{
   CAL.forEach(function(c){var aw=c[3]==='AfterWork';EVENTS.push({id:(aw?'aw-':'ev-')+c[0]+'-'+nk(c[3]),date:c[0],kind:c[3],title:aw?'AfterWork Race':c[3],what:c[4],time:c[1]+'–'+c[2],place:'APlus SimRacing Lounge, Hinwil',text:KTXT[c[3]]||'',url:'https://www.simracing-events.ch/'+c[5],aw:aw});});
   EVENTS.push({id:'gala',date:'2027-01-16',kind:'Highlight',title:'AfterWork Season Night',what:'Übergabe der Lizenz-Awards 2026',time:'ab 16:00',place:'APlus SimRacing Lounge, Hinwil',text:'Die Season Night zur Saison 2026: Übergabe der Lizenz-Awards. Dabei sind alle mit mindestens 10 AfterWorks in diesem Jahr.'});
   EVENTS.push({id:'jugendcamp-2027',date:'2027-07-19',kind:'Camp',title:'Jugendcamp 2027',what:'5 Tage SimRacing für Jugendliche',time:'Mo–Fr 19.–23.07.2027 · täglich 09:00–16:00',place:'APlus SimRacing Lounge, Hinwil',text:'Das Jugendcamp der Lounge: fünf Tage SimRacing vom 19. bis 23. Juli 2027, jeweils von 9 bis 16 Uhr. Infos für Teilnehmer und Eltern im Kanal «Jugendcamp».'});   // Roger 30.10.2026
   // Firmencup 2027: bewusst NICHT in der App (Roger 30.10.2026: geladene Gäste, passt nicht zur Community)
   // Clubprogramm Saison 2026/27 (Roger 30.10.2026) – öffentlich für alle sichtbar; Vergangenes fällt automatisch weg
   CLUBCAL.forEach(function(c){EVENTS.push({id:'club-'+c[0]+'-'+nk(c[3]),date:c[0],kind:'Club',title:c[3],what:c[4]||'Club-Programm 2026/27',time:c[1]||'Zeit folgt',place:c[5]||'APlus SimRacing Lounge, Hinwil',text:(c[6]?c[6]+' ':'')+'Anlass des A Plus SimRacing Club – für Club-Mitglieder.'});});
+  }
   var keep=EVENTS.filter(function(x){return !x.date||x.date>=t;});EVENTS.length=0;keep.sort(function(a,b){return (a.date||'9999').localeCompare(b.date||'9999');}).forEach(function(x){EVENTS.push(x);});}
 function nextAW(){for(var i=0;i<EVENTS.length;i++)if(EVENTS[i].aw&&!evVorbei(EVENTS[i]))return EVENTS[i];return null;}
 // Roger 03.11.2026: Termin von heute ist vorbei, sobald das AfterWork im TimeTool abgeschlossen ist – spätestens 15 Min. nach dem Ende (z.B. 22:15)
@@ -723,8 +769,8 @@ function awState(k){
     pct=Math.max(0.04,Math.min(1,(avg-lo)/(t-lo)));}
   return {y:y,avg:y.avg!=null?y.avg:avg,lic:cur,n:y.c,need:need,goal:goal,pct:pct,left:leftTuesdays(),award:y.c>=10,status:y.c>=4};
 }
-function leftTuesdays(){var y=TODAY.slice(0,4),all=CAL.filter(function(x){return x[3]==='AfterWork'&&x[0].slice(0,4)===y;});
-  if(all.length)return all.filter(function(x){return x[0]>TODAY||(x[0]===TODAY&&!D.aw.evenings.some(function(v){return v.d===TODAY&&v.n>0;}));}).length;   // Prüfung 31.10.2026: heutiger Abend mit Resultat zählt nicht mehr   // Roger 30.10.2026: echte AfterWork-Termine aus dem Kalender zählen (nicht jeden Dienstag)
+function leftTuesdays(){var y=TODAY.slice(0,4),all=awDates().filter(function(d){return d.slice(0,4)===y;});   // Roger 20.11.2026: AfterWork-Termine aus dem TimeTool
+  if(all.length||(kalOk()&&D.aw&&(D.aw.evenings||[]).some(function(v){return String(v.d).slice(0,4)===y;})))return all.filter(function(x){return x>TODAY||(x===TODAY&&!D.aw.evenings.some(function(v){return v.d===TODAY&&v.n>0;}));}).length;   // Prüfung 31.10.2026: heutiger Abend mit Resultat zählt nicht mehr   // Roger 30.10.2026: echte AfterWork-Termine aus dem Kalender zählen (nicht jeden Dienstag)
   var d=pd(TODAY),n=0,end=pd(TODAY.slice(0,4)+'-12-31');while(d<=end){if(d.getUTCDay()===2)n++;d=new Date(d.getTime()+864e5);}return n;}
 function person(k){return D&&D.people[k]||null;}
 function isClub(k){var p=person(k);if(p&&p.club)return true;return ((D.club&&D.club.entries)||[]).some(function(x){return entKeys(x).indexOf(k)>=0;});}
@@ -1635,13 +1681,13 @@ function trDetail(key,k){trAll();var me=TREV[k]||[];
 function listBox(h,n){return h?'<div class="list trlist" style="margin-top:10px">'+h+'</div>':'';}
 // Dauerbrenner: aktuelle Serie mit Balken, seit wann bzw. wann unterbrochen, längste Serie (Roger 02.11.2026)
 function trStreakBox(r){var si=r.si||{},n=r.now||0,nx=r.nx,ev=awAllEv().filter(function(x){return x.rows&&x.rows.length&&x.d<=TODAY;}),done={},heute=(TREV[U]||[]).some(function(m){return m.d===TODAY;});ev.forEach(function(x){if(x.d<TODAY||heute)done[x.d]=1;});
-  var miss=si.last?ev.filter(function(x){return x.d>si.last&&x.d!==TODAY;}):[],nxt=CAL.filter(function(c){return c[3]==='AfterWork'&&c[0]>=TODAY&&!done[c[0]];})[0];   // Prüfung 03.11.2026: heutiger Abend zählt erst als verpasst, wenn er vorbei ist
+  var miss=si.last?ev.filter(function(x){return x.d>si.last&&x.d!==TODAY;}):[],nxt=awDates().filter(function(d){return d>=TODAY&&!done[d];})[0];   // Roger 20.11.2026: AfterWork-Termine aus dem TimeTool   // Prüfung 03.11.2026: heutiger Abend zählt erst als verpasst, wenn er vorbei ist
   var ml=function(x){return dmy(x.d)+(x.label?' ('+e(x.label)+')':'');};
   var h='<div class="trsb'+(n?'':' brk')+'"><div class="trsbh"><small>Aktuelle Serie</small><b class="num">'+n+(nx?' <span>von '+nx+'</span>':'')+'</b></div>';
   if(nx)h+='<div class="trsbd" role="img" aria-label="'+n+' von '+nx+'">'+Array.apply(null,Array(nx)).map(function(z,i){return '<i class="'+(i<n?'on':'')+'"></i>';}).join('')+'</div>';
   if(n)h+='<p>Läuft seit <b>'+dmy(si.cs)+'</b> – '+n+' AfterWork'+(n===1?'':'s')+' hintereinander.'+(nx?' Noch <b class="num">'+(nx-n)+'</b> bis '+TRT[r.L]+'.':'')+'</p>';
-  else if(miss.length)h+='<p><b class="trsbx">Unterbrochen</b> am '+ml(miss[0])+'.'+(miss.length>1?' Seither verpasst: '+(miss.length<=3?miss.slice(1).map(ml).join(', '):(miss.length-1)+' AfterWorks')+'.':'')+' Zuletzt dabei: '+dmy(si.last)+'.</p><p>Deine neue Serie startet am nächsten AfterWork'+(nxt?' ('+dmy(nxt[0])+')':'')+(nx?' – für '+TRT[r.L]+' brauchst du <b class="num">'+nx+'</b> hintereinander':'')+'.</p>';
-  else h+='<p>Deine Serie startet mit deinem nächsten AfterWork'+(nxt?' ('+dmy(nxt[0])+')':'')+'.</p>';
+  else if(miss.length)h+='<p><b class="trsbx">Unterbrochen</b> am '+ml(miss[0])+'.'+(miss.length>1?' Seither verpasst: '+(miss.length<=3?miss.slice(1).map(ml).join(', '):(miss.length-1)+' AfterWorks')+'.':'')+' Zuletzt dabei: '+dmy(si.last)+'.</p><p>Deine neue Serie startet am nächsten AfterWork'+(nxt?' ('+dmy(nxt)+')':'')+(nx?' – für '+TRT[r.L]+' brauchst du <b class="num">'+nx+'</b> hintereinander':'')+'.</p>';
+  else h+='<p>Deine Serie startet mit deinem nächsten AfterWork'+(nxt?' ('+dmy(nxt)+')':'')+'.</p>';
   h+='</div>';
   if(r.v)h+='<div class="trsl">Deine längste Serie: <b class="num">'+r.v+'</b> AfterWork'+(r.v===1?'':'s')+' hintereinander'+(si.bs?' ('+dmy(si.bs)+(si.be!==si.bs?' – '+dmy(si.be):'')+')':'')+(n&&si.be===si.last?' – das ist deine aktuelle Serie':'')+'.</div>';
   return h;}
@@ -2734,7 +2780,7 @@ function start(){
   if(REAL&&U)pfBald();   // z.B. nach «Anderen Fahrer wählen» (beim Start: wartet ohnehin auf den Abgleich)
 }
 buildEvents();
-function prepData(j){if(j.names){j.combos.forEach(function(c){c.top=c.top.map(function(r){var N=j.names[r[0]];return [N[0],r[1],r[2],r[3],r[4],r[5],N[1]];});});}buildIdx(j);D=j;(D.aw.year||[]).forEach(function(r){r.nw=0;});(D.aw.evenings||[]).concat(Array.isArray(D.aw.past)?D.aw.past:[]).forEach(function(v){(v.rows||[]).forEach(function(r){r.nw='';});});   // Roger 31.10.2026: «nicht gewertet» nur im TimeTool, in der App nirgends sichtbar
+function prepData(j){if(j.names){j.combos.forEach(function(c){c.top=c.top.map(function(r){var N=j.names[r[0]];return [N[0],r[1],r[2],r[3],r[4],r[5],N[1]];});});}buildIdx(j);D=j;try{buildEvents();}catch(err){}(D.aw.year||[]).forEach(function(r){r.nw=0;});(D.aw.evenings||[]).concat(Array.isArray(D.aw.past)?D.aw.past:[]).forEach(function(v){(v.rows||[]).forEach(function(r){r.nw='';});});   // Roger 31.10.2026: «nicht gewertet» nur im TimeTool, in der App nirgends sichtbar
 ANON=!!(j.meta&&j.meta.anon);}
 function loadErr(err,title,txt){app.innerHTML='<div class="login"><div class="hero"><img src="logo.png" alt=""><h2>A Plus SimRacing Lounge</h2></div><div class="card" style="display:flex;flex-direction:column;gap:10px"><b>'+e(title||'Die Daten konnten nicht geladen werden.')+'</b><p class="note" style="margin:0">'+e(txt||'Prüfe deine Internetverbindung und tippe auf «Nochmals versuchen».')+(err&&err.message?' ('+e(String(err.message).slice(0,80))+')':'')+'</p><button class="btn pri" id="bReload">Nochmals versuchen</button>'+(REAL&&SB?'<button class="btn" id="bLout">Abmelden</button>':'')+'</div></div>';var r=$('#bReload');if(r)r.onclick=function(){location.reload();};var lo=$('#bLout');if(lo)lo.onclick=realLogout;}
 function realErr(err,what){var m=String((err&&(err.message||err.msg||err.error_description))||err||''),st=+(err&&err.status)||0,code=String((err&&err.code)||''),nm=String((err&&err.name)||''),sec=/(\d+)\s*sec/i.exec(m);
